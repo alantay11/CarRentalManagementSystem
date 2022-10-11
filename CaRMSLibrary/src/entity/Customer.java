@@ -21,21 +21,23 @@ public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long customerId;
+    
+    
 
     public Long getId() {
-        return id;
+        return customerId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.customerId = id;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
-        return hash;
+        hash += (customerId != null ? customerId.hashCode() : 0);
+        return hash; 
     }
 
     @Override
@@ -45,7 +47,7 @@ public class Customer implements Serializable {
             return false;
         }
         Customer other = (Customer) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.customerId == null && other.customerId != null) || (this.customerId != null && !this.customerId.equals(other.customerId))) {
             return false;
         }
         return true;
@@ -53,7 +55,7 @@ public class Customer implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Customer[ id=" + id + " ]";
+        return "entity.Customer[ id=" + customerId + " ]";
     }
     
 }
