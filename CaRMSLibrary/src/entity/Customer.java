@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,8 +23,27 @@ public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
-    
-    
+
+    @Column(nullable = false, length = 32)
+    private String firstName;
+    @Column(nullable = false, length = 32)
+    private String lastName;
+    @Column(nullable = false, length = 32)
+    private String email;
+    @Column(nullable = false, length = 32)
+    private String contactNumber;
+    @Column(nullable = false, length = 32)
+    private String addressLine1;
+    @Column(nullable = false, length = 32)
+    private String addressLine2;
+    @Column(nullable = false, length = 32)
+    private String postalCode;
+    @Column(nullable = false, length = 32)
+    private String username;
+    @Column(nullable = false, length = 32)
+    private String password;
+    @Column(length = 16)
+    private CreditCard creditCard;
 
     public Long getId() {
         return customerId;
@@ -37,7 +57,7 @@ public class Customer implements Serializable {
     public int hashCode() {
         int hash = 0;
         hash += (customerId != null ? customerId.hashCode() : 0);
-        return hash; 
+        return hash;
     }
 
     @Override
@@ -57,5 +77,5 @@ public class Customer implements Serializable {
     public String toString() {
         return "entity.Customer[ id=" + customerId + " ]";
     }
-    
+
 }
