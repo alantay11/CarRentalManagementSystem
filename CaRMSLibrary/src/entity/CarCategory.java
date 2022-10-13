@@ -35,7 +35,7 @@ public abstract class CarCategory implements Serializable {
     private List<Car> carList;
     
     @OneToOne
-    private RentalRateRecord rentalRateRecord;
+    private RentalRate rentalRateRecord;
 
     public CarCategory() {
     }
@@ -49,7 +49,7 @@ public abstract class CarCategory implements Serializable {
         this.carList = carList;
     }
 
-    public CarCategory(String carCategoryName, List<Car> carList, RentalRateRecord rentalRateRecord) {
+    public CarCategory(String carCategoryName, List<Car> carList, RentalRate rentalRateRecord) {
         this.carCategoryName = carCategoryName;
         this.carList = carList;
         this.rentalRateRecord = rentalRateRecord;
@@ -71,11 +71,11 @@ public abstract class CarCategory implements Serializable {
         this.carList = carList;
     }
 
-    public RentalRateRecord getRentalRateRecord() {
+    public RentalRate getRentalRateRecord() {
         return rentalRateRecord;
     }
 
-    public void setRentalRateRecord(RentalRateRecord rentalRateRecord) {
+    public void setRentalRateRecord(RentalRate rentalRateRecord) {
         this.rentalRateRecord = rentalRateRecord;
     }
     

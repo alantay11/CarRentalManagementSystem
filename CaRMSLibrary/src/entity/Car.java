@@ -39,7 +39,7 @@ public class Car implements Serializable {
     @Column(nullable = false, length = 32)
     private Reservation rentalAvail;
     @Column(nullable = false, length = 32)
-    private RentalRateRecord rentalRateRecord;
+    private RentalRate rentalRateRecord;
     
     @Column(nullable = false, length = 32)
     private Outlet outlet;
@@ -47,7 +47,7 @@ public class Car implements Serializable {
     public Car() {
     }
 
-    public Car(CarCategory category, String make, String model, String color, Reservation rentalAvail, RentalRateRecord rentalRateRecord, Outlet outlet) {
+    public Car(CarCategory category, String make, String model, String color, Reservation rentalAvail, RentalRate rentalRateRecord, Outlet outlet) {
         this.category = category;
         this.make = make;
         this.model = model;
@@ -105,11 +105,11 @@ public class Car implements Serializable {
         this.rentalAvail = rentalAvail;
     }
 
-    public RentalRateRecord getRentalRateRecord() {
+    public RentalRate getRentalRateRecord() {
         return rentalRateRecord;
     }
 
-    public void setRentalRateRecord(RentalRateRecord rentalRateRecord) {
+    public void setRentalRateRecord(RentalRate rentalRateRecord) {
         this.rentalRateRecord = rentalRateRecord;
     }
 

@@ -58,7 +58,7 @@ public class MainApp {
         
         if(username.length() > 0 && password.length() > 0)
         {
-            //currentStaffEntity = staffEntitySessionBeanRemote.staffLogin(username, password);      
+            //currentEmployee = employeeSessionBeanRemote.employeeLogin(username, password);      
         }
         else
         {

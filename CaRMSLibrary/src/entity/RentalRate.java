@@ -20,7 +20,7 @@ import javax.persistence.OneToOne;
  * @author Uni
  */
 @Entity
-public class RentalRateRecord implements Serializable {
+public class RentalRate implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -40,10 +40,10 @@ public class RentalRateRecord implements Serializable {
     @OneToOne
     private CarCategory carCategory;
 
-    public RentalRateRecord() {
+    public RentalRate() {
     }
 
-    public RentalRateRecord(String rateName, BigDecimal ratePerDay, LocalDateTime startDateTime, LocalDateTime endDateTime, CarCategory carCategory) {
+    public RentalRate(String rateName, BigDecimal ratePerDay, LocalDateTime startDateTime, LocalDateTime endDateTime, CarCategory carCategory) {
         this.rateName = rateName;
         this.ratePerDay = ratePerDay;
         this.startDateTime = startDateTime;
@@ -110,10 +110,10 @@ public class RentalRateRecord implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the rentalRateRecordId fields are not set
-        if (!(object instanceof RentalRateRecord)) {
+        if (!(object instanceof RentalRate)) {
             return false;
         }
-        RentalRateRecord other = (RentalRateRecord) object;
+        RentalRate other = (RentalRate) object;
         if ((this.rentalRateRecordId == null && other.rentalRateRecordId != null) || (this.rentalRateRecordId != null && !this.rentalRateRecordId.equals(other.rentalRateRecordId))) {
             return false;
         }
