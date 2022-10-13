@@ -48,6 +48,25 @@ public class Employee implements Serializable {
 
     public Employee() {
     }
+    
+    public Employee(String firstName, String lastName, String username, String password, EmployeeAccessRightEnum accessRight) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.accessRight = accessRight;
+    }
+
+    public Employee(String firstName, String lastName, String username, String password, EmployeeAccessRightEnum accessRight, Outlet assignedOutlet) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.accessRight = accessRight;
+        this.assignedOutlet = assignedOutlet;
+    }
+    
+    
 
     public Employee(String firstName, String lastName, String username, String password, EmployeeAccessRightEnum accessRight, Outlet assignedOutlet, TransitDriverDispatch transitDriverDispatch) {
         this.firstName = firstName;

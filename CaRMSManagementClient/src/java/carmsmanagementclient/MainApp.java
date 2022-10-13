@@ -5,6 +5,10 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.EmployeeSessionBeanRemote;
+import entity.Employee;
+import enumeration.EmployeeAccessRightEnum;
+import exception.InvalidLoginCredentialException;
 import java.util.Scanner;
 
 /**
@@ -12,7 +16,19 @@ import java.util.Scanner;
  * @author Uni
  */
 public class MainApp {
+
+    private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+
+    
+    private SalesManagerModule salesManagerModule;
+    
+    private Employee currentEmployee;
+
     public MainApp() {
+    }
+
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+        this.employeeSessionBeanRemote = employeeSessionBeanRemote;
     }
 
     public void runApp() {
@@ -31,7 +47,23 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    doLogin();
+                    try {
+                        doLogin();
+                        System.out.println("Login successful!\n");
+
+                        if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SALESMANAGER)) {
+                            salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote);
+                            salesManagerModule.salesManagerMenu();
+                        } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
+                            
+                        } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
+                            
+                        }
+                        
+
+                    } catch (InvalidLoginCredentialException ex) {
+                        System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 2) {
                     break;
                 } else {
@@ -44,27 +76,23 @@ public class MainApp {
             }
         }
     }
-    
-    private void doLogin() {
+
+    private void doLogin() throws InvalidLoginCredentialException {
         Scanner scanner = new Scanner(System.in);
         String username = "";
         String password = "";
-        
+
         System.out.println("*** CaRMSMC System :: Login ***\n");
         System.out.print("Enter username> ");
         username = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
-        
-        if(username.length() > 0 && password.length() > 0)
-        {
-            //currentEmployee = employeeSessionBeanRemote.employeeLogin(username, password);      
+
+        if (username.length() > 0 && password.length() > 0) {
+            currentEmployee = employeeSessionBeanRemote.employeeLogin(username, password);
+        } else {
+            throw new InvalidLoginCredentialException("Missing login credential!");
         }
-        else
-        {
-           // throw new InvalidLoginCredentialException("Missing login credential!");
-        }
-    }   
+    }
 
 }
-

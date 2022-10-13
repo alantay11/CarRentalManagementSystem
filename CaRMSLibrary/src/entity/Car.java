@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -21,7 +23,7 @@ public class Car implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
 
     
@@ -32,29 +34,45 @@ public class Car implements Serializable {
     @Column(nullable = false, length = 32)
     private String color;
     
-    @Column(nullable = false, length = 32)
+    @ManyToOne
     private CarCategory category;
     
-    // not sure whether want to use the class or not, maybe map them
-    @Column(nullable = false, length = 32)
+    @OneToOne
     private Reservation rentalAvail;
-    @Column(nullable = false, length = 32)
+    @OneToOne
     private RentalRate rentalRateRecord;
     
-    @Column(nullable = false, length = 32)
-    private Outlet outlet;
+    @OneToOne
+    private Outlet currentOutlet;
 
     public Car() {
     }
 
-    public Car(CarCategory category, String make, String model, String color, Reservation rentalAvail, RentalRate rentalRateRecord, Outlet outlet) {
+    public Car(String make, String model, String color, CarCategory category) {
+        this.make = make;
+        this.model = model;
+        this.color = color;
+        this.category = category;
+    }
+
+    public Car(String make, String model, String color, CarCategory category, Outlet currentOutlet) {
+        this.make = make;
+        this.model = model;
+        this.color = color;
+        this.category = category;
+        this.currentOutlet = currentOutlet;
+    }
+    
+    
+
+    public Car(CarCategory category, String make, String model, String color, Reservation rentalAvail, RentalRate rentalRateRecord, Outlet currentOutlet) {
         this.category = category;
         this.make = make;
         this.model = model;
         this.color = color;
         this.rentalAvail = rentalAvail;
         this.rentalRateRecord = rentalRateRecord;
-        this.outlet = outlet;
+        this.currentOutlet = currentOutlet;
     }
 
     public Long getCarId() {
@@ -114,11 +132,11 @@ public class Car implements Serializable {
     }
 
     public Outlet getOutlet() {
-        return outlet;
+        return currentOutlet;
     }
 
-    public void setOutlet(Outlet outlet) {
-        this.outlet = outlet;
+    public void setOutlet(Outlet currentOutlet) {
+        this.currentOutlet = currentOutlet;
     }
 
     @Override

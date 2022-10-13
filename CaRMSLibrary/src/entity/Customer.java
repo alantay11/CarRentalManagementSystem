@@ -11,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -42,7 +43,8 @@ public class Customer implements Serializable {
     private String username;
     @Column(nullable = false, length = 32)
     private String password;
-    @Column(length = 16)
+    
+    @OneToOne
     private CreditCard creditCard;
 
     public Long getId() {

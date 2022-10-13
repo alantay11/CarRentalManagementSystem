@@ -6,7 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,29 +31,42 @@ public class Outlet implements Serializable {
     private String address;
     
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime openingTime;    
+    private LocalTime openingTime;    
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime closingTime;
+    private LocalTime closingTime;
     
     
-    @OneToMany(mappedBy = "Car")
+    @OneToMany(mappedBy = "currentOutlet")
     private List<Car> carList;
     
-    @OneToMany(mappedBy = "Employee")
+    @OneToMany(mappedBy = "assignedOutlet")
     private List<Employee> employeeList;
     
-    @OneToMany(mappedBy = "TransitDriverDispatch")
-    private List<TransitDriverDispatch> transitDriverDispatchList;
+    @OneToMany(mappedBy = "departureOutlet")
+    private List<TransitDriverDispatch> outboundTransitDriverDispatchList;
+    
+    @OneToMany(mappedBy = "destinationOutlet")
+    private List<TransitDriverDispatch> inboundTransitDriverDispatchList;
 
     public Outlet() {
     }
 
-    public Outlet(String address, LocalDateTime openingTime, LocalDateTime closingTime, List<Car> carList) {
+    public Outlet(String address, LocalTime openingTime, LocalTime closingTime, List<Car> carList) {
         this.address = address;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.carList = carList;
     }    
+
+    public Outlet(String address, LocalTime openingTime, LocalTime closingTime, List<Car> carList, List<Employee> employeeList, List<TransitDriverDispatch> outboundTransitDriverDispatchList, List<TransitDriverDispatch> inboundTransitDriverDispatchList) {
+        this.address = address;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.carList = carList;
+        this.employeeList = employeeList;
+        this.outboundTransitDriverDispatchList = outboundTransitDriverDispatchList;
+        this.inboundTransitDriverDispatchList = inboundTransitDriverDispatchList;
+    }
     
     public Long getOutletId() {
         return outletId;
@@ -71,19 +84,19 @@ public class Outlet implements Serializable {
         this.address = address;
     }
 
-    public LocalDateTime getOpeningTime() {
+    public LocalTime getOpeningTime() {
         return openingTime;
     }
 
-    public void setOpeningTime(LocalDateTime openingTime) {
+    public void setOpeningTime(LocalTime openingTime) {
         this.openingTime = openingTime;
     }
 
-    public LocalDateTime getClosingTime() {
+    public LocalTime getClosingTime() {
         return closingTime;
     }
 
-    public void setClosingTime(LocalDateTime closingTime) {
+    public void setClosingTime(LocalTime closingTime) {
         this.closingTime = closingTime;
     }
 
@@ -93,6 +106,30 @@ public class Outlet implements Serializable {
 
     public void setCarList(List<Car> carList) {
         this.carList = carList;
+    }
+
+    public List<Employee> getEmployeeList() {
+        return employeeList;
+    }
+
+    public void setEmployeeList(List<Employee> employeeList) {
+        this.employeeList = employeeList;
+    }
+
+    public List<TransitDriverDispatch> getOutboundTransitDriverDispatchList() {
+        return outboundTransitDriverDispatchList;
+    }
+
+    public void setOutboundTransitDriverDispatchList(List<TransitDriverDispatch> outboundTransitDriverDispatchList) {
+        this.outboundTransitDriverDispatchList = outboundTransitDriverDispatchList;
+    }
+
+    public List<TransitDriverDispatch> getInboundTransitDriverDispatchList() {
+        return inboundTransitDriverDispatchList;
+    }
+
+    public void setInboundTransitDriverDispatchList(List<TransitDriverDispatch> inboundTransitDriverDispatchList) {
+        this.inboundTransitDriverDispatchList = inboundTransitDriverDispatchList;
     }
     
     

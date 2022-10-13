@@ -20,18 +20,18 @@ import javax.persistence.OneToOne;
  * @author Uni
  */
 @Entity
-public abstract class CarCategory implements Serializable {
+public class CarCategory implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carCategoryId;
     
     @Column(nullable = false, length = 32)
     private String carCategoryName;
     
     
-    @OneToMany(mappedBy = "Car")
+    @OneToMany(mappedBy = "category")
     private List<Car> carList;
     
     @OneToOne
