@@ -6,13 +6,12 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
 
 /**
  *
@@ -29,29 +28,30 @@ public class CreditCard implements Serializable {
     @Column(nullable = false, length = 32)
     private String nameonCC;
     @Column(nullable = false, length = 16)
-    private String ccNumber;
+    private int ccNumber;
     @Column(nullable = false, length = 3)
     private String cvv;
-    @Column
-    private Instant expiryDate;
-
-    public Long getCcId() {
-        return ccId;
-    }
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDate expiryDate;
 
     public CreditCard() {
     }
 
-    public CreditCard(String nameonCC, String ccNumber, String cvv, Instant expiryDate) {
+    public CreditCard(String nameonCC, int ccNumber, String cvv, LocalDate expiryDate) {
         this.nameonCC = nameonCC;
         this.ccNumber = ccNumber;
         this.cvv = cvv;
         this.expiryDate = expiryDate;
     }
 
+    public Long getCcId() {
+        return ccId;
+    }
+
     public void setCcId(Long ccId) {
         this.ccId = ccId;
     }
+    
 
     @Override
     public int hashCode() {
@@ -76,6 +76,38 @@ public class CreditCard implements Serializable {
     @Override
     public String toString() {
         return "entity.CreditCard[ id=" + ccId + " ]";
+    }
+
+    public String getNameonCC() {
+        return nameonCC;
+    }
+
+    public void setNameonCC(String nameonCC) {
+        this.nameonCC = nameonCC;
+    }
+
+    public int getCcNumber() {
+        return ccNumber;
+    }
+
+    public void setCcNumber(int ccNumber) {
+        this.ccNumber = ccNumber;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
 }

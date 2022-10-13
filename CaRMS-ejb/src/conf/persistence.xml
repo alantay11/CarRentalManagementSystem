@@ -2,6 +2,12 @@
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
   <persistence-unit name="CaRMS-ejbPU" transaction-type="JTA">
     <class>entity.Customer</class>
+    <class>entity.Car</class>
+    <class>entity.CarCategory</class>
+    <class>entity.CreditCard</class>
+    <class>entity.Outlet</class>
+    <class>entity.RentalRateRecord</class>
+    <class>entity.Reservation</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>
