@@ -42,6 +42,13 @@ public class RentalRate implements Serializable {
 
     public RentalRate() {
     }
+    
+    public RentalRate(String rateName, BigDecimal ratePerDay, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        this.rateName = rateName;
+        this.ratePerDay = ratePerDay;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+    }
 
     public RentalRate(String rateName, BigDecimal ratePerDay, LocalDateTime startDateTime, LocalDateTime endDateTime, CarCategory carCategory) {
         this.rateName = rateName;
