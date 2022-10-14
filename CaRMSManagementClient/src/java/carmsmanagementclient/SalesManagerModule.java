@@ -6,6 +6,9 @@
 package carmsmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import entity.RentalRate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 /**
@@ -30,7 +33,7 @@ public class SalesManagerModule {
         while(true)
         {
             System.out.println("*** CaRMSMC System :: Sales Manager ***\n");
-            System.out.println("1: Create New Model");
+            System.out.println("1: Create Rental Rate");
             System.out.println("2: View All Models");
             System.out.println("3: Update Model");
             System.out.println("4: Back\n");
@@ -44,7 +47,7 @@ public class SalesManagerModule {
 
                 if(response == 1)
                 {
-                    //doCheckout();
+                    doCreateRentalRate();
                 }
                 else if(response == 2)
                 {
@@ -69,6 +72,30 @@ public class SalesManagerModule {
                 break;
             }
         }
+    }
+    
+    public void doCreateRentalRate() {
+        Scanner scanner = new Scanner(System.in);
+        String rateName = "";
+        BigDecimal ratePerDay;
+        LocalDateTime startDateTime;
+        LocalDateTime endDateTime;
+        
+        System.out.println("*** CaRMSMC System :: Sales Manager :: Create Rental Rate ***\n");
+        System.out.print("Enter rate name> ");
+        rateName = scanner.nextLine().trim();
+        System.out.print("Enter rate per day> ");
+        ratePerDay = new BigDecimal(scanner.nextDouble());
+        scanner.nextLine();
+        System.out.print("Enter start date and time> ");
+        startDateTime = LocalDateTime.parse("14-10-2022, 12:00");
+        System.out.print("Enter end date and time> ");
+        endDateTime = LocalDateTime.parse("15-10-2022, 12:00");
+        RentalRate rentalRate = new RentalRate(rateName, ratePerDay, startDateTime, endDateTime);
+        
+        
+
+        
     }
 
 }
