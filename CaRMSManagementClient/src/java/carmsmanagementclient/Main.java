@@ -5,7 +5,9 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
 import javax.ejb.EJB;
 
 /**
@@ -15,13 +17,19 @@ import javax.ejb.EJB;
 public class Main {
 
     @EJB
+    private static CarCategorySessionBeanRemote carCategorySessionBeanRemote;
+
+    @EJB
+    private static RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+
+    @EJB
     private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
 
     /**
      * @param args the command line arguments
      */
      public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeSessionBeanRemote);
+        MainApp mainApp = new MainApp(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
         mainApp.runApp(); 
     }
     

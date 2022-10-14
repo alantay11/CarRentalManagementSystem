@@ -5,7 +5,9 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
 import enumeration.EmployeeAccessRightEnum;
 import exception.InvalidLoginCredentialException;
@@ -18,17 +20,20 @@ import java.util.Scanner;
 public class MainApp {
 
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
 
-    
     private SalesManagerModule salesManagerModule;
-    
+
     private Employee currentEmployee;
 
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
     }
 
     public void runApp() {
@@ -52,14 +57,13 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SALESMANAGER)) {
-                            salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote);
+                            salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                             salesManagerModule.salesManagerMenu();
                         } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
-                            
+
                         } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
-                            
+
                         }
-                        
 
                     } catch (InvalidLoginCredentialException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");

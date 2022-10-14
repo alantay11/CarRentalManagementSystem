@@ -35,6 +35,9 @@ public class RentalRate implements Serializable {
     private LocalDateTime startDateTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime endDateTime;
+    @Column(nullable = false)
+    private boolean enabled;
+    
     
     
     @OneToOne
@@ -43,19 +46,13 @@ public class RentalRate implements Serializable {
     public RentalRate() {
     }
     
-    public RentalRate(String rateName, BigDecimal ratePerDay, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        this.rateName = rateName;
-        this.ratePerDay = ratePerDay;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-    }
-
     public RentalRate(String rateName, BigDecimal ratePerDay, LocalDateTime startDateTime, LocalDateTime endDateTime, CarCategory carCategory) {
         this.rateName = rateName;
         this.ratePerDay = ratePerDay;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.carCategory = carCategory;
+        this.enabled = true;
     }
     
        
@@ -107,6 +104,14 @@ public class RentalRate implements Serializable {
         this.carCategory = carCategory;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -129,7 +134,8 @@ public class RentalRate implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.RentalRateRecord[ id=" + rentalRateRecordId + " ]";
+        return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay +
+                ", start date of " + this.startDateTime + " and end date of " + this.endDateTime + " for category " + this.carCategory;
     }
 
 }

@@ -111,7 +111,7 @@ public class CarCategory implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.CarCategory[ id=" + carCategoryId + " ]";
+        return this.carCategoryName;
     }
     
 }

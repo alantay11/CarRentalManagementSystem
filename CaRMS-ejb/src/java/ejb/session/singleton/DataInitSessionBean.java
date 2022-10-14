@@ -5,7 +5,9 @@
  */
 package ejb.session.singleton;
 
+import ejb.session.stateless.CarCategorySessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.RentalRateSessionBeanLocal;
 import entity.Car;
 import entity.CarCategory;
 import entity.Employee;
@@ -35,19 +37,36 @@ public class DataInitSessionBean {
     private EntityManager em;
 
     @EJB
+    private CarCategorySessionBeanLocal carCategorySessionBean;
+
+    @EJB
+    private RentalRateSessionBeanLocal rentalRateSessionBean;
+
+    @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
     @PostConstruct
     public void postConstruct() {
-        CarCategory sampleCarCategory = new CarCategory("Category");
+        CarCategory standardSedanCategory = new CarCategory("Standard Sedan");
+        CarCategory familySedanCategory = new CarCategory("Family Sedan");
+        CarCategory luxurySedanCategory = new CarCategory("Luxury Sedan");
+        CarCategory suvMinivanCategory = new CarCategory("SUV/Minivan");
+
+        if (em.find(CarCategory.class, 1l) == null) {
+            carCategorySessionBean.createCarCategory(standardSedanCategory);
+            carCategorySessionBean.createCarCategory(familySedanCategory);
+            carCategorySessionBean.createCarCategory(luxurySedanCategory);
+            carCategorySessionBean.createCarCategory(suvMinivanCategory);
+        }
+
         List<Car> sampleCarList = new ArrayList<>();
         Outlet sampleOutlet = new Outlet("address", LocalTime.parse("09:00"), LocalTime.parse("17:00"), sampleCarList);
-        Car sampleCar = new Car("Make", "Model", "Color", sampleCarCategory, sampleOutlet);
-        
+        Car sampleCar = new Car("Make", "Model", "Color", standardSedanCategory, sampleOutlet);
+
         sampleCarList.add(sampleCar);
-        
+
         Employee sampleSalesManager = new Employee("sales", "manager", "sales", "password", EmployeeAccessRightEnum.SALESMANAGER);//, sampleOutlet);
 
         if (em.find(Employee.class, 1l) == null) {

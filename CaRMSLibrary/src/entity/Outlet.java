@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,6 +51,13 @@ public class Outlet implements Serializable {
 
     public Outlet() {
     }
+    
+    public Outlet(String address, LocalTime openingTime, LocalTime closingTime) {
+        this.address = address;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.carList = new ArrayList<>();
+    }    
 
     public Outlet(String address, LocalTime openingTime, LocalTime closingTime, List<Car> carList) {
         this.address = address;
