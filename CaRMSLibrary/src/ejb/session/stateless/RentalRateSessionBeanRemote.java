@@ -22,5 +22,7 @@ public interface RentalRateSessionBeanRemote {
     List<RentalRate> retrieveAllRentalRates();
 
     RentalRate retrieveRentalRateUsingName(String rateName) throws InvalidRentalRateNameException;
+
+    RentalRate updateRentalRate(RentalRate rentalRate);
     
 }

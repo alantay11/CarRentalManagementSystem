@@ -49,6 +49,16 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         RentalRate rentalRate = (RentalRate) query.getResultList().get(0);
         return rentalRate;
     }
+
+    @Override
+    public RentalRate updateRentalRate(RentalRate rentalRate) {
+        em.merge(rentalRate);
+        em.flush();
+
+        return rentalRate;
+    }
+    
+    
     
     
     

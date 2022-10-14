@@ -179,7 +179,7 @@ public class SalesManagerModule {
             /// create this method
             rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate);
 
-            System.out.println("\nNew " + rentalRate.toString() + " created\n");
+            System.out.println("\n" + rentalRate.toString() + " updated\n");
         } catch (InvalidRentalRateNameException ex) {
             System.out.println("You have entered an invalid rental rate name!");
         } catch (InvalidCarCategoryNameException ex) {
