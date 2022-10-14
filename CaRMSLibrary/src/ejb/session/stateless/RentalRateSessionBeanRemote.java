@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
+import exception.InvalidRentalRateNameException;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -16,5 +18,9 @@ import javax.ejb.Remote;
 public interface RentalRateSessionBeanRemote {
 
     RentalRate createRentalRate(RentalRate rentalRate);
+
+    List<RentalRate> retrieveAllRentalRates();
+
+    RentalRate retrieveRentalRateUsingName(String rateName) throws InvalidRentalRateNameException;
     
 }

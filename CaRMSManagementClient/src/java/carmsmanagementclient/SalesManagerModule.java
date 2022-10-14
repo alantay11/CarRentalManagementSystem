@@ -11,6 +11,7 @@ import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.CarCategory;
 import entity.RentalRate;
 import exception.InvalidCarCategoryNameException;
+import exception.InvalidRentalRateNameException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -119,11 +120,25 @@ public class SalesManagerModule {
             System.out.println("You have entered an invalid car category!");
         }
     }
-    
+
     public void doUpdateRentalRate() {
         try {// all placeholder
+            System.out.println("*** CaRMSMC System :: Sales Manager :: Update Rental Rate ***\n");
+            
             Scanner scanner = new Scanner(System.in);
-            RentalRate rentalRate = new RentalRate();
+            List<RentalRate> rentalRateList = rentalRateSessionBeanRemote.retrieveAllRentalRates();
+
+            System.out.println("\n-----------------------------------");
+            for (RentalRate r : rentalRateList) {
+                System.out.println(r.toString());
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Enter name of rental rate you want to update verbatim> ");
+            String rentalRateName = scanner.nextLine().trim();
+            RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRateUsingName(rentalRateName);
+                               
+                    
+            ///////////////////// copy pasted from above
             String categoryName = "";
             String startDate = "";
             String startTime = "";
@@ -132,7 +147,7 @@ public class SalesManagerModule {
             LocalDateTime startDateTime;
             LocalDateTime endDateTime;
 
-            System.out.println("*** CaRMSMC System :: Sales Manager :: Create Rental Rate ***\n");
+            
             System.out.print("Enter rate name> ");
             rentalRate.setRateName(scanner.nextLine().trim());
 
@@ -161,15 +176,17 @@ public class SalesManagerModule {
             endTime = scanner.nextLine().trim();
             rentalRate.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime));
 
-            rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate);
+            /// create this method
+            rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate);
 
             System.out.println("\nNew " + rentalRate.toString() + " created\n");
+        } catch (InvalidRentalRateNameException ex) {
+            System.out.println("You have entered an invalid rental rate name!");
         } catch (InvalidCarCategoryNameException ex) {
             System.out.println("You have entered an invalid car category!");
         }
-
     }
-    
+
     public void doDeleteRentalRate() {
         try {// all placeholder
             Scanner scanner = new Scanner(System.in);

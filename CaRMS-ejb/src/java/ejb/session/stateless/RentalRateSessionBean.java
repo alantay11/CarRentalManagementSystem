@@ -6,9 +6,12 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
+import exception.InvalidRentalRateNameException;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -29,5 +32,26 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
         return rentalRate;
     }
+
+    @Override
+    public List<RentalRate> retrieveAllRentalRates() {
+        Query query = em.createQuery("SELECT r FROM RentalRate r");
+        return query.getResultList();
+    }
+
+    @Override
+    public RentalRate retrieveRentalRateUsingName(String rateName) throws InvalidRentalRateNameException {
+        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.rateName = :name");
+        query.setParameter("name", rateName);
+        if (query.getResultList().isEmpty()) {
+            throw new InvalidRentalRateNameException();
+        }
+        RentalRate rentalRate = (RentalRate) query.getResultList().get(0);
+        return rentalRate;
+    }
+    
+    
+    
+    
 
 }
