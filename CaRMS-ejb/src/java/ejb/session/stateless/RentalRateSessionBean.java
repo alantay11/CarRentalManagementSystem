@@ -57,6 +57,11 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
         return rentalRate;
     }
+
+    @Override
+    public RentalRate retrieveRentalRate(long rentalRateId) {
+        return em.find(RentalRate.class, rentalRateId);
+    }
     
     
     

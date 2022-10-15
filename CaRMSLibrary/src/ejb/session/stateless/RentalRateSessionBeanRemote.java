@@ -24,5 +24,7 @@ public interface RentalRateSessionBeanRemote {
     RentalRate retrieveRentalRateUsingName(String rateName) throws InvalidRentalRateNameException;
 
     RentalRate updateRentalRate(RentalRate rentalRate);
+
+    RentalRate retrieveRentalRate(long rentalRateId);
     
 }

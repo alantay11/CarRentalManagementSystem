@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.CarCategory;
 import exception.InvalidCarCategoryNameException;
+import exception.InvalidIdException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -49,6 +50,11 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         }
         CarCategory carCategory = (CarCategory) query.getResultList().get(0);
         return carCategory;
+    }
+
+    @Override
+    public CarCategory retrieveCarCategory(long carCategoryId) throws InvalidIdException {
+        return em.find(CarCategory.class, carCategoryId);
     }
 
     

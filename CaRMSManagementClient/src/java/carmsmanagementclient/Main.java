@@ -18,16 +18,11 @@ public class Main {
 
     @EJB
     private static CarCategorySessionBeanRemote carCategorySessionBeanRemote;
-
     @EJB
     private static RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
-
     @EJB
     private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
-
-    /**
-     * @param args the command line arguments
-     */
+    
      public static void main(String[] args) {
         MainApp mainApp = new MainApp(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
         mainApp.runApp(); 

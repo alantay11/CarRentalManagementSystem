@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.CarCategory;
 import exception.InvalidCarCategoryNameException;
+import exception.InvalidIdException;
 import javax.ejb.Local;
 
 /**
@@ -19,5 +20,7 @@ public interface CarCategorySessionBeanLocal {
     CarCategory createCarCategory(CarCategory carCategory);
 
     CarCategory retrieveCarCategoryUsingName(String name) throws InvalidCarCategoryNameException;
+
+    CarCategory retrieveCarCategory(long carCategoryId) throws InvalidIdException;
 
 }
