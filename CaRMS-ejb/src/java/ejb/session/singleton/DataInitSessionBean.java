@@ -38,15 +38,12 @@ public class DataInitSessionBean {
 
     @EJB
     private CarCategorySessionBeanLocal carCategorySessionBean;
-
     @EJB
     private RentalRateSessionBeanLocal rentalRateSessionBean;
-
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+   
     @PostConstruct
     public void postConstruct() {
         CarCategory standardSedanCategory = new CarCategory("Standard Sedan");
@@ -75,8 +72,6 @@ public class DataInitSessionBean {
             employeeSessionBeanLocal.createEmployee(salesManager);
             employeeSessionBeanLocal.createEmployee(operationsManager);
             employeeSessionBeanLocal.createEmployee(customerServiceExec);
-        }
-        if (em.find(Employee.class, 4l) == null) {
             employeeSessionBeanLocal.createEmployee(systemAdmin);
         }
     }

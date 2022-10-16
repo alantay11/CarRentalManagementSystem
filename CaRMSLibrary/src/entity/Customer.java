@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -45,11 +46,15 @@ public class Customer implements Serializable {
     private String username;
     @Column(nullable = false, length = 32)
     private String password;
-    
+
     @OneToOne
     private CreditCard creditCard;
+
     @OneToMany(mappedBy = "customer")
     private List<Reservation> reservationList;
+
+    @ManyToOne(optional = true)
+    private Partner partner;
 
     public Customer() {
     }
@@ -149,8 +154,14 @@ public class Customer implements Serializable {
     public void setReservationList(List<Reservation> reservationList) {
         this.reservationList = reservationList;
     }
-    
-    
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
+    }
 
     public Long getId() {
         return customerId;
