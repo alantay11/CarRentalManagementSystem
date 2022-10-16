@@ -25,6 +25,8 @@ public class MainApp {
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
 
     private SalesManagerModule salesManagerModule;
+    private CustomerServiceExecutiveModule customerServiceExecutiveModule;
+    private OperationsManagerModule operationsManagerModule;
 
     private Employee currentEmployee;
 
@@ -62,9 +64,10 @@ public class MainApp {
                                 salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                                 salesManagerModule.salesManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
-
+                                operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                                operationsManagerModule.operationsManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
-                                CustomerServiceExecutiveModule customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                                customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                                 customerServiceExecutiveModule.customerServiceExecutiveMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SYSTEMADMINISTRATOR)) {
 
