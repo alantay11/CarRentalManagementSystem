@@ -11,6 +11,7 @@ import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
 import enumeration.EmployeeAccessRightEnum;
 import exception.InvalidLoginCredentialException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -40,44 +41,48 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
-        while (true) {
-            System.out.println("*** Welcome to CaRMS Management Client (CaRMSMC) ***\n");
-            System.out.println("1: Login");
-            System.out.println("2: Exit\n");
-            response = 0;
+        try {
+            while (true) {
+                System.out.println("*** Welcome to CaRMS Management Client (CaRMSMC) ***\n");
+                System.out.println("1: Login");
+                System.out.println("2: Exit\n");
+                response = 0;
 
-            while (response < 1 || response > 2) {
-                System.out.print("> ");
+                while (response < 1 || response > 2) {
+                    System.out.print("> ");
 
-                response = scanner.nextInt();
+                    response = scanner.nextInt();
 
-                if (response == 1) {
-                    try {
-                        doLogin();
-                        System.out.println("Login successful!\n");
+                    if (response == 1) {
+                        try {
+                            doLogin();
+                            System.out.println("Login successful!\n");
 
-                        if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SALESMANAGER)) {
-                            salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
-                            salesManagerModule.salesManagerMenu();
-                        } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
+                            if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SALESMANAGER)) {
+                                salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                                salesManagerModule.salesManagerMenu();
+                            } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
 
-                        } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
+                            } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
 
+                            }
+
+                        } catch (InvalidLoginCredentialException ex) {
+                            System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                         }
-
-                    } catch (InvalidLoginCredentialException ex) {
-                        System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
+                    } else if (response == 2) {
+                        break;
+                    } else {
+                        System.out.print("Invalid option, please try again!\n");
                     }
-                } else if (response == 2) {
+                }
+
+                if (response == 2) {
                     break;
-                } else {
-                    System.out.print("Invalid option, please try again!\n");
                 }
             }
-
-            if (response == 2) {
-                break;
-            }
+        } catch (InputMismatchException ex) {
+            System.out.print("Invalid option, please try again!\n");
         }
     }
 

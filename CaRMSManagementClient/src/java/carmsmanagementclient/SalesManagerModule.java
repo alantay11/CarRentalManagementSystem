@@ -44,12 +44,14 @@ public class SalesManagerModule {
         while (true) {
             System.out.println("*** CaRMSMC System :: Sales Manager ***\n");
             System.out.println("1: Create Rental Rate");
-            System.out.println("2: Update Rental Rate");
-            System.out.println("3: Delete Rental Rate");
-            System.out.println("4: Back\n");
+            System.out.println("2: View All Rental Rates");
+            System.out.println("3: View Rental Rate Details");
+            System.out.println("4: Update Rental Rate");
+            System.out.println("5: Delete Rental Rate");
+            System.out.println("6: Back\n");
             response = 0;
 
-            while (response < 1 || response > 4) {
+            while (response < 1 || response > 6) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -57,17 +59,21 @@ public class SalesManagerModule {
                 if (response == 1) {
                     doCreateRentalRate();
                 } else if (response == 2) {
-                    doUpdateRentalRate();
+                    doViewAllRentalRates();
                 } else if (response == 3) {
-                    doDeleteRentalRate();
+                    doViewRentalRateDetails();
                 } else if (response == 4) {
+                    doUpdateRentalRate();
+                } else if (response == 5) {
+                    doDeleteRentalRate();
+                } else if (response == 6) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 4) {
+            if (response == 6) {
                 break;
             }
         }
@@ -123,18 +129,32 @@ public class SalesManagerModule {
         }
     }
 
-    public void doUpdateRentalRate() {
+    public void doViewAllRentalRates() {
+        getAllRentalRates();
+        System.out.print(">");
+    }
 
-        System.out.println("*** CaRMSMC System :: Sales Manager :: Update Rental Rate ***\n");
-        Scanner scanner = new Scanner(System.in);
-        Integer response;
-
+    private List<RentalRate> getAllRentalRates() {
         List<RentalRate> rentalRateList = rentalRateSessionBeanRemote.retrieveAllRentalRates();
         System.out.println("\n-----------------------------------");
         for (RentalRate r : rentalRateList) {
             System.out.println(r.toString());
         }
         System.out.println("-----------------------------------\n");
+        return rentalRateList;
+    }
+
+    public void doViewRentalRateDetails() {
+
+    }
+
+    public void doUpdateRentalRate() {
+
+        System.out.println("*** CaRMSMC System :: Sales Manager :: Update Rental Rate ***\n");
+        Scanner scanner = new Scanner(System.in);
+        Integer response;
+
+        List<RentalRate> rentalRateList = getAllRentalRates();
         System.out.print("Enter ID of rental rate you want to update> ");
         long rentalRateId = scanner.nextLong();
         RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRate(rentalRateId);
@@ -145,13 +165,12 @@ public class SalesManagerModule {
         String endTime = "";
 
         while (true) {
-            //System.out.println("\n" + rentalRate.toString());
             System.out.println("-----------------------------------");
             System.out.println("1: Edit Rate Name: " + rentalRate.getRateName());
             System.out.println("2: Edit Car Category: " + rentalRate.getCarCategory());
             System.out.println("3: Edit Rate per Day: $" + rentalRate.getRatePerDay());
-            System.out.println("4: Edit Start Date & Time: " + rentalRate.getStartDateTime());
-            System.out.println("5: Edit End Date & Time: " + rentalRate.getEndDateTime());
+            System.out.println("4: Edit Start Date & Time: " + rentalRate.getStartDateTime().toString().replace("T", " "));
+            System.out.println("5: Edit End Date & Time: " + rentalRate.getEndDateTime().toString().replace("T", " "));
             System.out.println("6: Finish");
             System.out.println("-----------------------------------\n");
             response = 0;
