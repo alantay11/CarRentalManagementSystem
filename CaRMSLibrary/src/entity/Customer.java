@@ -47,7 +47,7 @@ public class Customer implements Serializable {
     @Column(nullable = false, length = 32)
     private String password;
 
-    @OneToOne
+    @OneToOne(optional = true)
     private CreditCard creditCard;
 
     @OneToMany(mappedBy = "customer")

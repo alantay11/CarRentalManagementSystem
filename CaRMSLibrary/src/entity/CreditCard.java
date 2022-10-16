@@ -35,7 +35,7 @@ public class CreditCard implements Serializable {
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate expiryDate;
 
-    @OneToOne(mappedBy = "creditCard")
+    @OneToOne(mappedBy = "creditCard", optional = true)
     private Customer customer;
 
     public CreditCard() {
