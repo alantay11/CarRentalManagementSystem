@@ -5,10 +5,13 @@
  */
 package entity;
 
+import enumeration.CarStatusEnum;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,14 +32,16 @@ public class Car implements Serializable {
     private Long carId;
 
     @Column(nullable = false, length = 32)
-    private String make;
-    @Column(nullable = false, length = 32)
-    private String model;
+    private String licensePlateNum;
     @Column(nullable = false, length = 32)
     private String color;
+    @Enumerated(EnumType.STRING)
+    private CarStatusEnum carStatus;
 
     @ManyToOne
     private CarCategory category;
+    @ManyToOne
+    private Model model;
 
     @OneToMany(mappedBy = "car")
     private List<Reservation> reservationList;
@@ -51,29 +56,20 @@ public class Car implements Serializable {
     public Car() {
     }
 
-    public Car(String make, String model, String color, CarCategory category) {
-        this.make = make;
-        this.model = model;
-        this.color = color;
-        this.category = category;
+    public String getLicensePlateNum() {
+        return licensePlateNum;
     }
 
-    public Car(String make, String model, String color, CarCategory category, Outlet currentOutlet) {
-        this.make = make;
-        this.model = model;
-        this.color = color;
-        this.category = category;
-        this.currentOutlet = currentOutlet;
+    public void setLicensePlateNum(String licensePlateNum) {
+        this.licensePlateNum = licensePlateNum;
     }
 
-    public Car(String make, String model, String color, CarCategory category, List<Reservation> reservationList, RentalRate rentalRateRecord, Outlet currentOutlet) {
-        this.make = make;
-        this.model = model;
-        this.color = color;
-        this.category = category;
-        this.reservationList = reservationList;
-        this.rentalRateRecord = rentalRateRecord;
-        this.currentOutlet = currentOutlet;
+    public CarStatusEnum getCarStatus() {
+        return carStatus;
+    }
+
+    public void setCarStatus(CarStatusEnum carStatus) {
+        this.carStatus = carStatus;
     }
 
     public Long getCarId() {
@@ -92,20 +88,20 @@ public class Car implements Serializable {
         this.category = category;
     }
 
-    public String getMake() {
-        return make;
-    }
-
-    public void setMake(String make) {
-        this.make = make;
-    }
-
-    public String getModel() {
+    public Model getModel() {
         return model;
     }
 
-    public void setModel(String model) {
+    public void setModel(Model model) {
         this.model = model;
+    }
+
+    public TransitDriverDispatch getTransitDriverDispatchRecord() {
+        return transitDriverDispatchRecord;
+    }
+
+    public void setTransitDriverDispatchRecord(TransitDriverDispatch transitDriverDispatchRecord) {
+        this.transitDriverDispatchRecord = transitDriverDispatchRecord;
     }
 
     public String getColor() {
