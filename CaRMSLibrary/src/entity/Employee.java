@@ -44,7 +44,7 @@ public class Employee implements Serializable {
     private Outlet assignedOutlet;
     
     @OneToOne(optional = true)
-    private TransitDriverDispatch transitDriverDispatch;
+    private TransitDriverDispatch transitDriverDispatchRecord;
 
     public Employee() {
     }
@@ -75,7 +75,7 @@ public class Employee implements Serializable {
         this.password = password;
         this.accessRight = accessRight;
         this.assignedOutlet = assignedOutlet;
-        this.transitDriverDispatch = transitDriverDispatch;
+        this.transitDriverDispatchRecord = transitDriverDispatch;
     }
 
     public String getFirstName() {
@@ -126,12 +126,12 @@ public class Employee implements Serializable {
         this.assignedOutlet = assignedOutlet;
     }
 
-    public TransitDriverDispatch getTransitDriverDispatch() {
-        return transitDriverDispatch;
+    public TransitDriverDispatch getTransitDriverDispatchRecord() {
+        return transitDriverDispatchRecord;
     }
 
-    public void setTransitDriverDispatch(TransitDriverDispatch transitDriverDispatch) {
-        this.transitDriverDispatch = transitDriverDispatch;
+    public void setTransitDriverDispatchRecord(TransitDriverDispatch transitDriverDispatchRecord) {
+        this.transitDriverDispatchRecord = transitDriverDispatchRecord;
     }
     
     public Long getEmployeeId() {

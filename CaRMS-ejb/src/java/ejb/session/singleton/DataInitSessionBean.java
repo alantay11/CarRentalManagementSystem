@@ -67,16 +67,17 @@ public class DataInitSessionBean {
 
         sampleCarList.add(sampleCar);
 
+        Employee systemAdmin = new Employee("system", "manager", "sys", "password", EmployeeAccessRightEnum.SYSTEMADMINISTRATOR);
         Employee salesManager = new Employee("sales", "manager", "sales", "password", EmployeeAccessRightEnum.SALESMANAGER);//, sampleOutlet);
         Employee operationsManager = new Employee("ops", "manager", "ops", "password", EmployeeAccessRightEnum.OPERATIONSMANAGER);
         Employee customerServiceExec = new Employee("cse", "manager", "cse", "password", EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE);
         if (em.find(Employee.class, 1l) == null) {
             employeeSessionBeanLocal.createEmployee(salesManager);
-        }
-        
-        if (em.find(Employee.class, 2l) == null) {
             employeeSessionBeanLocal.createEmployee(operationsManager);
             employeeSessionBeanLocal.createEmployee(customerServiceExec);
+        }
+        if (em.find(Employee.class, 4l) == null) {
+            employeeSessionBeanLocal.createEmployee(systemAdmin);
         }
     }
 }

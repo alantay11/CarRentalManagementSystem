@@ -48,7 +48,7 @@ public class Customer implements Serializable {
     
     @OneToOne
     private CreditCard creditCard;
-    @OneToMany
+    @OneToMany(mappedBy = "customer")
     private List<Reservation> reservationList;
 
     public Customer() {

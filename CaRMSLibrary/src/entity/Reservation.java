@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 /**
@@ -37,7 +38,7 @@ public class Reservation implements Serializable {
     private List<RentalRate> rentalRateList;
     @OneToOne
     private Customer customer;
-    @OneToOne
+    @ManyToOne
     private Car car;
     @OneToOne
     private Outlet departureOutlet;

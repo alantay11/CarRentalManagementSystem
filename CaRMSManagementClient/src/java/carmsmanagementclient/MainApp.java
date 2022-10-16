@@ -65,6 +65,8 @@ public class MainApp {
 
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
 
+                            } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SYSTEMADMINISTRATOR)) {
+
                             }
 
                         } catch (InvalidLoginCredentialException ex) {
@@ -101,6 +103,59 @@ public class MainApp {
             currentEmployee = employeeSessionBeanRemote.employeeLogin(username, password);
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
+        }
+    }
+
+    private void sysAdminMenu() {
+        Scanner scanner = new Scanner(System.in);
+        Integer response;
+
+        try {
+            while (true) {
+                System.out.println("*** CaRMSMC System :: System Administrator ***\n");
+                System.out.println("1: Create New Outlet");
+                System.out.println("2: Create New Employee");
+                System.out.println("3: Create New Partner");
+                System.out.println("4: Create New Category");
+                System.out.println("5: Sales Manager Menu");
+                System.out.println("6: Operations Manager Menu");
+                System.out.println("7: Customer Service Executive Menu");
+                System.out.println("8: Logout\n");
+                response = 0;
+
+                while (response < 1 || response > 8) {
+                    System.out.print("> ");
+
+                    response = scanner.nextInt();
+
+                    if (response == 1) {
+                        //doCreateOutlet();
+                    } else if (response == 2) {
+                        //doCreateEmployee();
+                    } else if (response == 3) {
+                        //doCreatePartner();
+                    } else if (response == 4) {
+                        //doCreateCategory();
+                    } else if (response == 5) {
+                        salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                        salesManagerModule.salesManagerMenu();
+                    } else if (response == 6) {
+                        break;
+                    } else if (response == 7) {
+                        break;
+                    } else if (response == 8) {
+                        break;
+                    } else {
+                        System.out.println("Invalid option, please try again!\n");
+                    }
+                }
+                if (response == 8) {
+                    break;
+                }
+            }
+
+        } catch (InputMismatchException ex) {
+            System.out.print("Invalid option, please try again!\n");
         }
     }
 

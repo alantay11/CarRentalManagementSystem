@@ -6,12 +6,14 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 /**
@@ -36,12 +38,15 @@ public class Car implements Serializable {
     @ManyToOne
     private CarCategory category;
 
-    @OneToOne
-    private Reservation reservation;
+    @OneToMany(mappedBy = "car")
+    private List<Reservation> reservationList;
+
     @OneToOne
     private RentalRate rentalRateRecord;
     @OneToOne
     private Outlet currentOutlet;
+    @OneToOne
+    private TransitDriverDispatch transitDriverDispatchRecord;
 
     public Car() {
     }
@@ -61,12 +66,12 @@ public class Car implements Serializable {
         this.currentOutlet = currentOutlet;
     }
 
-    public Car(CarCategory category, String make, String model, String color, Reservation rentalAvail, RentalRate rentalRateRecord, Outlet currentOutlet) {
-        this.category = category;
+    public Car(String make, String model, String color, CarCategory category, List<Reservation> reservationList, RentalRate rentalRateRecord, Outlet currentOutlet) {
         this.make = make;
         this.model = model;
         this.color = color;
-        this.reservation = rentalAvail;
+        this.category = category;
+        this.reservationList = reservationList;
         this.rentalRateRecord = rentalRateRecord;
         this.currentOutlet = currentOutlet;
     }
@@ -111,12 +116,20 @@ public class Car implements Serializable {
         this.color = color;
     }
 
-    public Reservation getReservation() {
-        return reservation;
+    public List<Reservation> getReservationList() {
+        return reservationList;
     }
 
-    public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
+    public void setReservationList(List<Reservation> reservationList) {
+        this.reservationList = reservationList;
+    }
+
+    public Outlet getCurrentOutlet() {
+        return currentOutlet;
+    }
+
+    public void setCurrentOutlet(Outlet currentOutlet) {
+        this.currentOutlet = currentOutlet;
     }
 
     public RentalRate getRentalRateRecord() {
@@ -125,14 +138,6 @@ public class Car implements Serializable {
 
     public void setRentalRateRecord(RentalRate rentalRateRecord) {
         this.rentalRateRecord = rentalRateRecord;
-    }
-
-    public Outlet getOutlet() {
-        return currentOutlet;
-    }
-
-    public void setOutlet(Outlet currentOutlet) {
-        this.currentOutlet = currentOutlet;
     }
 
     @Override

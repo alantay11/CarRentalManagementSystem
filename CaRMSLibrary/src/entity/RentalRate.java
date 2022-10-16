@@ -8,11 +8,13 @@ package entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 /**
@@ -38,8 +40,10 @@ public class RentalRate implements Serializable {
     @Column(nullable = false)
     private boolean enabled;    
     
-    @OneToOne
+    @OneToOne(mappedBy = "rentalRate")
     private CarCategory carCategory;
+    @ManyToMany(mappedBy = "rentalRateList")
+    private List<Reservation> reservationList;
 
     public RentalRate() {
         this.enabled = true;

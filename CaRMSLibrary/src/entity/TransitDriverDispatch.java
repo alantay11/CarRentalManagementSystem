@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 /**
@@ -31,14 +32,15 @@ public class TransitDriverDispatch implements Serializable {
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime dropoffTime;
     
-    @OneToOne
+    @OneToOne(mappedBy = "transitDriverDispatchRecord")
     private Car car;
-    @OneToOne
+    @OneToOne(mappedBy = "transitDriverDispatchRecord")
     private Employee employee;
-    @OneToOne
+    @ManyToOne
     private Outlet departureOutlet;
-    @OneToOne
+    @ManyToOne
     private Outlet destinationOutlet;
+    
 
     public TransitDriverDispatch() {
     }

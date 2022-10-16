@@ -10,6 +10,7 @@ package enumeration;
  * @author Uni
  */
 public enum EmployeeAccessRightEnum {
+    SYSTEMADMINISTRATOR,
     CUSTOMERSERVICEEXECUTIVE,
     SALESMANAGER,
     OPERATIONSMANAGER;
