@@ -70,7 +70,7 @@ public class MainApp {
                                 customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                                 customerServiceExecutiveModule.customerServiceExecutiveMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SYSTEMADMINISTRATOR)) {
-
+                                sysAdminMenu();
                             }
 
                         } catch (InvalidLoginCredentialException ex) {
@@ -144,9 +144,11 @@ public class MainApp {
                         salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                         salesManagerModule.salesManagerMenu();
                     } else if (response == 6) {
-                        break;
+                        operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                        operationsManagerModule.operationsManagerMenu();
                     } else if (response == 7) {
-                        break;
+                        customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                        customerServiceExecutiveModule.customerServiceExecutiveMenu();
                     } else if (response == 8) {
                         break;
                     } else {
