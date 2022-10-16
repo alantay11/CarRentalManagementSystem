@@ -38,14 +38,11 @@ public class Outlet implements Serializable {
     
     
     @OneToMany(mappedBy = "currentOutlet")
-    private List<Car> carList;
-    
+    private List<Car> carList;    
     @OneToMany(mappedBy = "assignedOutlet")
-    private List<Employee> employeeList;
-    
+    private List<Employee> employeeList;    
     @OneToMany(mappedBy = "departureOutlet")
-    private List<TransitDriverDispatch> outboundTransitDriverDispatchList;
-    
+    private List<TransitDriverDispatch> outboundTransitDriverDispatchList;    
     @OneToMany(mappedBy = "destinationOutlet")
     private List<TransitDriverDispatch> inboundTransitDriverDispatchList;
 

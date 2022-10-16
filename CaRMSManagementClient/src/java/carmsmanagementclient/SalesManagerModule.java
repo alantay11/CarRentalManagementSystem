@@ -142,7 +142,7 @@ public class SalesManagerModule {
     }
 
     private List<RentalRate> getAllRentalRates() {
-        List<RentalRate> rentalRateList = rentalRateSessionBeanRemote.retrieveAllRentalRates();        
+        List<RentalRate> rentalRateList = rentalRateSessionBeanRemote.retrieveAllRentalRates();
         return rentalRateList;
     }
 
@@ -257,20 +257,24 @@ public class SalesManagerModule {
         }
     }
 
-    public void doDeleteRentalRate() {
+    public void doDeleteRentalRate() { //check what used means, when to delete and when not to
         System.out.println("*** CaRMSMC System :: Sales Manager :: Delete Rental Rate ***\n");
         Scanner scanner = new Scanner(System.in);
 
         doViewAllRentalRates();
-        System.out.print("Enter ID of rental rate you want to update> ");
+        System.out.print("Enter ID of rental rate you want to delete> ");
         long rentalRateId = scanner.nextLong();
         RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRate(rentalRateId);
-
-        System.out.print("\nConfirm update of " + rentalRate.toString() + "? (Y/N)> ");
+        scanner.nextLine();
+        System.out.print("\nConfirm deletion of " + rentalRate.toString() + "? (Y/N)> ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
         if (confirmation.equals("y")) {
-            rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate);
-            System.out.println("\n" + rentalRate.toString() + " deleted\n");
+            boolean deleted = rentalRateSessionBeanRemote.deleteRentalRate(rentalRateId);
+            if (deleted) {
+                System.out.println("\n" + rentalRate.toString() + " deleted\n");
+            } else {
+                System.out.println("\n" + rentalRate.toString() + " disabled\n");
+            }
         } else {
             System.out.println("\nDeletion cancelled\n");
         }

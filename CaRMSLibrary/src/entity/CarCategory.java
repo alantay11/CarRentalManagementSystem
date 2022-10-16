@@ -26,16 +26,15 @@ public class CarCategory implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carCategoryId;
-    
+
     @Column(nullable = false, length = 32)
     private String carCategoryName;
-    
-    
+
     @OneToMany(mappedBy = "category")
     private List<Car> carList;
-    
+
     @OneToOne
-    private RentalRate rentalRateRecord;
+    private RentalRate rentalRate;
 
     public CarCategory() {
     }
@@ -47,12 +46,6 @@ public class CarCategory implements Serializable {
     public CarCategory(String carCategoryName, List<Car> carList) {
         this.carCategoryName = carCategoryName;
         this.carList = carList;
-    }
-
-    public CarCategory(String carCategoryName, List<Car> carList, RentalRate rentalRateRecord) {
-        this.carCategoryName = carCategoryName;
-        this.carList = carList;
-        this.rentalRateRecord = rentalRateRecord;
     }
 
     public String getCarCategoryName() {
@@ -71,15 +64,13 @@ public class CarCategory implements Serializable {
         this.carList = carList;
     }
 
-    public RentalRate getRentalRateRecord() {
-        return rentalRateRecord;
+    public RentalRate getRentalRate() {
+        return rentalRate;
     }
 
-    public void setRentalRateRecord(RentalRate rentalRateRecord) {
-        this.rentalRateRecord = rentalRateRecord;
+    public void setRentalRate(RentalRate rentalRate) {
+        this.rentalRate = rentalRate;
     }
-    
-    
 
     public Long getCarCategoryId() {
         return carCategoryId;
@@ -113,5 +104,5 @@ public class CarCategory implements Serializable {
     public String toString() {
         return this.carCategoryName;
     }
-    
+
 }

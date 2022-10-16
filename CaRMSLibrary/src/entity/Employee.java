@@ -134,10 +134,6 @@ public class Employee implements Serializable {
         this.transitDriverDispatch = transitDriverDispatch;
     }
     
-    
-
-    
-    
     public Long getEmployeeId() {
         return employeeId;
     }

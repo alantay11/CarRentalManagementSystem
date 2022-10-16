@@ -62,11 +62,17 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     public RentalRate retrieveRentalRate(long rentalRateId) {
         return em.find(RentalRate.class, rentalRateId);
     }
-    
-    
-    
-    
-    
-    
 
+    @Override
+    public boolean deleteRentalRate(long rentalRateId) {
+        RentalRate rentalRate = retrieveRentalRate(rentalRateId);
+        if (rentalRate.getCarCategory() == null) {
+            em.remove(rentalRateId);
+            return true;
+        } else {
+            rentalRate.setEnabled(false);
+            em.merge(rentalRate);
+            return false;
+        }
+    }
 }

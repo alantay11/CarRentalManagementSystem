@@ -26,5 +26,7 @@ public interface RentalRateSessionBeanRemote {
     RentalRate updateRentalRate(RentalRate rentalRate);
 
     RentalRate retrieveRentalRate(long rentalRateId);
+
+    boolean deleteRentalRate(long rentalRateId);
     
 }

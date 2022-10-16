@@ -6,12 +6,15 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -24,25 +27,49 @@ public class Reservation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reservationId;
+
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDateTime pickUpTime;
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    private LocalDateTime dropOffTime;
+
+    @ManyToMany
+    private List<RentalRate> rentalRateList;
+    @OneToOne
+    private Customer customer;
+    @OneToOne
+    private Car car;
+    @OneToOne
+    private Outlet departureOutlet;
+    @OneToOne
+    private Outlet destinationOutlet;
+    @OneToOne(optional = true)
+    private TransitDriverDispatch transitDriverDispatch;
     
-    @Column(nullable = false, length = 32)
-    private String driverName;
-    @Column(nullable = false, length = 16)
-    private String car;
-    @Column
-    private Instant pickUpTime;
-    @Column
-    private Instant endTime;
-    @Column(nullable = false, length = 32)
-    private String rentalRec;
-    @Column(nullable = false, length = 32)
-    private Boolean employeeTransportAvail;
-    @Column(nullable = false, length = 32)
-    private String startLocation;
-    @Column(nullable = false, length = 32)
-    private String endLocation;
-    
-    
+
+    public Reservation() {
+    }
+
+    public Reservation(LocalDateTime pickUpTime, LocalDateTime dropOffTime, List<RentalRate> rentalRateList, Customer customer, Car car, Outlet departureOutlet, Outlet destinationOutlet) {
+        this.pickUpTime = pickUpTime;
+        this.dropOffTime = dropOffTime;
+        this.rentalRateList = rentalRateList;
+        this.customer = customer;
+        this.car = car;
+        this.departureOutlet = departureOutlet;
+        this.destinationOutlet = destinationOutlet;
+    }    
+
+    public Reservation(LocalDateTime pickUpTime, LocalDateTime dropOffTime, List<RentalRate> rentalRateList, Customer customer, Car car, Outlet departureOutlet, Outlet destinationOutlet, TransitDriverDispatch transitDriverDispatch) {
+        this.pickUpTime = pickUpTime;
+        this.dropOffTime = dropOffTime;
+        this.rentalRateList = rentalRateList;
+        this.customer = customer;
+        this.car = car;
+        this.departureOutlet = departureOutlet;
+        this.destinationOutlet = destinationOutlet;
+        this.transitDriverDispatch = transitDriverDispatch;
+    }
 
     public Long getreservationId() {
         return reservationId;
@@ -51,22 +78,78 @@ public class Reservation implements Serializable {
     public void setId(Long reservationId) {
         this.reservationId = reservationId;
     }
-    
-    public Reservation() {
+
+    public Long getReservationId() {
+        return reservationId;
     }
 
-    public Reservation(Long reservationId, String driverName, String car, Instant pickUpTime, Instant endTime, String rentalRec, Boolean employeeTransportAvail, String startLocation, String endLocation) {
+    public void setReservationId(Long reservationId) {
         this.reservationId = reservationId;
-        this.driverName = driverName;
-        this.car = car;
-        this.pickUpTime = pickUpTime;
-        this.endTime = endTime;
-        this.rentalRec = rentalRec;
-        this.employeeTransportAvail = employeeTransportAvail;
-        this.startLocation = startLocation;
-        this.endLocation = endLocation;
     }
-    
+
+    public LocalDateTime getPickUpTime() {
+        return pickUpTime;
+    }
+
+    public void setPickUpTime(LocalDateTime pickUpTime) {
+        this.pickUpTime = pickUpTime;
+    }
+
+    public LocalDateTime getDropOffTime() {
+        return dropOffTime;
+    }
+
+    public void setDropOffTime(LocalDateTime dropOffTime) {
+        this.dropOffTime = dropOffTime;
+    }
+
+    public List<RentalRate> getRentalRateList() {
+        return rentalRateList;
+    }
+
+    public void setRentalRateList(List<RentalRate> rentalRateList) {
+        this.rentalRateList = rentalRateList;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public void setCar(Car car) {
+        this.car = car;
+    }
+
+    public Outlet getDepartureOutlet() {
+        return departureOutlet;
+    }
+
+    public void setDepartureOutlet(Outlet departureOutlet) {
+        this.departureOutlet = departureOutlet;
+    }
+
+    public Outlet getDestinationOutlet() {
+        return destinationOutlet;
+    }
+
+    public void setDestinationOutlet(Outlet destinationOutlet) {
+        this.destinationOutlet = destinationOutlet;
+    }
+
+    public TransitDriverDispatch getTransitDriverDispatch() {
+        return transitDriverDispatch;
+    }
+
+    public void setTransitDriverDispatch(TransitDriverDispatch transitDriverDispatch) {
+        this.transitDriverDispatch = transitDriverDispatch;
+    }
 
     @Override
     public int hashCode() {
@@ -92,5 +175,5 @@ public class Reservation implements Serializable {
     public String toString() {
         return "entity.Reservation[ id=" + reservationId + " ]";
     }
-    
+
 }

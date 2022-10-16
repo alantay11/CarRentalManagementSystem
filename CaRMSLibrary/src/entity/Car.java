@@ -26,22 +26,20 @@ public class Car implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
 
-    
     @Column(nullable = false, length = 32)
     private String make;
     @Column(nullable = false, length = 32)
     private String model;
     @Column(nullable = false, length = 32)
     private String color;
-    
+
     @ManyToOne
     private CarCategory category;
-    
+
     @OneToOne
-    private Reservation rentalAvail;
+    private Reservation reservation;
     @OneToOne
     private RentalRate rentalRateRecord;
-    
     @OneToOne
     private Outlet currentOutlet;
 
@@ -62,15 +60,13 @@ public class Car implements Serializable {
         this.category = category;
         this.currentOutlet = currentOutlet;
     }
-    
-    
 
     public Car(CarCategory category, String make, String model, String color, Reservation rentalAvail, RentalRate rentalRateRecord, Outlet currentOutlet) {
         this.category = category;
         this.make = make;
         this.model = model;
         this.color = color;
-        this.rentalAvail = rentalAvail;
+        this.reservation = rentalAvail;
         this.rentalRateRecord = rentalRateRecord;
         this.currentOutlet = currentOutlet;
     }
@@ -115,12 +111,12 @@ public class Car implements Serializable {
         this.color = color;
     }
 
-    public Reservation getRentalAvail() {
-        return rentalAvail;
+    public Reservation getReservation() {
+        return reservation;
     }
 
-    public void setRentalAvail(Reservation rentalAvail) {
-        this.rentalAvail = rentalAvail;
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
     public RentalRate getRentalRateRecord() {

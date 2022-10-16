@@ -36,9 +36,7 @@ public class RentalRate implements Serializable {
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime endDateTime;
     @Column(nullable = false)
-    private boolean enabled;
-    
-    
+    private boolean enabled;    
     
     @OneToOne
     private CarCategory carCategory;
@@ -136,7 +134,7 @@ public class RentalRate implements Serializable {
     @Override
     public String toString() {
         return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay +
-                ", start date of " + this.startDateTime.toString().replace("T", ", ") + " and end date of " + this.endDateTime.toString().replace("T", ", ") + " for category " + this.carCategory;
+                ", start date of " + this.startDateTime.toString().replace("T", ", ") + " and end date of " + this.endDateTime.toString().replace("T", ", ") +
+                " for category " + this.carCategory + ((enabled) ? "" : "DISABLED");
     }
-
 }

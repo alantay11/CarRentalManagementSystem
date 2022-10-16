@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -34,6 +35,9 @@ public class CreditCard implements Serializable {
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate expiryDate;
 
+    @OneToOne
+    private Customer customer;
+
     public CreditCard() {
     }
 
@@ -44,6 +48,14 @@ public class CreditCard implements Serializable {
         this.expiryDate = expiryDate;
     }
 
+    public CreditCard(String nameonCC, int ccNumber, String cvv, LocalDate expiryDate, Customer customer) {
+        this.nameonCC = nameonCC;
+        this.ccNumber = ccNumber;
+        this.cvv = cvv;
+        this.expiryDate = expiryDate;
+        this.customer = customer;
+    }
+
     public Long getCcId() {
         return ccId;
     }
@@ -51,31 +63,13 @@ public class CreditCard implements Serializable {
     public void setCcId(Long ccId) {
         this.ccId = ccId;
     }
-    
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (ccId != null ? ccId.hashCode() : 0);
-        return hash;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the ccId fields are not set
-        if (!(object instanceof CreditCard)) {
-            return false;
-        }
-        CreditCard other = (CreditCard) object;
-        if ((this.ccId == null && other.ccId != null) || (this.ccId != null && !this.ccId.equals(other.ccId))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "entity.CreditCard[ id=" + ccId + " ]";
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
     public String getNameonCC() {
@@ -108,6 +102,31 @@ public class CreditCard implements Serializable {
 
     public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (ccId != null ? ccId.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the ccId fields are not set
+        if (!(object instanceof CreditCard)) {
+            return false;
+        }
+        CreditCard other = (CreditCard) object;
+        if ((this.ccId == null && other.ccId != null) || (this.ccId != null && !this.ccId.equals(other.ccId))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "entity.CreditCard[ id=" + ccId + " ]";
     }
 
 }
