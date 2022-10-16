@@ -36,16 +36,21 @@ public class Reservation implements Serializable {
 
     @ManyToMany
     private List<RentalRate> rentalRateList;
-    @OneToOne
+    
+    @ManyToOne
     private Customer customer;
     @ManyToOne
     private Car car;
+    
     @OneToOne
     private Outlet departureOutlet;
     @OneToOne
     private Outlet destinationOutlet;
+    
+    /* Not sure if this is necessary
     @OneToOne(optional = true)
     private TransitDriverDispatch transitDriverDispatch;
+    */
     
 
     public Reservation() {
@@ -60,17 +65,6 @@ public class Reservation implements Serializable {
         this.departureOutlet = departureOutlet;
         this.destinationOutlet = destinationOutlet;
     }    
-
-    public Reservation(LocalDateTime pickUpTime, LocalDateTime dropOffTime, List<RentalRate> rentalRateList, Customer customer, Car car, Outlet departureOutlet, Outlet destinationOutlet, TransitDriverDispatch transitDriverDispatch) {
-        this.pickUpTime = pickUpTime;
-        this.dropOffTime = dropOffTime;
-        this.rentalRateList = rentalRateList;
-        this.customer = customer;
-        this.car = car;
-        this.departureOutlet = departureOutlet;
-        this.destinationOutlet = destinationOutlet;
-        this.transitDriverDispatch = transitDriverDispatch;
-    }
 
     public Long getreservationId() {
         return reservationId;
@@ -142,14 +136,6 @@ public class Reservation implements Serializable {
 
     public void setDestinationOutlet(Outlet destinationOutlet) {
         this.destinationOutlet = destinationOutlet;
-    }
-
-    public TransitDriverDispatch getTransitDriverDispatch() {
-        return transitDriverDispatch;
-    }
-
-    public void setTransitDriverDispatch(TransitDriverDispatch transitDriverDispatch) {
-        this.transitDriverDispatch = transitDriverDispatch;
     }
 
     @Override
