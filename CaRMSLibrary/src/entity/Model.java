@@ -25,16 +25,27 @@ public class Model implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long modelId;
-    
+
     @Column(nullable = false, length = 32)
     private String make;
     @Column(nullable = false, length = 32)
-    private String model;   
-    
+    private String model;
+    @Column(nullable = false)
+    private boolean enabled;
+
     @OneToMany(mappedBy = "model")
     private List<Car> carList;
 
     public Model() {
+        this.enabled = true;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getMake() {
@@ -61,8 +72,6 @@ public class Model implements Serializable {
         this.carList = carList;
     }
 
-    
-    
     public Long getModelId() {
         return modelId;
     }
@@ -95,5 +104,5 @@ public class Model implements Serializable {
     public String toString() {
         return "entity.Model[ id=" + modelId + " ]";
     }
-    
+
 }

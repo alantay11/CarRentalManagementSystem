@@ -37,6 +37,8 @@ public class Car implements Serializable {
     private String color;
     @Enumerated(EnumType.STRING)
     private CarStatusEnum carStatus;
+    @Column(nullable = false)
+    private boolean enabled;
 
     @ManyToOne
     private CarCategory category;
@@ -54,6 +56,15 @@ public class Car implements Serializable {
     private TransitDriverDispatch transitDriverDispatchRecord;
 
     public Car() {
+        this.enabled = true;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getLicensePlateNum() {
