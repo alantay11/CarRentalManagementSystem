@@ -48,7 +48,7 @@ public class SalesManagerModule {
             System.out.println("3: View Rental Rate Details");
             System.out.println("4: Update Rental Rate");
             System.out.println("5: Delete Rental Rate");
-            System.out.println("6: Back\n");
+            System.out.println("6: Logout\n");
             response = 0;
 
             while (response < 1 || response > 6) {
@@ -130,8 +130,10 @@ public class SalesManagerModule {
     }
 
     public void doViewAllRentalRates() {
+        Scanner scanner = new Scanner(System.in);
         getAllRentalRates();
-        System.out.print(">");
+        System.out.print("Press enter to continue>");        
+        scanner.nextLine();
     }
 
     private List<RentalRate> getAllRentalRates() {
@@ -145,7 +147,22 @@ public class SalesManagerModule {
     }
 
     public void doViewRentalRateDetails() {
-
+        Scanner scanner = new Scanner(System.in);
+        List<RentalRate> rentalRates = getAllRentalRates();
+        System.out.println("\n-----------------------------------");
+        for (RentalRate r : rentalRates) {
+            System.out.println("ID: " + r.getRentalRateRecordId() + ", Rate Name: " + r.getRateName());
+        }
+        System.out.println("-----------------------------------\n");
+        
+        System.out.print("Enter ID of rental rate you want to view> ");
+        long rentalRateId = scanner.nextLong();
+        scanner.nextLine();
+        RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRate(rentalRateId);
+        System.out.println("\n" + rentalRate.toString() + "\n");
+        System.out.print("Press enter to continue>");        
+        scanner.nextLine();
+        System.out.println();
     }
 
     public void doUpdateRentalRate() {
