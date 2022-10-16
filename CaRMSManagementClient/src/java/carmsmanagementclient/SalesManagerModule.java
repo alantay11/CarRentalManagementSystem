@@ -131,18 +131,18 @@ public class SalesManagerModule {
 
     public void doViewAllRentalRates() {
         Scanner scanner = new Scanner(System.in);
-        getAllRentalRates();
-        System.out.print("Press enter to continue>");        
-        scanner.nextLine();
-    }
-
-    private List<RentalRate> getAllRentalRates() {
-        List<RentalRate> rentalRateList = rentalRateSessionBeanRemote.retrieveAllRentalRates();
+        List<RentalRate> rentalRateList = getAllRentalRates();
         System.out.println("\n-----------------------------------");
         for (RentalRate r : rentalRateList) {
             System.out.println(r.toString());
         }
         System.out.println("-----------------------------------\n");
+        System.out.print("Press enter to continue>");
+        scanner.nextLine();
+    }
+
+    private List<RentalRate> getAllRentalRates() {
+        List<RentalRate> rentalRateList = rentalRateSessionBeanRemote.retrieveAllRentalRates();        
         return rentalRateList;
     }
 
@@ -154,24 +154,24 @@ public class SalesManagerModule {
             System.out.println("ID: " + r.getRentalRateRecordId() + ", Rate Name: " + r.getRateName());
         }
         System.out.println("-----------------------------------\n");
-        
+
         System.out.print("Enter ID of rental rate you want to view> ");
         long rentalRateId = scanner.nextLong();
         scanner.nextLine();
         RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRate(rentalRateId);
         System.out.println("\n" + rentalRate.toString() + "\n");
-        System.out.print("Press enter to continue>");        
+        System.out.print("Press enter to continue>");
         scanner.nextLine();
         System.out.println();
     }
 
     public void doUpdateRentalRate() {
-
         System.out.println("*** CaRMSMC System :: Sales Manager :: Update Rental Rate ***\n");
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
         List<RentalRate> rentalRateList = getAllRentalRates();
+        doViewAllRentalRates();
         System.out.print("Enter ID of rental rate you want to update> ");
         long rentalRateId = scanner.nextLong();
         RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRate(rentalRateId);
@@ -258,53 +258,22 @@ public class SalesManagerModule {
     }
 
     public void doDeleteRentalRate() {
-        try {// all placeholder
-            Scanner scanner = new Scanner(System.in);
-            RentalRate rentalRate = new RentalRate();
-            String categoryName = "";
-            String startDate = "";
-            String startTime = "";
-            String endDate = "";
-            String endTime = "";
-            LocalDateTime startDateTime;
-            LocalDateTime endDateTime;
+        System.out.println("*** CaRMSMC System :: Sales Manager :: Delete Rental Rate ***\n");
+        Scanner scanner = new Scanner(System.in);
 
-            System.out.println("*** CaRMSMC System :: Sales Manager :: Create Rental Rate ***\n");
-            System.out.print("Enter rate name> ");
-            rentalRate.setRateName(scanner.nextLine().trim());
+        doViewAllRentalRates();
+        System.out.print("Enter ID of rental rate you want to update> ");
+        long rentalRateId = scanner.nextLong();
+        RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRate(rentalRateId);
 
-            List<CarCategory> carCategoryList = carCategorySessionBean.retrieveAllCarCategories();
-
-            System.out.println("\n-----------------------------------");
-            for (CarCategory c : carCategoryList) {
-                System.out.println(c.toString());
-            }
-            System.out.println("-----------------------------------\n");
-            System.out.print("Enter name of car category verbatim> ");
-            String carCategoryName = scanner.nextLine().trim();
-            rentalRate.setCarCategory(carCategorySessionBean.retrieveCarCategoryUsingName(carCategoryName));
-
-            System.out.print("Enter rate per day> ");
-            rentalRate.setRatePerDay(new BigDecimal(scanner.nextDouble()));
-            scanner.nextLine();
-            System.out.print("Enter start date in the format YYYY-MM-DD> ");
-            startDate = scanner.nextLine().trim();
-            System.out.print("Enter start time in the format HH:MM> ");
-            startTime = scanner.nextLine().trim();
-            rentalRate.setStartDateTime(LocalDateTime.parse(startDate + "T" + startTime));
-            System.out.print("Enter end date in the format YYYY-MM-DD> ");
-            endDate = scanner.nextLine().trim();
-            System.out.print("Enter end time in the format HH:MM> ");
-            endTime = scanner.nextLine().trim();
-            rentalRate.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime));
-
-            rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate);
-
-            System.out.println("\nNew " + rentalRate.toString() + " created\n");
-        } catch (InvalidCarCategoryNameException ex) {
-            System.out.println("You have entered an invalid car category!");
+        System.out.print("\nConfirm update of " + rentalRate.toString() + "? (Y/N)> ");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        if (confirmation.equals("y")) {
+            rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate);
+            System.out.println("\n" + rentalRate.toString() + " deleted\n");
+        } else {
+            System.out.println("\nDeletion cancelled\n");
         }
-
     }
 
 }
