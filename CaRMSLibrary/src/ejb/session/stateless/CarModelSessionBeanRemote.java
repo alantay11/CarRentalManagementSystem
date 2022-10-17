@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 
 import entity.CarModel;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -21,7 +22,7 @@ public interface CarModelSessionBeanRemote {
     CarModel createCarModel(CarModel carModel);
     
     // view all models
-    List<CarModel>
+    List<CarModel> retrieveAllCarModels;
     
     // update model
     
