@@ -23,8 +23,6 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     @Override
     public RentalRate createRentalRate(RentalRate rentalRate) {
         em.persist(rentalRate);
@@ -60,13 +58,15 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     @Override
     public RentalRate retrieveRentalRate(long rentalRateId) {
-        return em.find(RentalRate.class, rentalRateId);
+        RentalRate rentalRate = em.find(RentalRate.class, rentalRateId);
+        rentalRate.getReservationList().size();
+        return rentalRate;
     }
 
     @Override
     public boolean deleteRentalRate(long rentalRateId) {
         RentalRate rentalRate = retrieveRentalRate(rentalRateId);
-        if (rentalRate.getCarCategory() == null) {
+        if (rentalRate.getReservationList().isEmpty()) {
             em.remove(rentalRateId);
             return true;
         } else {

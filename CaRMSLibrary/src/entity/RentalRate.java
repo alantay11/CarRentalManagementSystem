@@ -99,6 +99,14 @@ public class RentalRate implements Serializable {
         this.endDateTime = endDateTime;
     }
 
+    public List<Reservation> getReservationList() {
+        return reservationList;
+    }
+
+    public void setReservationList(List<Reservation> reservationList) {
+        this.reservationList = reservationList;
+    }
+
     public CarCategory getCarCategory() {
         return carCategory;
     }
