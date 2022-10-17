@@ -36,12 +36,16 @@ public class CarModel implements Serializable {
     @Column(nullable = false)
     private boolean enabled;
     
+    @OneToMany(mappedBy = "model")
+    private List<Car> carList;
+    
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
 
-    @OneToMany(mappedBy = "model")
-    private List<Car> carList;
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Car car;
 
 
     public CarModel() {
