@@ -6,6 +6,7 @@
 package carmsmanagementclient;
 
 import ejb.session.stateless.CarCategorySessionBeanRemote;
+import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
@@ -20,6 +21,7 @@ import java.util.Scanner;
  */
 public class MainApp {
 
+    private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
@@ -33,7 +35,8 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote) {
+    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote) {
+        this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
