@@ -5,9 +5,11 @@
  */
 package ejb.session.stateless;
 
+import entity.Customer;
 import entity.Employee;
-import exception.InvalidLoginCredentialException;
+import exception.CustomerNotFoundException;
 import exception.EmployeeNotFoundException;
+import exception.InvalidLoginCredentialException;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -18,43 +20,51 @@ import javax.persistence.Query;
  * @author Uni
  */
 @Stateless
-public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeSessionBeanLocal {
+public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerSessionBeanLocal {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
     @Override
-    public Employee employeeLogin(String username, String password) throws InvalidLoginCredentialException {
+    public Customer customerLogin(String username, String password) throws InvalidLoginCredentialException {
         try {
-            Employee employee = retrieveEmployeeByUsername(username);
+            Customer customer = retrieveCustomerByUsername(username);
 
-            if (employee.getPassword().equals(password)) {
+            if (customer.getPassword().equals(password)) {
                 //employee.get().size();                
-                return employee;
+                return customer;
             } else {
                 throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
             }
-        } catch (EmployeeNotFoundException ex) {
+        } catch (CustomerNotFoundException ex) {
             throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
         }
     }
 
     @Override
-    public Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException {
-        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
+    public Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException {
+        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.username = :username");
         query.setParameter("username", username);
         if (query.getResultList().isEmpty()) {
-            throw new EmployeeNotFoundException();
+            throw new CustomerNotFoundException();
         }
-        Employee employee = (Employee) query.getResultList().get(0);
-        return employee;
+        Customer customer = (Customer) query.getResultList().get(0);
+        return customer;
     }
 
     @Override
-    public Employee createEmployee(Employee employee) {
-        em.persist(employee);
+    public Customer createCustomer(Customer customer) {
+        em.persist(customer);
         em.flush();
-        return employee;
+        return customer;
     }
+    
+    
+    
+    
+    
+    
 
+
+    
 }

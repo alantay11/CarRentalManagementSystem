@@ -21,6 +21,6 @@ public interface EmployeeSessionBeanRemote {
 
     Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException;
 
-    long createEmployee(Employee employee);
+    Employee createEmployee(Employee employee);
     
 }

@@ -5,8 +5,8 @@
  */
 package ejb.session.stateless;
 
-import entity.Employee;
-import exception.EmployeeNotFoundException;
+import entity.Customer;
+import exception.CustomerNotFoundException;
 import javax.ejb.Local;
 
 /**
@@ -14,10 +14,8 @@ import javax.ejb.Local;
  * @author Uni
  */
 @Local
-public interface EmployeeSessionBeanLocal {
+public interface CustomerSessionBeanLocal {
 
-    Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException;
-
-    Employee createEmployee(Employee employee);
+    Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException ;
     
 }

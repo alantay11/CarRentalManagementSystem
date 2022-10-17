@@ -32,15 +32,15 @@ public class Customer implements Serializable {
     private String firstName;
     @Column(nullable = false, length = 32)
     private String lastName;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 32, unique = true)
     private String email;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 16)
     private String contactNumber;
     @Column(nullable = false, length = 32)
     private String addressLine1;
     @Column(nullable = false, length = 32)
     private String addressLine2;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 12)
     private String postalCode;
     @Column(nullable = false, length = 32)
     private String username;
@@ -193,7 +193,9 @@ public class Customer implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Customer[ id=" + customerId + " ]";
+        return "Customer: " + this.customerId + " with name " + this.firstName + " " + this.lastName + ", email of " + this.email +
+                ", contact number of " + this.contactNumber + ", address of " + this.addressLine1 + "\n" + this.addressLine2 +
+                ", username of " + this.username + " and password " + this.password;
     }
 
 }
