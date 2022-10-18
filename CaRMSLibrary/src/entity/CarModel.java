@@ -43,10 +43,6 @@ public class CarModel implements Serializable {
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Car car;
-
 
     public CarModel() {
         this.enabled = true;
