@@ -11,6 +11,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
 import enumeration.EmployeeAccessRightEnum;
+import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -42,7 +43,7 @@ public class MainApp {
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
     }
 
-    public void runApp() {
+    public void runApp() throws InvalidIdException {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
@@ -67,7 +68,7 @@ public class MainApp {
                                 salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                                 salesManagerModule.salesManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
-                                operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                                operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote);
                                 operationsManagerModule.operationsManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
                                 customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
@@ -113,7 +114,7 @@ public class MainApp {
         }
     }
 
-    private void sysAdminMenu() {
+    private void sysAdminMenu() throws InvalidIdException {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
@@ -147,7 +148,7 @@ public class MainApp {
                         salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                         salesManagerModule.salesManagerMenu();
                     } else if (response == 6) {
-                        operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                        operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote);
                         operationsManagerModule.operationsManagerMenu();
                     } else if (response == 7) {
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);

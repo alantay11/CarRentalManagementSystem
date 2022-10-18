@@ -39,7 +39,7 @@ public class OperationsManagerModule {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
     }
 
-    public void operationsManagerMenu() {
+    public void operationsManagerMenu() throws InvalidIdException {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
 
