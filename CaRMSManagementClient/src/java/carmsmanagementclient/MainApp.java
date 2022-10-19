@@ -7,6 +7,7 @@ package carmsmanagementclient;
 
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
@@ -26,7 +27,9 @@ public class MainApp {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
+    private CarSessionBeanRemote carSessionBeanRemote;
 
+    
     private SalesManagerModule salesManagerModule;
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
     private OperationsManagerModule operationsManagerModule;
@@ -36,11 +39,12 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote) {
+    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote) {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
     }
 
     public void runApp() throws InvalidIdException {
@@ -68,7 +72,7 @@ public class MainApp {
                                 salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                                 salesManagerModule.salesManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
-                                operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote);
+                                operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote);
                                 operationsManagerModule.operationsManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
                                 customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);

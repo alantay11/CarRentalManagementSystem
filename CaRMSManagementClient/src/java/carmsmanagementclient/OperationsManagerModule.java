@@ -7,10 +7,13 @@ package carmsmanagementclient;
 
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
+import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
 import java.util.List;
 import java.util.Scanner;
@@ -25,6 +28,7 @@ public class OperationsManagerModule {
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBean;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
+    private CarSessionBeanRemote carSessionBeanRemote;
 
     public OperationsManagerModule() {
     }
@@ -32,11 +36,13 @@ public class OperationsManagerModule {
     public OperationsManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, 
             RentalRateSessionBeanRemote rentalRateSessionBeanRemote, 
             CarCategorySessionBeanRemote carCategorySessionBean,
-            CarModelSessionBeanRemote carModelSessionBeanRemote) {
+            CarModelSessionBeanRemote carModelSessionBeanRemote,
+            CarSessionBeanRemote carSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBean = carCategorySessionBean;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
     }
 
     public void operationsManagerMenu() throws InvalidIdException {
@@ -73,9 +79,9 @@ public class OperationsManagerModule {
                 } else if (response == 3) {
                     doUpdateCarModel();
                 } else if (response == 4) {
-                    //  doDeleteCarModel();
+                    doDeleteCarModel();
                 } else if (response == 5) {
-                    // doCreateNewCar();
+                    doCreateNewCar();
                 } else if (response == 6) {
                     //  doViewAllCars();
                 } else if (response == 7) {
@@ -111,8 +117,9 @@ public class OperationsManagerModule {
             String model = "";
             
             System.out.println("*** CaRMSMC System :: Operations Manager :: Create New Car Model ***\n");
-            System.out.print("Enter name of car model> ");
-            carModel.setModel(scanner.nextLine().trim());
+            System.out.print("Enter ID of car model> ");
+            Long carModelId = scanner.nextLong();
+            carModel.setCarModelId(carModelId);
             
             // retrieve car category first
             List<CarCategory> carCategoryList = carCategorySessionBean.retrieveAllCarCategories();
@@ -236,5 +243,83 @@ public class OperationsManagerModule {
         }
     }
     
+    public void doDeleteCarModel() {
+        System.out.println("*** CaRMSMC System :: Operations Manager :: Delete Rental Rate ***\n");
+        Scanner scanner = new Scanner(System.in);
+    
+        doViewAllCarModels();
+        System.out.print("Enter ID of car model you want to delete> ");
+        long carModelId = scanner.nextLong();
+        CarModel carModel = carModelSessionBeanRemote.retrieveCarModel(carModelId);
+        scanner.nextLine();
+        
+        System.out.print("\nConfirm deletion of " + carModel.toString() + "? (Y/N)> ");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+
+        if (confirmation.equals("y")) {
+            boolean deleted = carModelSessionBeanRemote.deleteCarModel(carModelId);
+            if (deleted) {
+                System.out.println("\n" + carModel.toString() + " deleted\n");
+            } else {
+                System.out.println("\n" + carModel.toString() + " disabled\n");
+            }
+        } else {
+            System.out.println("\nDeletion cancelled\n");
+        }
+    }
+    
+    public void doCreateNewCar() {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            Car car = new Car();
+            String licensePlateNum = "";
+            String color = "";
+            CarStatusEnum carStatus;
+            
+            
+            System.out.println("*** CaRMSMC System :: Operations Manager :: Create Rental Rate ***\n");
+            System.out.print("Enter ID of car> ");
+            Long carId = scanner.nextLong();
+            car.setCarId(carId);
+            
+            // create car for particular make and model 
+            List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
+            
+            int counter = 1;
+            System.out.println("\n-----------------------------------");
+            for (CarModel cm : carModelList) {
+                System.out.println(counter + ": " + cm.toString());
+                counter++;
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Enter ID of car model> ");
+            long carModelId = scanner.nextLong();
+            car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
+            
+            // create new car with license plate number, colour, status 
+            // (in outlet or on rental) and location (specific customer or outlet).
+            System.out.print("Enter license plate number> ");
+            licensePlateNum = scanner.nextLine().trim();
+            car.setLicensePlateNum(licensePlateNum);
+            
+            System.out.print("Enter color> ");
+            color = scanner.nextLine().trim();
+            car.setColor(color);
+            
+            System.out.print("Enter status> ");
+            carStatus = scanner.next();
+            car.setCarStatus(carStatus);
+            
+            /*System.out.print("Enter location> ");
+            carStatus = scanner.next();
+            car.setCarStatus(carStatus); */
+            
+            car = carSessionBeanRemote.createCar(car);
+            
+            System.out.println("\nNew " + car.toString() + " created\n");           
+        } catch (InvalidIdException ex) {
+            System.out.println("You have entered an invalid ID!\n");
+        } 
+    }
     
 }
