@@ -7,6 +7,7 @@ package carmsmanagementclient;
 
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import exception.InvalidIdException;
@@ -19,6 +20,8 @@ import javax.ejb.EJB;
 public class Main {
 
     @EJB
+    private static CarSessionBeanRemote carSessionBeanRemote;
+    @EJB
     private static CarModelSessionBeanRemote carModelSessionBeanRemote;
     @EJB
     private static CarCategorySessionBeanRemote carCategorySessionBeanRemote;
@@ -28,8 +31,9 @@ public class Main {
     private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
     
     
+    
      public static void main(String[] args) throws InvalidIdException {
-        MainApp mainApp = new MainApp(carModelSessionBeanRemote, employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+        MainApp mainApp = new MainApp(carModelSessionBeanRemote, employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carSessionBeanRemote);
         mainApp.runApp(); 
     }
     

@@ -33,8 +33,8 @@ public class OperationsManagerModule {
     public OperationsManagerModule() {
     }
 
-    public OperationsManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, 
-            RentalRateSessionBeanRemote rentalRateSessionBeanRemote, 
+    public OperationsManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote,
+            RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
             CarCategorySessionBeanRemote carCategorySessionBean,
             CarModelSessionBeanRemote carModelSessionBeanRemote,
             CarSessionBeanRemote carSessionBeanRemote) {
@@ -108,22 +108,22 @@ public class OperationsManagerModule {
             }
         }
     }
-    
+
     public void doCreateCarModel() {
         try {
             Scanner scanner = new Scanner(System.in);
             CarModel carModel = new CarModel();
             String make = "";
             String model = "";
-            
+
             System.out.println("*** CaRMSMC System :: Operations Manager :: Create New Car Model ***\n");
             System.out.print("Enter ID of car model> ");
             Long carModelId = scanner.nextLong();
             carModel.setCarModelId(carModelId);
-            
+
             // retrieve car category first
             List<CarCategory> carCategoryList = carCategorySessionBean.retrieveAllCarCategories();
-            
+
             int counter = 1;
             System.out.println("\n-----------------------------------");
             for (CarCategory c : carCategoryList) {
@@ -134,34 +134,34 @@ public class OperationsManagerModule {
             System.out.print("Enter ID of car category> ");
             long carCategoryId = scanner.nextLong();
             carModel.setCarCategory(carCategorySessionBean.retrieveCarCategory(carCategoryId));
-            
+
             // create new model w/ make and model attributes
             System.out.print("Enter make of car> ");
             make = scanner.nextLine().trim();
             carModel.setMake(make);
-            
+
             System.out.print("Enter model of car> ");
             model = scanner.nextLine().trim();
             carModel.setModel(model);
-            
+
             carModel = carModelSessionBeanRemote.createCarModel(carModel);
-            
+
             System.out.println("\nNew " + carModel.toString() + " created\n");
-            
+
         } catch (InvalidIdException ex) {
             System.out.println("You have entered an invalid ID!\n");
         }
     }
-    
+
     private List<CarModel> getAllCarModels() {
         List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
         return carModelList;
     }
-    
+
     public void doViewAllCarModels() {
         Scanner scanner = new Scanner(System.in);
         List<CarModel> carModelList = getAllCarModels();
-        
+
         System.out.println("\n-----------------------------------");
         for (CarModel cm : carModelList) {
             System.out.println(cm.toString());
@@ -170,21 +170,21 @@ public class OperationsManagerModule {
         System.out.print("Press enter to continue>");
         scanner.nextLine();
     }
-    
+
     public void doUpdateCarModel() throws InvalidIdException {
         System.out.println("*** CaRMSMC System :: Operations Manager :: Update Car Model ***\n");
         Scanner scanner = new Scanner(System.in);
         Integer response;
-        
+
         List<CarModel> carModelList = getAllCarModels();
         doViewAllCarModels();
         System.out.print("Enter ID of car model you want to update> ");
         long carModelId = scanner.nextLong();
         CarModel carModel = carModelSessionBeanRemote.retrieveCarModel(carModelId);
-        
+
         String make = "";
         String model = "";
-        
+
         while (true) {
             System.out.println("-----------------------------------");
             System.out.println("1: Edit Car Make: " + carModel.getMake());
@@ -193,7 +193,7 @@ public class OperationsManagerModule {
             System.out.println("4: Finish");
             System.out.println("-----------------------------------\n");
             response = 0;
-            
+
             while (response < 1 || response > 4) {
                 System.out.print("> ");
 
@@ -228,11 +228,12 @@ public class OperationsManagerModule {
                 } catch (InvalidIdException ex) {
                     System.out.println("\nYou have entered an invalid ID!\n");
                 }
-            } if (response == 4) {
+            }
+            if (response == 4) {
                 break;
             }
         }
-        
+
         System.out.print("\nConfirm update of " + carModel.toString() + "? (Y/N)> ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
         if (confirmation.equals("y")) {
@@ -242,17 +243,17 @@ public class OperationsManagerModule {
             System.out.println("\nUpdate cancelled\n");
         }
     }
-    
+
     public void doDeleteCarModel() {
         System.out.println("*** CaRMSMC System :: Operations Manager :: Delete Rental Rate ***\n");
         Scanner scanner = new Scanner(System.in);
-    
+
         doViewAllCarModels();
         System.out.print("Enter ID of car model you want to delete> ");
         long carModelId = scanner.nextLong();
         CarModel carModel = carModelSessionBeanRemote.retrieveCarModel(carModelId);
         scanner.nextLine();
-        
+
         System.out.print("\nConfirm deletion of " + carModel.toString() + "? (Y/N)> ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
 
@@ -267,24 +268,23 @@ public class OperationsManagerModule {
             System.out.println("\nDeletion cancelled\n");
         }
     }
-    
+
     public void doCreateNewCar() {
         try {
             Scanner scanner = new Scanner(System.in);
             Car car = new Car();
             String licensePlateNum = "";
             String color = "";
-            CarStatusEnum carStatus;
-            
-            
+            String carStatus;
+
             System.out.println("*** CaRMSMC System :: Operations Manager :: Create Rental Rate ***\n");
             System.out.print("Enter ID of car> ");
             Long carId = scanner.nextLong();
             car.setCarId(carId);
-            
+
             // create car for particular make and model 
             List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
-            
+
             int counter = 1;
             System.out.println("\n-----------------------------------");
             for (CarModel cm : carModelList) {
@@ -295,31 +295,35 @@ public class OperationsManagerModule {
             System.out.print("Enter ID of car model> ");
             long carModelId = scanner.nextLong();
             car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
-            
+
             // create new car with license plate number, colour, status 
             // (in outlet or on rental) and location (specific customer or outlet).
             System.out.print("Enter license plate number> ");
             licensePlateNum = scanner.nextLine().trim();
             car.setLicensePlateNum(licensePlateNum);
-            
+
             System.out.print("Enter color> ");
             color = scanner.nextLine().trim();
             car.setColor(color);
-            
+
             System.out.print("Enter status> ");
-            carStatus = scanner.next();
-            car.setCarStatus(carStatus);
-            
+            carStatus = scanner.nextLine().trim();
+            if (carStatus.equals(CarStatusEnum.INOUTLET)) {
+                car.setCarStatus(CarStatusEnum.INOUTLET);
+            } else if (carStatus.equals(CarStatusEnum.ONRENTAL)) {
+                car.setCarStatus(CarStatusEnum.ONRENTAL);
+
+            }
+
             /*System.out.print("Enter location> ");
             carStatus = scanner.next();
             car.setCarStatus(carStatus); */
-            
             car = carSessionBeanRemote.createCar(car);
-            
-            System.out.println("\nNew " + car.toString() + " created\n");           
+
+            System.out.println("\nNew " + car.toString() + " created\n");
         } catch (InvalidIdException ex) {
             System.out.println("You have entered an invalid ID!\n");
-        } 
+        }
     }
-    
+
 }
