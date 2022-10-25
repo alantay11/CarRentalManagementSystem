@@ -40,7 +40,7 @@ public class CarModel implements Serializable {
     private List<Car> carList;
     
     @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
+    //@JoinColumn(nullable = false)
     private CarCategory carCategory;
 
 

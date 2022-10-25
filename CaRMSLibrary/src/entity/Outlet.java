@@ -27,41 +27,45 @@ public class Outlet implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
-    
+
     @Column(nullable = false, length = 32)
     private String address;
-    
+
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalTime openingTime;    
+    private LocalTime openingTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalTime closingTime;
-    
-    
+
     @OneToMany(mappedBy = "currentOutlet")
-    private List<Car> carList;    
+    private List<Car> carList;
     @OneToMany(mappedBy = "assignedOutlet")
-    private List<Employee> employeeList;    
+    private List<Employee> employeeList;
     @OneToMany(mappedBy = "departureOutlet")
-    private List<TransitDriverDispatch> outboundTransitDriverDispatchList;    
+    private List<TransitDriverDispatch> outboundTransitDriverDispatchList;
     @OneToMany(mappedBy = "destinationOutlet")
     private List<TransitDriverDispatch> inboundTransitDriverDispatchList;
 
+    /* might need 
+    @OneToMany(mappedBy = "departureOutlet")
+    private List<TransitDriverDispatch> pickupReservationList;
+     */
+    
     public Outlet() {
     }
-    
+
     public Outlet(String address, LocalTime openingTime, LocalTime closingTime) {
         this.address = address;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.carList = new ArrayList<>();
-    }    
+    }
 
     public Outlet(String address, LocalTime openingTime, LocalTime closingTime, List<Car> carList) {
         this.address = address;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
         this.carList = carList;
-    }    
+    }
 
     public Outlet(String address, LocalTime openingTime, LocalTime closingTime, List<Car> carList, List<Employee> employeeList, List<TransitDriverDispatch> outboundTransitDriverDispatchList, List<TransitDriverDispatch> inboundTransitDriverDispatchList) {
         this.address = address;
@@ -72,7 +76,7 @@ public class Outlet implements Serializable {
         this.outboundTransitDriverDispatchList = outboundTransitDriverDispatchList;
         this.inboundTransitDriverDispatchList = inboundTransitDriverDispatchList;
     }
-    
+
     public Long getOutletId() {
         return outletId;
     }
@@ -136,8 +140,6 @@ public class Outlet implements Serializable {
     public void setInboundTransitDriverDispatchList(List<TransitDriverDispatch> inboundTransitDriverDispatchList) {
         this.inboundTransitDriverDispatchList = inboundTransitDriverDispatchList;
     }
-    
-    
 
     @Override
     public int hashCode() {
@@ -163,5 +165,5 @@ public class Outlet implements Serializable {
     public String toString() {
         return "entity.Outlet[ id=" + outletId + " ]";
     }
-    
+
 }

@@ -36,6 +36,7 @@ public class TransitDriverDispatch implements Serializable {
     private Car car;
     @OneToOne(mappedBy = "transitDriverDispatchRecord")
     private Employee employee;
+    
     @ManyToOne
     private Outlet departureOutlet;
     @ManyToOne

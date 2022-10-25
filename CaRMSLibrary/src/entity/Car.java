@@ -49,10 +49,8 @@ public class Car implements Serializable {
     private List<Reservation> reservationList;
 
     @OneToOne
-    private RentalRate rentalRateRecord;
-    @OneToOne
     private Outlet currentOutlet;
-    @OneToOne
+    @OneToOne(optional = true)
     private TransitDriverDispatch transitDriverDispatchRecord;
 
     public Car() {
@@ -146,14 +144,6 @@ public class Car implements Serializable {
 
     public void setCurrentOutlet(Outlet currentOutlet) {
         this.currentOutlet = currentOutlet;
-    }
-
-    public RentalRate getRentalRateRecord() {
-        return rentalRateRecord;
-    }
-
-    public void setRentalRateRecord(RentalRate rentalRateRecord) {
-        this.rentalRateRecord = rentalRateRecord;
     }
 
     @Override

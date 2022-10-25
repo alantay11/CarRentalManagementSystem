@@ -29,7 +29,7 @@ public class CarCategory implements Serializable {
 
     @Column(nullable = false, length = 32)
     private String carCategoryName;
-
+    
     @OneToMany(mappedBy = "category")
     private List<Car> carList;
 
