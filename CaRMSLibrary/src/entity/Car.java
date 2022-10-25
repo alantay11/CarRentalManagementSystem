@@ -54,10 +54,6 @@ public class Car implements Serializable {
     private Outlet currentOutlet;
     @OneToOne
     private TransitDriverDispatch transitDriverDispatchRecord;
-    
-    @OneToMany(mappedBy = "model")
-    private List<Car> carList;
-    
 
     public Car() {
         this.enabled = true;
@@ -183,14 +179,6 @@ public class Car implements Serializable {
     @Override
     public String toString() {
         return "entity.Car[ id=" + carId + " ]";
-    }
-
-    public List<Car> getCarList() {
-        return carList;
-    }
-
-    public void setCarList(List<Car> carList) {
-        this.carList = carList;
     }
 
 }

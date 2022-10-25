@@ -22,66 +22,55 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
-    
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-    
     // usecase #14
     @Override
-    public CarModel createCarModel(CarModel carModel)
-    {
+    public CarModel createCarModel(CarModel carModel) {
         em.persist(carModel);
-        
         em.flush();
-        
+
         return carModel;
     }
-    
+
     // usecase #15 sorted in ascending order by carcategory, make and model
     @Override
-    public List<CarModel> retrieveAllCarModels() 
-    {
+    public List<CarModel> retrieveAllCarModels() {
         Query query = em.createQuery("SELECT m FROM CarModel m ORDER BY m.carCategory, m.make, m.model");
         return query.getResultList();
     }
-    
+
     // usecase #16
     @Override
-    public CarModel updateCarModel(CarModel carModel)
-    {
+    public CarModel updateCarModel(CarModel carModel) {
         em.merge(carModel);
         em.flush();
-        
+
         return carModel;
     }
-    
+
     // usecase #17
     @Override
-    public CarModel retrieveCarModel(long carModelId) 
-    {
+    public CarModel retrieveCarModel(long carModelId) {
         CarModel carModel = em.find(CarModel.class, carModelId);
         carModel.getCarList().size();
         return carModel;
     }
-    
-    @Override 
-    public boolean deleteCarModel(long carModelId)
-    {
+
+    @Override
+    public boolean deleteCarModel(long carModelId) {
         CarModel carModel = retrieveCarModel(carModelId);
-        
-        if(carModel.getCarList().isEmpty()) 
-        {
+
+        if (carModel.getCarList().isEmpty()) {
             em.remove(carModel);
-            
+
             return true;
-        } 
-        else
-        {
+        } else {
             carModel.setEnabled(false);
             em.merge(carModel);
-            
+
             return false;
         }
     }
-    
+
 }

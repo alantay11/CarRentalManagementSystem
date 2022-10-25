@@ -23,9 +23,6 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-    
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
 
     @Override
     public CarCategory createCarCategory(CarCategory carCategory) {
@@ -33,13 +30,12 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         em.flush();
         return carCategory;
     }
-    
+
     @Override
     public List<CarCategory> retrieveAllCarCategories() {
         Query query = em.createQuery("SELECT c FROM CarCategory c");
         return query.getResultList();
     }
-    
 
     @Override
     public CarCategory retrieveCarCategoryUsingName(String name) throws InvalidCarCategoryNameException {
@@ -57,9 +53,4 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         return em.find(CarCategory.class, carCategoryId);
     }
 
-    
-    
-    
-    
-    
 }

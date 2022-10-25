@@ -17,6 +17,8 @@ import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -153,7 +155,7 @@ public class OperationsManagerModule {
             System.out.println("You have entered an invalid ID!\n");
         }
     }
-    
+
     // case #2
     private List<CarModel> getAllCarModels() {
         List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
@@ -326,17 +328,17 @@ public class OperationsManagerModule {
             car = carSessionBeanRemote.createCar(car);
 
             System.out.println("\nNew " + car.toString() + " created\n");
-        } catch (InvalidIdException ex) {
-            System.out.println("You have entered an invalid ID!\n");
+        } catch (Exception ex) {
+            System.out.println("You have entered an invalid field!\n");
         }
     }
-    
+
     // case #6
     private List<Car> getAllCars() {
         List<Car> carList = carSessionBeanRemote.retrieveAllCars();
         return carList;
     }
-    
+
     public void doViewAllCars() {
         Scanner scanner = new Scanner(System.in);
         List<Car> carList = getAllCars();
@@ -348,28 +350,33 @@ public class OperationsManagerModule {
         System.out.print("Press enter to continue>");
         scanner.nextLine();
     }
-    
+
     // case #7
     private void doViewCarDetails() {
         Scanner scanner = new Scanner(System.in);
         List<Car> carList = getAllCars();
-        
+
         System.out.println("\n-----------------------------------");
         for (Car c : carList) {
-            System.out.println("ID: " + c.getCarId()+ ", Car Model: " + c.getModel());
+            System.out.println("ID: " + c.getCarId() + ", Car Model: " + c.getModel());
         }
         System.out.println("-----------------------------------\n");
 
         System.out.print("Enter ID of car you want to view> ");
         long carId = scanner.nextLong();
         scanner.nextLine();
-        Car car = carSessionBeanRemote.retrieveCar(carId);
-        System.out.println("\n" + car.toString() + "\n");
-        System.out.print("Press enter to continue>");
-        scanner.nextLine();
-        System.out.println();
+        Car car;
+        try {
+            car = carSessionBeanRemote.retrieveCar(carId);
+            System.out.println("\n" + car.toString() + "\n");
+            System.out.print("Press enter to continue>");
+            scanner.nextLine();
+            System.out.println();
+        } catch (InvalidIdException ex) {
+            System.out.println("You have entered an invalid ID!\n");
+        }
     }
-    
+
     // case #8
     private void doUpdateCar() {
         System.out.println("*** CaRMSMC System :: Operations Manager :: Update Car ***\n");
@@ -380,74 +387,81 @@ public class OperationsManagerModule {
         doViewAllCars();
         System.out.print("Enter ID of car you want to update> ");
         long carId = scanner.nextLong();
-        Car car = carSessionBeanRemote.retrieveCar(carId);
+        Car car;
+        try {
+            car = carSessionBeanRemote.retrieveCar(carId);
 
-        // attributes: license plate number, colour, status 
-        // (in outlet or on rental) and location (specific customer or outlet).
-        String licensePlateNum = "";
-        String color = "";
-        String carStatus = "";
-        String location = "";
-        
-        while (true) {
-            System.out.println("-----------------------------------");
-            System.out.println("1: Edit Car License Plate Number: " + car.getLicensePlateNum());
-            System.out.println("2: Edit Car Color: " + car.getColor());
-            System.out.println("3: Edit Car Status: $" + car.getCarStatus());
-            System.out.println("4: Edit Car Location: " + car.getCurrentOutlet());
-            System.out.println("5: Finish");
-            System.out.println("-----------------------------------\n");
-            response = 0;
-        
-            while (response < 1 || response > 5) {
-                System.out.print("> ");
+            // attributes: license plate number, colour, status 
+            // (in outlet or on rental) and location (specific customer or outlet).
+            String licensePlateNum = "";
+            String color = "";
+            String carStatus = "";
+            String location = "";
 
-                response = scanner.nextInt();
-                scanner.nextLine();
+            while (true) {
+                System.out.println("-----------------------------------");
+                System.out.println("1: Edit Car License Plate Number: " + car.getLicensePlateNum());
+                System.out.println("2: Edit Car Color: " + car.getColor());
+                System.out.println("3: Edit Car Status: $" + car.getCarStatus());
+                System.out.println("4: Edit Car Location: " + car.getCurrentOutlet());
+                System.out.println("5: Finish");
+                System.out.println("-----------------------------------\n");
+                response = 0;
 
-                try {
-                    if (response == 1) {
-                        System.out.println("Enter Car License Plate Number> ");
-                        car.setLicensePlateNum(scanner.nextLine().trim());
-                    } else if (response == 2) {
-                        System.out.println("Enter Car Color> ");
-                        car.setColor(scanner.nextLine().trim());
-                    } else if (response == 3) {
-                        System.out.println("Enter Car Status> ");
-                        carStatus = scanner.nextLine().trim();
-                        if (CarStatusEnum.INOUTLET.equals(carStatus)) {
-                            car.setCarStatus(CarStatusEnum.INOUTLET);
-                        } else if (carStatus.equals(CarStatusEnum.ONRENTAL)) {
-                            car.setCarStatus(CarStatusEnum.ONRENTAL);
+                while (response < 1 || response > 5) {
+                    System.out.print("> ");
+
+                    response = scanner.nextInt();
+                    scanner.nextLine();
+
+                    try {
+                        if (response == 1) {
+                            System.out.println("Enter Car License Plate Number> ");
+                            car.setLicensePlateNum(scanner.nextLine().trim());
+                        } else if (response == 2) {
+                            System.out.println("Enter Car Color> ");
+                            car.setColor(scanner.nextLine().trim());
+                        } else if (response == 3) {
+                            System.out.println("Enter Car Status> ");
+                            carStatus = scanner.nextLine().trim();
+                            if (CarStatusEnum.INOUTLET.equals(carStatus)) {
+                                car.setCarStatus(CarStatusEnum.INOUTLET);
+                            } else if (carStatus.equals(CarStatusEnum.ONRENTAL)) {
+                                car.setCarStatus(CarStatusEnum.ONRENTAL);
+                            }
+                        } else if (response == 4) {
+                            System.out.println("Enter Car Location> ");
+                            // fill in here
+
+                        } else if (response == 5) {
+                            break;
+                        } else {
+                            System.out.println("Invalid option, please try again!\n");
                         }
-                    } else if (response == 4) {
-                        System.out.println("Enter Car Location> ");
-                        // fill in here
-                        
-                    } else if (response == 5) {
-                        break;
-                    } else {
-                        System.out.println("Invalid option, please try again!\n");
+                    } catch (Exception ex) {
+                        System.out.println("\nYou have entered an invalid field!\n");
                     }
-                } catch (InvalidIdException ex) {
-                    System.out.println("\nYou have entered an invalid ID!\n");
-                } 
+                }
+
+                if (response == 5) {
+                    break;
+                }
+
             }
-            if (response == 5) {
-                break;
+
+            System.out.print("\nConfirm update of " + car.toString() + "? (Y/N)> ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (confirmation.equals("y")) {
+                car = carSessionBeanRemote.updateCar(car);
+                System.out.println("\n" + car.toString() + " updated\n");
+            } else {
+                System.out.println("\nUpdate cancelled\n");
             }
-        }
-        
-        System.out.print("\nConfirm update of " + car.toString() + "? (Y/N)> ");
-        String confirmation = scanner.nextLine().trim().toLowerCase();
-        if (confirmation.equals("y")) {
-            car = carSessionBeanRemote.updateCar(car);
-            System.out.println("\n" + car.toString() + " updated\n");
-        } else {
-            System.out.println("\nUpdate cancelled\n");
+        } catch (InvalidIdException ex) {
+            System.out.println("You have entered an invalid ID!\n");
         }
     }
-    
+
     // case #9
     public void doDeleteCar() {
         System.out.println("*** CaRMSMC System :: Operations Manager :: Delete Car ***\n");
@@ -456,21 +470,24 @@ public class OperationsManagerModule {
         doViewAllCars();
         System.out.print("Enter ID of car you want to delete> ");
         long carId = scanner.nextLong();
-        Car car = carSessionBeanRemote.retrieveCar(carId);
-        scanner.nextLine();
-        System.out.print("\nConfirm deletion of " + car.toString() + "? (Y/N)> ");
-        String confirmation = scanner.nextLine().trim().toLowerCase();
-        if (confirmation.equals("y")) {
-            boolean deleted = carSessionBeanRemote.deleteCar(carId);
-            if (deleted) {
-                System.out.println("\n" + car.toString() + " deleted\n");
+        try {
+            Car car = carSessionBeanRemote.retrieveCar(carId);
+            scanner.nextLine();
+            System.out.print("\nConfirm deletion of " + car.toString() + "? (Y/N)> ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (confirmation.equals("y")) {
+                boolean deleted = carSessionBeanRemote.deleteCar(carId);
+                if (deleted) {
+                    System.out.println("\n" + car.toString() + " deleted\n");
+                } else {
+                    System.out.println("\n" + car.toString() + " disabled\n");
+                }
             } else {
-                System.out.println("\n" + car.toString() + " disabled\n");
+                System.out.println("\nDeletion cancelled\n");
             }
-        } else {
-            System.out.println("\nDeletion cancelled\n");
+        } catch (InvalidIdException ex) {
+            System.out.println("You have entered an invalid ID!\n");
         }
     }
 
 }
-

@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import exception.InvalidIdException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -20,10 +21,10 @@ public interface CarSessionBeanLocal {
     
     public List<Car> retrieveAllCars();
 
-    public Car retrieveCar(long carId);
+    public Car retrieveCar(long carId) throws InvalidIdException;
 
     public Car updateCar(Car car);
 
-    public boolean deleteCar(long carId);
+    public boolean deleteCar(long carId) throws InvalidIdException;
 
 }

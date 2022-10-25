@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import enumeration.CarStatusEnum;
+import exception.InvalidIdException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -21,65 +23,54 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-    
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-    
+
     // usecase #18
     @Override
-    public Car createCar(Car car)
-    {
+    public Car createCar(Car car) {
         em.persist(car);
         em.flush();
-        
+
         return car;
     }
-    
+
     // usecase #19: category, make, model and license plate number
     @Override
-    public List<Car> retrieveAllCars()
-    {
+    public List<Car> retrieveAllCars() {
         Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.category, c.model, c.licensePlateNum");
         return query.getResultList();
     }
-    
+
     // usecase #20: view details of particular car record
     @Override
-    public Car retrieveCar(long carId)
-    {
+    public Car retrieveCar(long carId) throws InvalidIdException {
         Car car = em.find(Car.class, carId);
-        car.getCarList().size();
-       
+        car.getReservationList().size();
+
         return car;
     }
-    
+
     // usecase #21
     @Override
-    public Car updateCar(Car car)
-    {
+    public Car updateCar(Car car) {
         em.merge(car);
         em.flush();
-        
+
         return car;
     }
-    
+
     // usecase #22
     @Override
-    public boolean deleteCar(long carId)
-    {
+    public boolean deleteCar(long carId) throws InvalidIdException {
         Car car = retrieveCar(carId);
-        
-        if(car.getCarList().isEmpty()) 
-        {
+
+        if (car.getCarStatus().equals(CarStatusEnum.INOUTLET)) {
             em.remove(car);
-            
+
             return true;
-        }
-        else
-        {
+        } else {
             car.setEnabled(false);
             em.merge(car);
-            
+
             return false;
         }
     }
