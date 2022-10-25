@@ -16,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -43,6 +44,7 @@ public class Car implements Serializable {
 
    
     @ManyToOne
+    @JoinColumn(nullable = false)
     private CarModel model;
 
     @OneToMany(mappedBy = "car")

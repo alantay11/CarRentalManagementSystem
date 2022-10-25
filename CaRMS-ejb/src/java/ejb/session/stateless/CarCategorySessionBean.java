@@ -34,7 +34,13 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
     @Override
     public List<CarCategory> retrieveAllCarCategories() {
         Query query = em.createQuery("SELECT c FROM CarCategory c");
-        return query.getResultList();
+        List<CarCategory> carCategories = query.getResultList();
+
+        for (CarCategory cc : carCategories) {
+            cc.getCarList().size();
+            cc.getRentalRateList().size();
+        }
+        return carCategories;
     }
 
     @Override

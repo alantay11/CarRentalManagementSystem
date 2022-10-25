@@ -30,22 +30,21 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
-    
-    
     // usecase #18
     @Override
     public Car createCar(Car car, long carModelId) {
+        em.persist(car);
+
         // since car belongs to car model, add to carlist within carmodel
         CarModel carModel = carModelSessionBeanLocal.retrieveCarModel(carModelId);
-        em.persist(car);
         carModel.getCarList().add(car);
-        
+
         // since car has to be sorted by category, make sure it is connected
         CarCategory carCategory = carModel.getCarCategory();
         carCategory.getCarList().add(car);
-        em.merge(carCategory);        
-        em.merge(carModel);        
-        
+        //em.merge(carCategory);        
+        //em.merge(carModel);        
+
         em.flush();
 
         return car;
@@ -55,7 +54,13 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public List<Car> retrieveAllCars() {
         Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.model.carCategory, c.model.make, c.model.model, c.licensePlateNum");
-        return query.getResultList();
+        
+        List<Car> cars = query.getResultList();
+        
+        for (Car c : cars) {
+            c.getReservationList().size();            
+        }
+        return cars;
     }
 
     // usecase #20: view details of particular car record
@@ -80,14 +85,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public boolean deleteCar(long carId) throws InvalidIdException {
         Car car = retrieveCar(carId);
-        
+
         // removing connection from carmodel to car
         CarModel carModel = car.getModel();
         List<Car> carList = carModel.getCarList();
         carList.remove(car);
         carModel.setCarList(carList);
         em.merge(carModel);
-        
+
         // removing connextion from car category to car
         CarCategory carCategory = carModel.getCarCategory();
         carList = carCategory.getCarList();

@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
@@ -26,22 +27,23 @@ public class TransitDriverDispatch implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transitDriverDispatchId;
-    
+
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime pickupTime;    
+    private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime dropoffTime;
-    
+
     @OneToOne(mappedBy = "transitDriverDispatchRecord")
     private Car car;
     @OneToOne(mappedBy = "transitDriverDispatchRecord")
     private Employee employee;
-    
-    @ManyToOne
+
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private Outlet departureOutlet;
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private Outlet destinationOutlet;
-    
 
     public TransitDriverDispatch() {
     }
@@ -102,9 +104,6 @@ public class TransitDriverDispatch implements Serializable {
     public void setDestinationOutlet(Outlet destinationOutlet) {
         this.destinationOutlet = destinationOutlet;
     }
-    
-    
-    
 
     public Long getTransitDriverDispatchId() {
         return transitDriverDispatchId;
@@ -138,5 +137,5 @@ public class TransitDriverDispatch implements Serializable {
     public String toString() {
         return "entity.TransitDriverDispatch[ id=" + transitDriverDispatchId + " ]";
     }
-    
+
 }
