@@ -35,8 +35,6 @@ public class CreditCard implements Serializable {
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate expiryDate;
 
-    @OneToOne(mappedBy = "creditCard", optional = true)
-    private Customer customer;
 
     public CreditCard() {
     }
@@ -48,28 +46,12 @@ public class CreditCard implements Serializable {
         this.expiryDate = expiryDate;
     }
 
-    public CreditCard(String nameonCC, int ccNumber, String cvv, LocalDate expiryDate, Customer customer) {
-        this.nameonCC = nameonCC;
-        this.ccNumber = ccNumber;
-        this.cvv = cvv;
-        this.expiryDate = expiryDate;
-        this.customer = customer;
-    }
-
     public Long getCcId() {
         return ccId;
     }
 
     public void setCcId(Long ccId) {
         this.ccId = ccId;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
     }
 
     public String getNameonCC() {
