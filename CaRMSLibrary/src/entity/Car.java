@@ -152,7 +152,7 @@ public class Car implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Car[ id=" + carId + " ]";
+        return "Car with id " + this.carId + ", license plate number " + this.licensePlateNum + ", color " + this.color;
     }
 
 }

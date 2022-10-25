@@ -164,7 +164,7 @@ public class Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Employee[ id=" + employeeId + " ]";
+        return "Employee with id " + this.employeeId + ", name " + this.firstName + " " + this.lastName + ", username " + this.username + ", access right" + this.accessRight;
     }
     
 }

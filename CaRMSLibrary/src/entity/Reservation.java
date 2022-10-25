@@ -150,7 +150,7 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Reservation[ id=" + reservationId + " ]";
+        return "Reservation with id " + this.reservationId + ", pick up time" + this.pickupTime.toString().replace("T", ", ") + ", return time " + this.returnTime.toString().replace("T", ", ");
     }
 
 }

@@ -109,7 +109,7 @@ public class CreditCard implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.CreditCard[ id=" + ccId + " ]";
+        return "Credit card id " + this.ccId + ", name " + this.nameonCC;
     }
 
 }
