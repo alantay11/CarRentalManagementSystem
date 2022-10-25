@@ -5,9 +5,12 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategory;
 import entity.RentalRate;
+import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,11 +23,20 @@ import javax.persistence.Query;
 @Stateless
 public class RentalRateSessionBean implements RentalRateSessionBeanRemote, RentalRateSessionBeanLocal {
 
+    @EJB
+    private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
+
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
+    
+    
 
     @Override
-    public RentalRate createRentalRate(RentalRate rentalRate) {
+    public RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException {
+        CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategory(carCategoryId);
+        carCategory.getRentalRateList().add(rentalRate);
+        
+        em.merge(carCategory);
         em.persist(rentalRate);
         em.flush();
 

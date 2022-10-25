@@ -15,7 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -40,7 +40,7 @@ public class RentalRate implements Serializable {
     @Column(nullable = false)
     private boolean enabled;
 
-    @OneToOne(mappedBy = "rentalRate")
+    @ManyToOne
     private CarCategory carCategory;
 
     @ManyToMany(mappedBy = "rentalRateList")

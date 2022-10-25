@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
+import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
 import java.util.List;
 import javax.ejb.Remote;
@@ -17,7 +18,7 @@ import javax.ejb.Remote;
 @Remote
 public interface RentalRateSessionBeanRemote {
 
-    RentalRate createRentalRate(RentalRate rentalRate);
+    RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException ;
 
     List<RentalRate> retrieveAllRentalRates();
 

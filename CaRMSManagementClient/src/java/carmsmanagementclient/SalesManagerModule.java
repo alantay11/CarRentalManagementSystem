@@ -119,7 +119,7 @@ public class SalesManagerModule {
             endTime = scanner.nextLine().trim();
             rentalRate.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime));
 
-            rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate);
+            rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate, carCategoryId);
 
             System.out.println("\nNew " + rentalRate.toString() + " created\n");
         } catch (InvalidIdException ex) {
@@ -257,7 +257,7 @@ public class SalesManagerModule {
         }
     }
 
-    public void doDeleteRentalRate() { //check what used means, when to delete and when not to
+    public void doDeleteRentalRate() {
         System.out.println("*** CaRMSMC System :: Sales Manager :: Delete Rental Rate ***\n");
         Scanner scanner = new Scanner(System.in);
 

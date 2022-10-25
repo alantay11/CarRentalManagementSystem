@@ -50,7 +50,9 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
 
     @Override
     public CarCategory retrieveCarCategory(long carCategoryId) throws InvalidIdException {
-        return em.find(CarCategory.class, carCategoryId);
+        CarCategory carCategory = em.find(CarCategory.class, carCategoryId);
+        carCategory.getRentalRateList().size();
+        return carCategory;
     }
 
 }

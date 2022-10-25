@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 /**
  *
@@ -33,8 +32,8 @@ public class CarCategory implements Serializable {
     @OneToMany(mappedBy = "category")
     private List<Car> carList;
 
-    @OneToOne
-    private RentalRate rentalRate;
+    @OneToMany(mappedBy = "carCategory")
+    private List<RentalRate> rentalRateList;
 
     public CarCategory() {
     }
@@ -64,13 +63,15 @@ public class CarCategory implements Serializable {
         this.carList = carList;
     }
 
-    public RentalRate getRentalRate() {
-        return rentalRate;
+    public List<RentalRate> getRentalRateList() {
+        return rentalRateList;
     }
 
-    public void setRentalRate(RentalRate rentalRate) {
-        this.rentalRate = rentalRate;
+    public void setRentalRateList(List<RentalRate> rentalRateList) {
+        this.rentalRateList = rentalRateList;
     }
+
+   
 
     public Long getCarCategoryId() {
         return carCategoryId;
