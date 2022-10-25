@@ -38,27 +38,26 @@ public class RentalRate implements Serializable {
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime endDateTime;
     @Column(nullable = false)
-    private boolean enabled;    
-    
+    private boolean enabled;
+
     @OneToOne(mappedBy = "rentalRate")
     private CarCategory carCategory;
+
     @ManyToMany(mappedBy = "rentalRateList")
     private List<Reservation> reservationList;
 
     public RentalRate() {
         this.enabled = true;
     }
-    
-    public RentalRate(String rateName, BigDecimal ratePerDay, LocalDateTime startDateTime, LocalDateTime endDateTime, CarCategory carCategory) {
-        this.rateName = rateName;
-        this.ratePerDay = ratePerDay;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
-        this.carCategory = carCategory;
-        this.enabled = true;
+
+    public CarCategory getCarCategory() {
+        return carCategory;
     }
-    
-       
+
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
+    }
+
     public Long getRentalRateRecordId() {
         return rentalRateRecordId;
     }
@@ -107,14 +106,6 @@ public class RentalRate implements Serializable {
         this.reservationList = reservationList;
     }
 
-    public CarCategory getCarCategory() {
-        return carCategory;
-    }
-
-    public void setCarCategory(CarCategory carCategory) {
-        this.carCategory = carCategory;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
@@ -145,8 +136,9 @@ public class RentalRate implements Serializable {
 
     @Override
     public String toString() {
-        return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay +
-                ", start date of " + this.startDateTime.toString().replace("T", ", ") + " and end date of " + this.endDateTime.toString().replace("T", ", ") +
-                " for category " + this.carCategory + ((enabled) ? "" : "DISABLED");
+        return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay
+                + ", start date of " + this.startDateTime.toString().replace("T", ", ") + " and end date of " + this.endDateTime.toString().replace("T", ", ")
+                //+ " for category " + this.carCategory 
+                + ((enabled) ? "" : "DISABLED");
     }
 }

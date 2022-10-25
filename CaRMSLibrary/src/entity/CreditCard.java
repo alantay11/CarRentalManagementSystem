@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Future;
 
 /**
  *
@@ -31,6 +32,7 @@ public class CreditCard implements Serializable {
     private int ccNumber;
     @Column(nullable = false, length = 3)
     private String cvv;
+    @Future
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate expiryDate;
 

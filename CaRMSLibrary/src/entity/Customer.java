@@ -42,7 +42,7 @@ public class Customer implements Serializable {
     private String addressLine2;
     @Column(nullable = false, length = 12)
     private String postalCode;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false, length = 32, unique = true)
     private String username;
     @Column(nullable = false, length = 32)
     private String password;

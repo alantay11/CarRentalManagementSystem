@@ -30,41 +30,29 @@ public class Reservation implements Serializable {
     private Long reservationId;
 
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime pickUpTime;
+    private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime dropOffTime;
+    private LocalDateTime returnTime;
 
     @ManyToMany
     private List<RentalRate> rentalRateList;
-    
+
     @ManyToOne
     private Customer customer;
     @ManyToOne
     private Car car;
-    
+
     @OneToOne
     private Outlet departureOutlet;
     @OneToOne
     private Outlet destinationOutlet;
-    
+
     /* Not sure if this is necessary
     @OneToOne(optional = true)
     private TransitDriverDispatch transitDriverDispatch;
-    */
-    
-
+     */
     public Reservation() {
     }
-
-    public Reservation(LocalDateTime pickUpTime, LocalDateTime dropOffTime, List<RentalRate> rentalRateList, Customer customer, Car car, Outlet departureOutlet, Outlet destinationOutlet) {
-        this.pickUpTime = pickUpTime;
-        this.dropOffTime = dropOffTime;
-        this.rentalRateList = rentalRateList;
-        this.customer = customer;
-        this.car = car;
-        this.departureOutlet = departureOutlet;
-        this.destinationOutlet = destinationOutlet;
-    }    
 
     public Long getreservationId() {
         return reservationId;
@@ -82,20 +70,20 @@ public class Reservation implements Serializable {
         this.reservationId = reservationId;
     }
 
-    public LocalDateTime getPickUpTime() {
-        return pickUpTime;
+    public LocalDateTime getPickupTime() {
+        return pickupTime;
     }
 
-    public void setPickUpTime(LocalDateTime pickUpTime) {
-        this.pickUpTime = pickUpTime;
+    public void setPickupTime(LocalDateTime pickupTime) {
+        this.pickupTime = pickupTime;
     }
 
-    public LocalDateTime getDropOffTime() {
-        return dropOffTime;
+    public LocalDateTime getReturnTime() {
+        return returnTime;
     }
 
-    public void setDropOffTime(LocalDateTime dropOffTime) {
-        this.dropOffTime = dropOffTime;
+    public void setReturnTime(LocalDateTime returnTime) {
+        this.returnTime = returnTime;
     }
 
     public List<RentalRate> getRentalRateList() {

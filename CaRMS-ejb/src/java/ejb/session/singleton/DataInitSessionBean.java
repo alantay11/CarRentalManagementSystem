@@ -59,7 +59,7 @@ public class DataInitSessionBean {
         }
 
         List<Car> sampleCarList = new ArrayList<>();
-        Outlet sampleOutlet = new Outlet("address", LocalTime.parse("09:00"), LocalTime.parse("17:00"), sampleCarList);
+        //Outlet sampleOutlet = new Outlet("address", LocalTime.parse("09:00"), LocalTime.parse("17:00"), sampleCarList);
         //Car sampleCar = new Car("Make", "Model", "Color", standardSedanCategory, sampleOutlet);
 
         //sampleCarList.add(sampleCar);
