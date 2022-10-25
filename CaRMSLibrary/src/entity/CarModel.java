@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,6 +47,7 @@ public class CarModel implements Serializable {
 
     public CarModel() {
         this.enabled = true;
+        this.carList = new ArrayList<>();
     }
 
     public CarModel(String make, String model) {
@@ -117,7 +119,7 @@ public class CarModel implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Model[ id=" + carModelId + " ]";
+        return "CarModel with id " + carModelId + ", make " + this.make + ", model " + this.model + " for category " + this.carCategory + " with cars " + this.carList;
     }
 
     public CarCategory getCarCategory() {

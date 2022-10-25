@@ -17,8 +17,6 @@ import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -120,10 +118,7 @@ public class OperationsManagerModule {
             String model = "";
 
             System.out.println("*** CaRMSMC System :: Operations Manager :: Create New Car Model ***\n");
-            System.out.print("Enter ID of car model> ");
-            Long carModelId = scanner.nextLong();
-            carModel.setCarModelId(carModelId);
-
+            
             // retrieve car category first
             List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
 
@@ -137,6 +132,7 @@ public class OperationsManagerModule {
             System.out.print("Enter ID of car category> ");
             long carCategoryId = scanner.nextLong();
             carModel.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
+            scanner.nextLine();
 
             // create new model w/ make and model attributes
             System.out.print("Enter make of car> ");
@@ -286,10 +282,7 @@ public class OperationsManagerModule {
             String carStatus;
 
             System.out.println("*** CaRMSMC System :: Operations Manager :: Create Car ***\n");
-            System.out.print("Enter ID of car> ");
-            Long carId = scanner.nextLong();
-            car.setCarId(carId);
-
+            
             // create car for particular make and model 
             List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
 
@@ -303,6 +296,7 @@ public class OperationsManagerModule {
             System.out.print("Enter ID of car model> ");
             long carModelId = scanner.nextLong();
             car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
+            scanner.nextLine();
 
             // create new car with license plate number, colour, status 
             // (in outlet or on rental) and location (specific customer or outlet).
@@ -314,18 +308,15 @@ public class OperationsManagerModule {
             color = scanner.nextLine().trim();
             car.setColor(color);
 
-            System.out.print("Enter status> ");
+            System.out.print("Enter status (Outlet/Rented)> ");
             carStatus = scanner.nextLine().trim();
-            if (carStatus.equals(CarStatusEnum.INOUTLET)) {
+            if (carStatus.toLowerCase().equals("outlet")) {
                 car.setCarStatus(CarStatusEnum.INOUTLET);
-            } else if (carStatus.equals(CarStatusEnum.ONRENTAL)) {
+            } else if (carStatus.toLowerCase().equals("rented")) {
                 car.setCarStatus(CarStatusEnum.ONRENTAL);
             }
-
-            /*System.out.print("Enter location> ");
-            carStatus = scanner.next();
-            car.setCarStatus(carStatus); */
-            car = carSessionBeanRemote.createCar(car);
+            
+            car = carSessionBeanRemote.createCar(car, carModelId);
 
             System.out.println("\nNew " + car.toString() + " created\n");
         } catch (Exception ex) {
@@ -383,7 +374,7 @@ public class OperationsManagerModule {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
-        // List<Car> carList = getAllCars();
+        
         doViewAllCars();
         System.out.print("Enter ID of car you want to update> ");
         long carId = scanner.nextLong();

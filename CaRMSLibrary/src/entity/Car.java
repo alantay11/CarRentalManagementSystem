@@ -7,6 +7,7 @@ package entity;
 
 import enumeration.CarStatusEnum;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,8 +41,7 @@ public class Car implements Serializable {
     @Column(nullable = false)
     private boolean enabled;
 
-    @ManyToOne
-    private CarCategory category;
+   
     @ManyToOne
     private CarModel model;
 
@@ -54,16 +54,8 @@ public class Car implements Serializable {
     private TransitDriverDispatch transitDriverDispatchRecord;
 
     public Car() {
+        this.reservationList = new ArrayList<>();
         this.enabled = true;
-    }
-
-    public Car(CarCategory carCategory, CarModel model, String licensePlateNum, String color, CarStatusEnum carStatus, TransitDriverDispatch transitDriverDispatchRecord) {
-        this.category = carCategory;
-        this.model = model;
-        this.licensePlateNum = licensePlateNum;
-        this.color = color;
-        this.carStatus = carStatus;
-        this.transitDriverDispatchRecord = transitDriverDispatchRecord;
     }
 
     public boolean isEnabled() {
@@ -96,14 +88,6 @@ public class Car implements Serializable {
 
     public void setCarId(Long carId) {
         this.carId = carId;
-    }
-
-    public CarCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(CarCategory category) {
-        this.category = category;
     }
 
     public CarModel getModel() {

@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -57,6 +58,7 @@ public class Customer implements Serializable {
     private Partner partner;
 
     public Customer() {
+        this.reservationList = new ArrayList<>();
     }
 
     public Long getCustomerId() {

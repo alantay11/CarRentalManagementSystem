@@ -46,6 +46,10 @@ public class Outlet implements Serializable {
     private List<Reservation> outboundReservationList;
 
     public Outlet() {
+        this.carList = new ArrayList<>();
+        this.employeeList = new ArrayList<>();
+        this.inboundTransitDriverDispatchList = new ArrayList<>();
+        this.outboundReservationList = new ArrayList<>();
     }
 
     public List<Reservation> getOutboundReservationList() {

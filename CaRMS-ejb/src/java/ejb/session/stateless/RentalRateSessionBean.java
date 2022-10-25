@@ -28,16 +28,15 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-    
-    
 
     @Override
     public RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException {
+        em.persist(rentalRate);
         CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategory(carCategoryId);
         carCategory.getRentalRateList().add(rentalRate);
-        
+
         em.merge(carCategory);
-        em.persist(rentalRate);
+        
         em.flush();
 
         return rentalRate;
@@ -78,6 +77,13 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @Override
     public boolean deleteRentalRate(long rentalRateId) {
         RentalRate rentalRate = retrieveRentalRate(rentalRateId);
+        CarCategory carCategory = rentalRate.getCarCategory();
+        List<RentalRate> rentalRateList = carCategory.getRentalRateList();
+        rentalRateList.remove(rentalRate);
+        carCategory.setRentalRateList(rentalRateList);
+
+        em.merge(carCategory);
+
         if (rentalRate.getReservationList().isEmpty()) {
             em.remove(rentalRateId);
             return true;
