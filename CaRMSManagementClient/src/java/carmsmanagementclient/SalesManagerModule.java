@@ -26,7 +26,7 @@ public class SalesManagerModule {
 
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
-    private CarCategorySessionBeanRemote carCategorySessionBean;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
 
     public SalesManagerModule() {
     }
@@ -34,7 +34,7 @@ public class SalesManagerModule {
     public SalesManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBean) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
-        this.carCategorySessionBean = carCategorySessionBean;
+        this.carCategorySessionBeanRemote = carCategorySessionBean;
     }
 
     public void salesManagerMenu() {
@@ -92,7 +92,7 @@ public class SalesManagerModule {
             System.out.print("Enter rate name> ");
             rentalRate.setRateName(scanner.nextLine().trim());
 
-            List<CarCategory> carCategoryList = carCategorySessionBean.retrieveAllCarCategories();
+            List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
 
             int counter = 1;
             System.out.println("\n-----------------------------------");
@@ -103,7 +103,7 @@ public class SalesManagerModule {
             System.out.println("-----------------------------------\n");
             System.out.print("Enter ID of car category> ");
             long carCategoryId = scanner.nextLong();
-            rentalRate.setCarCategory(carCategorySessionBean.retrieveCarCategory(carCategoryId));
+            rentalRate.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
 
             System.out.print("Enter rate per day> ");
             rentalRate.setRatePerDay(new BigDecimal(scanner.nextDouble()));
@@ -203,7 +203,7 @@ public class SalesManagerModule {
                         System.out.print("Enter rate name> ");
                         rentalRate.setRateName(scanner.nextLine().trim());
                     } else if (response == 2) {
-                        List<CarCategory> carCategoryList = carCategorySessionBean.retrieveAllCarCategories();
+                        List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
                         int counter = 1;
                         System.out.println("\n-----------------------------------");
                         for (CarCategory c : carCategoryList) {
@@ -214,7 +214,7 @@ public class SalesManagerModule {
                         System.out.print("Enter ID of car category> ");
                         long carCategoryId = scanner.nextLong();
                         scanner.nextLine();
-                        rentalRate.setCarCategory(carCategorySessionBean.retrieveCarCategory(carCategoryId));
+                        rentalRate.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
                     } else if (response == 3) {
                         System.out.print("Enter rate per day> ");
                         rentalRate.setRatePerDay(new BigDecimal(scanner.nextDouble()));

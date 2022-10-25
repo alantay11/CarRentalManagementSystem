@@ -26,7 +26,7 @@ public class OperationsManagerModule {
 
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
-    private CarCategorySessionBeanRemote carCategorySessionBean;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
 
@@ -40,12 +40,12 @@ public class OperationsManagerModule {
             CarSessionBeanRemote carSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
-        this.carCategorySessionBean = carCategorySessionBean;
+        this.carCategorySessionBeanRemote = carCategorySessionBean;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
     }
 
-    public void operationsManagerMenu() throws InvalidIdException {
+    public void operationsManagerMenu() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
 
@@ -123,7 +123,7 @@ public class OperationsManagerModule {
             carModel.setCarModelId(carModelId);
 
             // retrieve car category first
-            List<CarCategory> carCategoryList = carCategorySessionBean.retrieveAllCarCategories();
+            List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
 
             int counter = 1;
             System.out.println("\n-----------------------------------");
@@ -134,7 +134,7 @@ public class OperationsManagerModule {
             System.out.println("-----------------------------------\n");
             System.out.print("Enter ID of car category> ");
             long carCategoryId = scanner.nextLong();
-            carModel.setCarCategory(carCategorySessionBean.retrieveCarCategory(carCategoryId));
+            carModel.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
 
             // create new model w/ make and model attributes
             System.out.print("Enter make of car> ");
@@ -175,7 +175,7 @@ public class OperationsManagerModule {
     }
 
     // case #3
-    public void doUpdateCarModel() throws InvalidIdException {
+    public void doUpdateCarModel() {
         System.out.println("*** CaRMSMC System :: Operations Manager :: Update Car Model ***\n");
         Scanner scanner = new Scanner(System.in);
         Integer response;
@@ -212,7 +212,7 @@ public class OperationsManagerModule {
                         System.out.print("Enter car model> ");
                         carModel.setModel(scanner.nextLine().trim());
                     } else if (response == 3) {
-                        List<CarCategory> carCategoryList = carCategorySessionBean.retrieveAllCarCategories();
+                        List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
                         int counter = 1;
                         System.out.println("\n-----------------------------------");
                         for (CarCategory c : carCategoryList) {
@@ -223,7 +223,7 @@ public class OperationsManagerModule {
                         System.out.print("Enter ID of car category> ");
                         long carCategoryId = scanner.nextLong();
                         scanner.nextLine();
-                        carModel.setCarCategory(carCategorySessionBean.retrieveCarCategory(carCategoryId));
+                        carModel.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
                     } else if (response == 4) {
                         break;
                     } else {

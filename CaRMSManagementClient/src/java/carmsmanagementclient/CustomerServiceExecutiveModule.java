@@ -18,7 +18,7 @@ public class CustomerServiceExecutiveModule {
     
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
-    private CarCategorySessionBeanRemote carCategorySessionBean;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
 
     public CustomerServiceExecutiveModule() {
     }
@@ -26,7 +26,7 @@ public class CustomerServiceExecutiveModule {
     public CustomerServiceExecutiveModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBean) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
-        this.carCategorySessionBean = carCategorySessionBean;
+        this.carCategorySessionBeanRemote = carCategorySessionBean;
     }
     
     public void customerServiceExecutiveMenu() {

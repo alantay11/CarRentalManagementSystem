@@ -32,7 +32,7 @@ public class Main {
     
     
     
-     public static void main(String[] args) throws InvalidIdException {
+     public static void main(String[] args) {
         MainApp mainApp = new MainApp(carModelSessionBeanRemote, employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carSessionBeanRemote);
         mainApp.runApp(); 
     }

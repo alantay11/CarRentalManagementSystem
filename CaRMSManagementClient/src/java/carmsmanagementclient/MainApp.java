@@ -47,7 +47,7 @@ public class MainApp {
         this.carSessionBeanRemote = carSessionBeanRemote;
     }
 
-    public void runApp() throws InvalidIdException {
+    public void runApp() {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
@@ -118,7 +118,7 @@ public class MainApp {
         }
     }
 
-    private void sysAdminMenu() throws InvalidIdException {
+    private void sysAdminMenu() {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
