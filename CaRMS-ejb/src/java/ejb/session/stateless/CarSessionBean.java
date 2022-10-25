@@ -36,7 +36,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     // usecase #19: category, make, model and license plate number
     @Override
     public List<Car> retrieveAllCars() {
-        Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.category, c.model, c.licensePlateNum");
+        Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.category, c.model.make, c.model.model, c.licensePlateNum");
         return query.getResultList();
     }
 
