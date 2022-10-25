@@ -35,10 +35,12 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     // usecase #18
     @Override
     public Car createCar(Car car, long carModelId) {
+        // since car belongs to car model, add to carlist within carmodel
         CarModel carModel = carModelSessionBeanLocal.retrieveCarModel(carModelId);
         em.persist(car);
         carModel.getCarList().add(car);
         
+        // since car has to be sorted by category, make sure it is connected
         CarCategory carCategory = carModel.getCarCategory();
         carCategory.getCarList().add(car);
         em.merge(carCategory);        
@@ -78,12 +80,15 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public boolean deleteCar(long carId) throws InvalidIdException {
         Car car = retrieveCar(carId);
+        
+        // removing connection from carmodel to car
         CarModel carModel = car.getModel();
         List<Car> carList = carModel.getCarList();
         carList.remove(car);
         carModel.setCarList(carList);
         em.merge(carModel);
         
+        // removing connextion from car category to car
         CarCategory carCategory = carModel.getCarCategory();
         carList = carCategory.getCarList();
         carList.remove(car);
