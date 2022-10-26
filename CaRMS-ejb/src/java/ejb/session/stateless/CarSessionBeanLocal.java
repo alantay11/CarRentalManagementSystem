@@ -17,7 +17,7 @@ import javax.ejb.Local;
 @Local
 public interface CarSessionBeanLocal {
     
-    public Car createCar(Car car, long carModelId);
+    public Car createCar(Car car, long carModelId, long outletId);
     
     public List<Car> retrieveAllCars();
 

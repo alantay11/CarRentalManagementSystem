@@ -316,6 +316,20 @@ public class OperationsManagerModule {
                 car.setCarStatus(CarStatusEnum.ONRENTAL);
             }
             
+            List<Outlet> outletList = out.retrieveAllCarModels();
+
+            int counter = 1;
+            System.out.println("\n-----------------------------------");
+            for (CarModel cm : carModelList) {
+                System.out.println(counter + ": " + cm.toString());
+                counter++;
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Enter ID of car model> ");
+            long carModelId = scanner.nextLong();
+            car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
+            scanner.nextLine();
+            
             car = carSessionBeanRemote.createCar(car, carModelId);
 
             System.out.println("\nNew " + car.toString() + " created\n");

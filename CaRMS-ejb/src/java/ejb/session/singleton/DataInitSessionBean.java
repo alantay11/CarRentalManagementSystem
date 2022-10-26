@@ -6,12 +6,17 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.CarCategorySessionBeanLocal;
+import ejb.session.stateless.CarModelSessionBeanLocal;
+import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
+import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.RentalRateSessionBeanLocal;
 import entity.Car;
 import entity.CarCategory;
+import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
+import enumeration.CarStatusEnum;
 import enumeration.EmployeeAccessRightEnum;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -33,9 +38,16 @@ import javax.persistence.PersistenceContext;
 @Startup
 public class DataInitSessionBean {
 
+    @EJB
+    private CarModelSessionBeanLocal carModelSessionBean;
+
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
+    @EJB
+    private CarSessionBeanLocal carSessionBean;
+    @EJB
+    private OutletSessionBeanLocal outletSessionBean;
     @EJB
     private CarCategorySessionBeanLocal carCategorySessionBean;
     @EJB
@@ -43,7 +55,6 @@ public class DataInitSessionBean {
     @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
 
-   
     @PostConstruct
     public void postConstruct() {
         CarCategory standardSedanCategory = new CarCategory("Standard Sedan");
@@ -52,22 +63,64 @@ public class DataInitSessionBean {
         CarCategory suvMinivanCategory = new CarCategory("SUV/Minivan");
 
         if (em.find(CarCategory.class, 1l) == null) {
-            carCategorySessionBean.createCarCategory(standardSedanCategory);
+            standardSedanCategory = carCategorySessionBean.createCarCategory(standardSedanCategory);
             carCategorySessionBean.createCarCategory(familySedanCategory);
             carCategorySessionBean.createCarCategory(luxurySedanCategory);
             carCategorySessionBean.createCarCategory(suvMinivanCategory);
         }
 
         List<Car> sampleCarList = new ArrayList<>();
-        //Outlet sampleOutlet = new Outlet("address", LocalTime.parse("09:00"), LocalTime.parse("17:00"), sampleCarList);
-        //Car sampleCar = new Car("Make", "Model", "Color", standardSedanCategory, sampleOutlet);
+        Outlet sampleOutlet = new Outlet();
+        sampleOutlet.setAddress("NUS");
+        sampleOutlet.setOpeningTime(LocalTime.parse("09:00"));
+        sampleOutlet.setClosingTime(LocalTime.parse("17:00"));
+        
+        if (em.find(Outlet.class, 1l) == null) {
+            outletSessionBean.createOutlet(sampleOutlet);
+        }
+        
+        CarModel sampleCarModel = new CarModel();        
+        sampleCarModel.setCarCategory(standardSedanCategory);
+        sampleCarModel.setMake("Ferrari");
+        sampleCarModel.setModel("FML");
+        
+        if (em.find(CarModel.class, 1l) == null) {
+            carModelSessionBean.createCarModel(sampleCarModel);
+        }
+        
+        
+        Car sampleCar = new Car();
+        sampleCar.setModel(sampleCarModel);
+        sampleCar.setCarStatus(CarStatusEnum.ONRENTAL);
+        sampleCar.setColor("DEATH");
+        sampleCar.setCurrentOutlet(sampleOutlet);
+        sampleCar.setLicensePlateNum("999999");
+        
+        if (em.find(Car.class, 1l) == null) {
+            carSessionBean.createCar(sampleCar, sampleCarModel.getCarModelId(), sampleOutlet.getOutletId());
+        }
+        
+        sampleCarList.add(sampleCar);                
+        sampleOutlet.setCarList(sampleCarList);
+        
+        
 
-        //sampleCarList.add(sampleCar);
-
-        Employee systemAdmin = new Employee("system", "manager", "sys", "password", EmployeeAccessRightEnum.SYSTEMADMINISTRATOR);
-        Employee salesManager = new Employee("sales", "manager", "sales", "password", EmployeeAccessRightEnum.SALESMANAGER);//, sampleOutlet);
-        Employee operationsManager = new Employee("ops", "manager", "ops", "password", EmployeeAccessRightEnum.OPERATIONSMANAGER);
-        Employee customerServiceExec = new Employee("cse", "manager", "cse", "password", EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE);
+        List<Employee> employees = new ArrayList<>();
+        Employee systemAdmin = new Employee("system", "manager", "sys", "password", EmployeeAccessRightEnum.SYSTEMADMINISTRATOR, sampleOutlet);
+        Employee salesManager = new Employee("sales", "manager", "sales", "password", EmployeeAccessRightEnum.SALESMANAGER, sampleOutlet);
+        Employee operationsManager = new Employee("ops", "manager", "ops", "password", EmployeeAccessRightEnum.OPERATIONSMANAGER, sampleOutlet);
+        Employee customerServiceExec = new Employee("cse", "manager", "cse", "password", EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE, sampleOutlet);
+        employees.add(systemAdmin);
+        employees.add(salesManager);
+        employees.add(operationsManager);
+        employees.add(customerServiceExec);
+        
+        sampleOutlet.setEmployeeList(employees);
+        
+        if (em.find(Outlet.class, 1l) == null) {
+            outletSessionBean.createOutlet(sampleOutlet);
+        }
+        
         if (em.find(Employee.class, 1l) == null) {
             employeeSessionBeanLocal.createEmployee(salesManager);
             employeeSessionBeanLocal.createEmployee(operationsManager);

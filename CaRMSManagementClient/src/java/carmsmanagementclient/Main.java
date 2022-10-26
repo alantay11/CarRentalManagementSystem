@@ -10,7 +10,6 @@ import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
-import exception.InvalidIdException;
 import javax.ejb.EJB;
 
 /**

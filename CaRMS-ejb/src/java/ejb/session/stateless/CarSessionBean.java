@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
+import entity.Outlet;
 import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
 import java.util.List;
@@ -25,6 +26,9 @@ import javax.persistence.Query;
 public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
 
     @EJB
+    private OutletSessionBeanLocal outletSessionBean;
+
+    @EJB
     private CarModelSessionBeanLocal carModelSessionBeanLocal;
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
@@ -32,7 +36,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     // usecase #18
     @Override
-    public Car createCar(Car car, long carModelId) {
+    public Car createCar(Car car, long carModelId, long outletId) {
         em.persist(car);
 
         // since car belongs to car model, add to carlist within carmodel
@@ -42,6 +46,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         // since car has to be sorted by category, make sure it is connected
         CarCategory carCategory = carModel.getCarCategory();
         carCategory.getCarList().add(car);
+
+        // since car belongs to outlet, add to carlist within outler
+        Outlet outlet = outletSessionBean.retrieveOutlet(outletId);
+        outlet.getCarList().add(car);
         //em.merge(carCategory);        
         //em.merge(carModel);        
 
@@ -54,11 +62,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @Override
     public List<Car> retrieveAllCars() {
         Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.model.carCategory, c.model.make, c.model.model, c.licensePlateNum");
-        
+
         List<Car> cars = query.getResultList();
-        
+
         for (Car c : cars) {
-            c.getReservationList().size();            
+            c.getReservationList().size();
         }
         return cars;
     }
