@@ -13,7 +13,6 @@ import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
 import enumeration.EmployeeAccessRightEnum;
-import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -113,9 +112,9 @@ public class MainApp {
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
 
-        if (username.length() > 0 && password.length() > 0) {
+        try {
             currentEmployee = employeeSessionBeanRemote.employeeLogin(username, password);
-        } else {
+        } catch (InvalidLoginCredentialException exception) {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
     }

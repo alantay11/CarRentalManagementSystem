@@ -19,8 +19,6 @@ import entity.Outlet;
 import enumeration.CarStatusEnum;
 import enumeration.EmployeeAccessRightEnum;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
