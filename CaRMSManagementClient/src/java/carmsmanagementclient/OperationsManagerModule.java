@@ -9,10 +9,12 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
+import entity.Outlet;
 import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
 import java.util.List;
@@ -29,20 +31,22 @@ public class OperationsManagerModule {
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
+    private OutletSessionBeanRemote outletSessionBeanRemote;
 
     public OperationsManagerModule() {
     }
 
     public OperationsManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote,
             RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
-            CarCategorySessionBeanRemote carCategorySessionBean,
+            CarCategorySessionBeanRemote carCategorySessionBeanRemote,
             CarModelSessionBeanRemote carModelSessionBeanRemote,
-            CarSessionBeanRemote carSessionBeanRemote) {
+            CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
-        this.carCategorySessionBeanRemote = carCategorySessionBean;
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
     }
 
     public void operationsManagerMenu() {
@@ -118,7 +122,7 @@ public class OperationsManagerModule {
             String model = "";
 
             System.out.println("*** CaRMSMC System :: Operations Manager :: Create New Car Model ***\n");
-            
+
             // retrieve car category first
             List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
 
@@ -282,7 +286,7 @@ public class OperationsManagerModule {
             String carStatus;
 
             System.out.println("*** CaRMSMC System :: Operations Manager :: Create Car ***\n");
-            
+
             // create car for particular make and model 
             List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
 
@@ -315,22 +319,21 @@ public class OperationsManagerModule {
             } else if (carStatus.toLowerCase().equals("rented")) {
                 car.setCarStatus(CarStatusEnum.ONRENTAL);
             }
-            
-            List<Outlet> outletList = out.retrieveAllCarModels();
 
-            int counter = 1;
+            List<Outlet> outletList = outletSessionBeanRemote.retrieveAllOutlets();
+            counter = 1;
             System.out.println("\n-----------------------------------");
-            for (CarModel cm : carModelList) {
-                System.out.println(counter + ": " + cm.toString());
+            for (Outlet o : outletList) {
+                System.out.println(counter + ": " + o.toString());
                 counter++;
             }
             System.out.println("-----------------------------------\n");
-            System.out.print("Enter ID of car model> ");
-            long carModelId = scanner.nextLong();
+            System.out.print("Enter ID of outlet> ");
+            long outletId = scanner.nextLong();
             car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
             scanner.nextLine();
-            
-            car = carSessionBeanRemote.createCar(car, carModelId);
+
+            car = carSessionBeanRemote.createCar(car, carModelId, outletId);
 
             System.out.println("\nNew " + car.toString() + " created\n");
         } catch (Exception ex) {
@@ -388,7 +391,6 @@ public class OperationsManagerModule {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
-        
         doViewAllCars();
         System.out.print("Enter ID of car you want to update> ");
         long carId = scanner.nextLong();

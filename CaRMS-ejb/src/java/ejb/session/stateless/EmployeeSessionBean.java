@@ -6,8 +6,10 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.Outlet;
 import exception.InvalidLoginCredentialException;
 import exception.EmployeeNotFoundException;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,8 +22,12 @@ import javax.persistence.Query;
 @Stateless
 public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeSessionBeanLocal {
 
+    @EJB
+    private OutletSessionBeanLocal outletSessionBeanLocal;
+
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
+    
 
     @Override
     public Employee employeeLogin(String username, String password) throws InvalidLoginCredentialException {
@@ -51,8 +57,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
 
     @Override
-    public Employee createEmployee(Employee employee) {
+    public Employee createEmployee(Employee employee, long outletId) {
         em.persist(employee);
+        
+        Outlet outlet = outletSessionBeanLocal.retrieveOutlet(outletId);
+        outlet.getEmployeeList().add(employee);
+        
+        
         em.flush();
         return employee;
     }

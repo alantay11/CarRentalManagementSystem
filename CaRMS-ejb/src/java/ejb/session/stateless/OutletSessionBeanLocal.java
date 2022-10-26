@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Outlet;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -18,5 +19,7 @@ public interface OutletSessionBeanLocal {
     public Outlet createOutlet(Outlet outlet);
 
     public Outlet retrieveOutlet(long outletId);
+
+    List<Outlet> retrieveAllOutlets();
     
 }

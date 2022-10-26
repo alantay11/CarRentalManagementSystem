@@ -69,7 +69,6 @@ public class DataInitSessionBean {
             carCategorySessionBean.createCarCategory(suvMinivanCategory);
         }
 
-        List<Car> sampleCarList = new ArrayList<>();
         Outlet sampleOutlet = new Outlet();
         sampleOutlet.setAddress("NUS");
         sampleOutlet.setOpeningTime(LocalTime.parse("09:00"));
@@ -99,33 +98,16 @@ public class DataInitSessionBean {
         if (em.find(Car.class, 1l) == null) {
             carSessionBean.createCar(sampleCar, sampleCarModel.getCarModelId(), sampleOutlet.getOutletId());
         }
-        
-        sampleCarList.add(sampleCar);                
-        sampleOutlet.setCarList(sampleCarList);
-        
-        
-
-        List<Employee> employees = new ArrayList<>();
         Employee systemAdmin = new Employee("system", "manager", "sys", "password", EmployeeAccessRightEnum.SYSTEMADMINISTRATOR, sampleOutlet);
         Employee salesManager = new Employee("sales", "manager", "sales", "password", EmployeeAccessRightEnum.SALESMANAGER, sampleOutlet);
         Employee operationsManager = new Employee("ops", "manager", "ops", "password", EmployeeAccessRightEnum.OPERATIONSMANAGER, sampleOutlet);
         Employee customerServiceExec = new Employee("cse", "manager", "cse", "password", EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE, sampleOutlet);
-        employees.add(systemAdmin);
-        employees.add(salesManager);
-        employees.add(operationsManager);
-        employees.add(customerServiceExec);
-        
-        sampleOutlet.setEmployeeList(employees);
-        
-        if (em.find(Outlet.class, 1l) == null) {
-            outletSessionBean.createOutlet(sampleOutlet);
-        }
         
         if (em.find(Employee.class, 1l) == null) {
-            employeeSessionBeanLocal.createEmployee(salesManager);
-            employeeSessionBeanLocal.createEmployee(operationsManager);
-            employeeSessionBeanLocal.createEmployee(customerServiceExec);
-            employeeSessionBeanLocal.createEmployee(systemAdmin);
+            employeeSessionBeanLocal.createEmployee(salesManager, sampleOutlet.getOutletId());
+            employeeSessionBeanLocal.createEmployee(operationsManager, sampleOutlet.getOutletId());
+            employeeSessionBeanLocal.createEmployee(customerServiceExec, sampleOutlet.getOutletId());
+            employeeSessionBeanLocal.createEmployee(systemAdmin, sampleOutlet.getOutletId());
         }
     }
 }

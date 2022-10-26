@@ -138,7 +138,8 @@ public class Outlet implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Outlet[ id=" + outletId + " ]";
+        return "Outlet id = " + outletId + " " + address + this.carList + this.employeeList + this.inboundTransitDriverDispatchList + this.outboundReservationList
+                + this.openingTime + this.closingTime;
     }
 
 }
