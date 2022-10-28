@@ -175,6 +175,8 @@ public class SalesManagerModule {
         System.out.print("Enter ID of rental rate you want to update> ");
         long rentalRateId = scanner.nextLong();
         RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRate(rentalRateId);
+        long oldCarCategoryId = rentalRate.getCarCategory().getCarCategoryId();
+        long newCarCategoryId = oldCarCategoryId;
 
         String startDate = "";
         String startTime = "";
@@ -213,6 +215,7 @@ public class SalesManagerModule {
                         System.out.println("-----------------------------------\n");
                         System.out.print("Enter ID of car category> ");
                         long carCategoryId = scanner.nextLong();
+                        newCarCategoryId = carCategoryId;
                         scanner.nextLine();
                         rentalRate.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
                     } else if (response == 3) {
@@ -250,8 +253,12 @@ public class SalesManagerModule {
         System.out.print("\nConfirm update of " + rentalRate.toString() + "? (Y/N)> ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
         if (confirmation.equals("y")) {
-            rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate);
-            System.out.println("\n" + rentalRate.toString() + " updated\n");
+            try {
+                rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate, oldCarCategoryId, newCarCategoryId);
+                System.out.println("\n" + rentalRate.toString() + " updated\n");
+            } catch (InvalidIdException exception) {
+                System.out.println("\nYou have entered an invalid ID!\n");
+            }
         } else {
             System.out.println("\nUpdate cancelled\n");
         }

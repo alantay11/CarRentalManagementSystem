@@ -66,7 +66,13 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
-    public RentalRate updateRentalRate(RentalRate rentalRate) {
+    public RentalRate updateRentalRate(RentalRate rentalRate, long oldCarCategoryId, long newCarCategoryId) throws InvalidIdException {
+        CarCategory oldCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(oldCarCategoryId);
+        oldCarCategory.getRentalRateList().remove(rentalRate);
+        
+        CarCategory newCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(newCarCategoryId);
+        newCarCategory.getRentalRateList().add(rentalRate);
+        
         em.merge(rentalRate);
         em.flush();
 
