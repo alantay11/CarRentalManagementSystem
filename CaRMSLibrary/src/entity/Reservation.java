@@ -153,7 +153,11 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "Reservation with id " + this.reservationId + ", pick up time" + this.pickupTime.toString().replace("T", ", ") + ", return time " + this.returnTime.toString().replace("T", ", ");
+        return "Reservation with id " + this.reservationId + ", pick up time" + this.pickupTime.toString().replace("T", ", ") + 
+                " from outlet " + this.departureOutlet +
+                ", return time " + this.returnTime.toString().replace("T", ", ") + 
+                " to outlet " + this.destinationOutlet +
+                " for car " + this.car + " with rental rates " + this.rentalRateList;
     }
 
 }

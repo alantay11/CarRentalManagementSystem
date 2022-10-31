@@ -11,5 +11,6 @@ package enumeration;
  */
 public enum CarStatusEnum {
     INOUTLET,
+    RESERVED,
     ONRENTAL;
 }

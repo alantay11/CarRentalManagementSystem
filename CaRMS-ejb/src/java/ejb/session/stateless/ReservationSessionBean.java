@@ -5,7 +5,12 @@
  */
 package ejb.session.stateless;
 
+import entity.Reservation;
+import java.util.List;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -14,6 +19,22 @@ import javax.ejb.Stateless;
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @PersistenceContext(unitName = "CaRMS-ejbPU")
+    private EntityManager em;
+
+    @Override
+    public List<Reservation> retrieveAllMyReservations(long customerId) {
+        Query query = em.createQuery("SELECT r from Reservation r where r.customer.customerId = :customerId");
+        
+        List<Reservation> reservations = query.getResultList();
+        
+        for (Reservation r : reservations) {
+            r.getRentalRateList().size();
+        }
+        
+        return reservations;
+    }
+
+    
+    
 }
