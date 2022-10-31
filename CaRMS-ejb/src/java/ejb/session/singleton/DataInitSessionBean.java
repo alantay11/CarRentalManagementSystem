@@ -10,12 +10,14 @@ import ejb.session.stateless.CarModelSessionBeanLocal;
 import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
+import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.RentalRateSessionBeanLocal;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
+import entity.Partner;
 import enumeration.CarStatusEnum;
 import enumeration.EmployeeAccessRightEnum;
 import java.time.LocalTime;
@@ -41,7 +43,8 @@ public class DataInitSessionBean {
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
-
+    @EJB
+    private PartnerSessionBeanLocal partnerSessionBean;
     @EJB
     private CarSessionBeanLocal carSessionBean;
     @EJB
@@ -231,9 +234,7 @@ public class DataInitSessionBean {
             carSessionBean.createCar(sampleSUV2, sampleSUV2.getModel().getCarModelId(), sampleSUV2.getCurrentOutlet().getOutletId());
             carSessionBean.createCar(sampleSUV3, sampleSUV3.getModel().getCarModelId(), sampleSUV3.getCurrentOutlet().getOutletId());
         }
-        
-        
-        
+
         Employee systemAdmin = new Employee("system", "manager", "sys", "password", EmployeeAccessRightEnum.SYSTEMADMINISTRATOR, sampleOutlet);
         Employee salesManager = new Employee("sales", "manager", "sales", "password", EmployeeAccessRightEnum.SALESMANAGER, sampleOutlet);
         Employee operationsManager = new Employee("ops", "manager", "ops", "password", EmployeeAccessRightEnum.OPERATIONSMANAGER, sampleOutlet);
@@ -244,6 +245,14 @@ public class DataInitSessionBean {
             employeeSessionBeanLocal.createEmployee(operationsManager, sampleOutlet.getOutletId());
             employeeSessionBeanLocal.createEmployee(customerServiceExec, sampleOutlet.getOutletId());
             employeeSessionBeanLocal.createEmployee(systemAdmin, sampleOutlet.getOutletId());
+        }
+
+        Partner partner = new Partner();
+        partner.setUsername("partner");
+        partner.setPassword("password");
+
+        if (em.find(Partner.class, 1l) == null) {
+            partnerSessionBean.createPartner(partner);
         }
     }
 }
