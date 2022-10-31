@@ -42,22 +42,11 @@ public class Outlet implements Serializable {
     private List<Employee> employeeList;
     @OneToMany(mappedBy = "destinationOutlet")
     private List<TransitDriverDispatch> inboundTransitDriverDispatchList;
-    @OneToMany(mappedBy = "departureOutlet")
-    private List<Reservation> outboundReservationList;
 
     public Outlet() {
         this.carList = new ArrayList<>();
         this.employeeList = new ArrayList<>();
         this.inboundTransitDriverDispatchList = new ArrayList<>();
-        this.outboundReservationList = new ArrayList<>();
-    }
-
-    public List<Reservation> getOutboundReservationList() {
-        return outboundReservationList;
-    }
-
-    public void setOutboundReservationList(List<Reservation> outboundReservationList) {
-        this.outboundReservationList = outboundReservationList;
     }
 
     public Long getOutletId() {
@@ -138,7 +127,7 @@ public class Outlet implements Serializable {
 
     @Override
     public String toString() {
-        return "Outlet id = " + outletId + " " + address + this.carList + this.employeeList + this.inboundTransitDriverDispatchList + this.outboundReservationList
+        return "Outlet ID: " + outletId + " " + address + this.carList + this.employeeList + this.inboundTransitDriverDispatchList
                 + this.openingTime + this.closingTime;
     }
 

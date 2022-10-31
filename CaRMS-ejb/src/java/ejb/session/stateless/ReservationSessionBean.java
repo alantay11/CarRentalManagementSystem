@@ -23,6 +23,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     private EntityManager em;
 
     @Override
+    public Reservation createReservation(Reservation reservation) {
+        em.persist(reservation);
+
+        em.flush();
+        return reservation;
+    }
+
+    @Override
     public List<Reservation> retrieveAllMyReservations(long customerId) {
         Query query = em.createQuery("SELECT r from Reservation r where r.customer.customerId = :customerId");
         query.setParameter("customerId", customerId);
@@ -48,7 +56,5 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         Reservation reservation = retrieveReservation(reservationId);
         reservation.setIsCancelled(true);
     }
-    
-    
 
 }

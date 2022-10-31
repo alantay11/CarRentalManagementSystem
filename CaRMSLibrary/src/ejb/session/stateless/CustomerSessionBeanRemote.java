@@ -17,7 +17,7 @@ import javax.ejb.Remote;
 @Remote
 public interface CustomerSessionBeanRemote {
 
-    Customer customerLogin(String username, String password)throws InvalidLoginCredentialException;
+    Customer customerLogin(String username, String password) throws InvalidLoginCredentialException, CustomerNotFoundException ;
 
     Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException ;
 

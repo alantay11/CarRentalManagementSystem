@@ -26,17 +26,14 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     private EntityManager em;
 
     @Override
-    public Customer customerLogin(String username, String password) throws InvalidLoginCredentialException {
-        try {
-            Customer customer = retrieveCustomerByUsername(username);
+    public Customer customerLogin(String username, String password) throws InvalidLoginCredentialException, CustomerNotFoundException {
 
-            if (customer.getPassword().equals(password)) {
-                //employee.get().size();                
-                return customer;
-            } else {
-                throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
-            }
-        } catch (CustomerNotFoundException ex) {
+        Customer customer = retrieveCustomerByUsername(username);
+
+        if (customer.getPassword().equals(password)) {
+            //employee.get().size();                
+            return customer;
+        } else {
             throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
         }
     }
@@ -58,13 +55,5 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         em.flush();
         return customer;
     }
-    
-    
-    
-    
-    
-    
 
-
-    
 }

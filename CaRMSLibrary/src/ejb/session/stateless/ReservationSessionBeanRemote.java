@@ -21,5 +21,7 @@ public interface ReservationSessionBeanRemote {
     Reservation retrieveReservation(long reservationid);
 
     void cancelReservation(long reservationId);
+
+    Reservation createReservation(Reservation reservation);
     
 }

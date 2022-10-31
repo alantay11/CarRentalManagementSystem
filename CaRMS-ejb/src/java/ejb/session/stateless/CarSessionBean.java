@@ -127,25 +127,29 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModeId");
         query.setParameter("makeModeId", makeModelId);
         int totalAvailableCars = query.getResultList().size();
-        
-        
-        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.isCancelled = false AND r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
         reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime);
         List<Reservation> clashingReservations = reservationQuery.getResultList();
+
+        System.out.println(clashingReservations);
+        System.out.println("numclashes = " + clashingReservations.size() + "numAvailCars = " + totalAvailableCars);
 
         return totalAvailableCars > clashingReservations.size();
     }
 
     @Override
     public boolean searchCarByCategory(long categoryId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) {
-        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carCategory = :categoryId");
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carCategory.carCategoryId = :categoryId");
         query.setParameter("categoryId", categoryId);
         int totalAvailableCars = query.getResultList().size();
-        
-        
-        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.isCancelled = false AND r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
         reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime);
         List<Reservation> clashingReservations = reservationQuery.getResultList();
+
+        System.out.println(clashingReservations);
+        System.out.println("numclashes = " + clashingReservations.size() + "numAvailCars = " + totalAvailableCars);
 
         return totalAvailableCars > clashingReservations.size();
     }

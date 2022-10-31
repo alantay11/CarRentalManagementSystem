@@ -39,7 +39,7 @@ public class OutletSessionBean implements OutletSessionBeanLocal, OutletSessionB
 
     @Override
     public List<Outlet> retrieveAllOutlets() {
-        Query query = em.createQuery("SELECT c FROM Car c ORDER BY c.model.carCategory, c.model.make, c.model.model, c.licensePlateNum");
+        Query query = em.createQuery("SELECT o FROM Outlet o");
 
         List<Outlet> outlets = query.getResultList();
 
@@ -47,7 +47,6 @@ public class OutletSessionBean implements OutletSessionBeanLocal, OutletSessionB
             o.getCarList().size();
             o.getEmployeeList().size();
             o.getInboundTransitDriverDispatchList().size();
-            o.getOutboundReservationList().size();
         }
         return outlets;
     }

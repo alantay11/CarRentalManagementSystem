@@ -17,7 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 /**
  *
@@ -44,10 +43,17 @@ public class Reservation implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Customer customer;
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Car car;
-
+    
+    @ManyToOne
+    @JoinColumn
+    private Car car;    
+    @ManyToOne
+    @JoinColumn
+    private CarModel carModel;
+    @ManyToOne
+    @JoinColumn
+    private CarCategory carCategory;
+    
     @ManyToOne
     private Outlet departureOutlet;
     @ManyToOne
@@ -60,6 +66,22 @@ public class Reservation implements Serializable {
     public Reservation() {
         this.rentalRateList = new ArrayList<>();
         this.isCancelled = false;
+    }
+
+    public CarCategory getCarCategory() {
+        return carCategory;
+    }
+
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
+    }
+
+    public CarModel getCarModel() {
+        return carModel;
+    }
+
+    public void setCarModel(CarModel carModel) {
+        this.carModel = carModel;
     }
 
     public Long getreservationId() {
@@ -164,7 +186,7 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "Reservation with id " + this.reservationId + ", pick up time" + this.pickupTime.toString().replace("T", ", ") + 
+        return "Reservation with id " + this.reservationId + ", pick up time " + this.pickupTime.toString().replace("T", ", ") + 
                 " from outlet " + this.departureOutlet +
                 ", return time " + this.returnTime.toString().replace("T", ", ") + 
                 " to outlet " + this.destinationOutlet +
