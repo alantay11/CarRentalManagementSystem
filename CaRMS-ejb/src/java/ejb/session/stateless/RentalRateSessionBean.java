@@ -12,7 +12,7 @@ import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -120,11 +120,19 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory = : carCategoryId AND r.startDateTime <= :returnTime OR r.endDateTime >= :pickupTime");
         query.setParameter("carCategoryId", carCategoryId).setParameter("pickupTime", pickupTime).setParameter("returnTime", returnTime);
 
-        // get cheapest rates for the reservation somehow 
-        
-        
+        // get cheapest rates for the reservation somehow
+        // only 1 rate applies per day
+        // find cheapest for the first 24h
+        // and continue
+        //asking prof abt this
         List<RentalRate> rentalRates = query.getResultList();
-        return rentalRates;
+        List<RentalRate> bestRentalRates = new ArrayList<>();
+        for (RentalRate r : rentalRates) {
+            ////if good add to bestRentalRates
+            
+        }
+        
+        return bestRentalRates;
     }
 
 }
