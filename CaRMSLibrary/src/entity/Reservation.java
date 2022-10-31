@@ -35,6 +35,8 @@ public class Reservation implements Serializable {
     private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime returnTime;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isCancelled;
 
     @ManyToMany
     private List<RentalRate> rentalRateList;
@@ -57,6 +59,7 @@ public class Reservation implements Serializable {
      */
     public Reservation() {
         this.rentalRateList = new ArrayList<>();
+        this.isCancelled = false;
     }
 
     public Long getreservationId() {
@@ -105,6 +108,14 @@ public class Reservation implements Serializable {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public boolean isIsCancelled() {
+        return isCancelled;
+    }
+
+    public void setIsCancelled(boolean isCancelled) {
+        this.isCancelled = isCancelled;
     }
 
     public Car getCar() {

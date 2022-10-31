@@ -159,7 +159,7 @@ public class MainApp {
                 } else if (response == 2) {
                     //doReserveCar();
                 } else if (response == 3) {
-                    //doCancelReservation();
+                    doCancelReservation();
                 } else if (response == 4) {
                     doViewReservationDetails();
                 } else if (response == 5) {
@@ -175,19 +175,39 @@ public class MainApp {
             }
         }
     }
-    
-    private List<Reservation> getAllMyReservations() {
-        return reservationSessionBeanRemote.retrieveAllMyReservations(currentCustomer.getId());        
+
+    private void doCancelReservation() {
+        System.out.println("*** CaRMSRC System :: Customer :: Cancel Reservation ***\n");
+        Scanner scanner = new Scanner(System.in);
+
+        doViewAllMyReservations();
+        System.out.print("Enter ID of reservation you want to delete> ");
+        long reservationId = scanner.nextLong();
+        Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
+        scanner.nextLine();
+        System.out.print("\nConfirm cancellation of " + reservation.toString() + "? (Y/N)> ");
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        if (confirmation.equals("y")) {
+            reservationSessionBeanRemote.cancelReservation(reservationId);
+            System.out.println("\n" + reservation.toString() + " cancelled\n");
+        } else {
+            System.out.println("\nCancellation cancelled\n");
+        }
     }
-    
+
+    private List<Reservation> getAllMyReservations() {
+        return reservationSessionBeanRemote.retrieveAllMyReservations(currentCustomer.getId());
+    }
+
     private void doViewReservationDetails() {
+        System.out.println("*** CaRMSRC System :: Customer :: View Reservation Details ***\n");
         Scanner scanner = new Scanner(System.in);
         List<Reservation> reservations = getAllMyReservations();
         for (Reservation r : reservations) {
-            System.out.println("ID: " + r.getReservationId()+ ", Pickup at: " + r.getPickupTime() + " from " + r.getDepartureOutlet());
+            System.out.println("ID: " + r.getReservationId() + ", Pickup at: " + r.getPickupTime() + " from " + r.getDepartureOutlet());
         }
         System.out.println("-----------------------------------\n");
-         System.out.print("Enter ID of reservation you want to view> ");
+        System.out.print("Enter ID of reservation you want to view> ");
         long reservationId = scanner.nextLong();
         scanner.nextLine();
         Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
@@ -196,8 +216,9 @@ public class MainApp {
         scanner.nextLine();
         System.out.println();
     }
-    
+
     private void doViewAllMyReservations() {
+        System.out.println("*** CaRMSRC System :: Customer :: View All My Reservations ***\n");
         Scanner scanner = new Scanner(System.in);
         List<Reservation> reservations = getAllMyReservations();
         System.out.println("\n-----------------------------------");
@@ -206,6 +227,6 @@ public class MainApp {
         }
         System.out.println("-----------------------------------\n");
         System.out.print("Press enter to continue>");
-        scanner.nextLine();        
+        scanner.nextLine();
     }
 }
