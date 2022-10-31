@@ -283,9 +283,9 @@ public class MainApp {
         }
 
         if (available) {
-            System.out.println("A car is available for reservation");
+            System.out.println("A car is available for reservation\n");
         } else {
-            System.out.println("No cars are available for the specified times and outlets");
+            System.out.println("No cars are available for the specified times and outlets\n");
             reservation = null;
         }
         return reservation;
