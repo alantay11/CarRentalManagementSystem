@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Partner;
+import exception.InvalidLoginCredentialException;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -22,4 +23,8 @@ public interface PartnerSessionBeanLocal {
 
     List<Partner> retrieveAllPartners();
     
+    Partner partnerLogin(String username, String password) throws InvalidLoginCredentialException;
+
+    Partner retrievePartnerByUsername(String username);
+
 }

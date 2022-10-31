@@ -10,12 +10,14 @@ import ejb.session.stateless.CarModelSessionBeanLocal;
 import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
+import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.RentalRateSessionBeanLocal;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Employee;
 import entity.Outlet;
+import entity.Partner;
 import enumeration.CarStatusEnum;
 import enumeration.EmployeeAccessRightEnum;
 import java.time.LocalTime;
@@ -35,6 +37,9 @@ import javax.persistence.PersistenceContext;
 @LocalBean
 @Startup
 public class DataInitSessionBean {
+
+    @EJB
+    private PartnerSessionBeanLocal partnerSessionBean;
 
     @EJB
     private CarModelSessionBeanLocal carModelSessionBean;
@@ -244,6 +249,14 @@ public class DataInitSessionBean {
             employeeSessionBeanLocal.createEmployee(operationsManager, sampleOutlet.getOutletId());
             employeeSessionBeanLocal.createEmployee(customerServiceExec, sampleOutlet.getOutletId());
             employeeSessionBeanLocal.createEmployee(systemAdmin, sampleOutlet.getOutletId());
+        }
+        
+        Partner partner = new Partner();
+        partner.setUsername("partner");
+        partner.setPassword("password");
+        
+        if (em.find(Partner.class, 1l) == null) {
+            partnerSessionBean.createPartner(partner);
         }
     }
 }
