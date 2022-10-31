@@ -6,12 +6,19 @@
 package carmsreservationclient;
 
 import ejb.session.stateless.CarCategorySessionBeanRemote;
+import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
+import entity.CarCategory;
+import entity.CarModel;
 import entity.Customer;
+import entity.Outlet;
 import entity.Reservation;
 import exception.InvalidLoginCredentialException;
+import java.time.LocalDateTime;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -24,20 +31,27 @@ public class MainApp {
 
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
+    private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private ReservationSessionBeanRemote reservationSessionBeanRemote;
-
+    private OutletSessionBeanRemote outletSessionBeanRemote;
     private Customer currentCustomer;
+    private CarSessionBeanRemote carSessionBeanRemote;
 
     public MainApp() {
     }
 
     public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
-            CarCategorySessionBeanRemote carCategorySessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
+            CarCategorySessionBeanRemote carCategorySessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote,
+            OutletSessionBeanRemote outletSessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote,
+            CarSessionBeanRemote carSessionBeanRemote) {
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.carModelSessionBeanRemote = carModelSessionBeanRemote;
+        this.carSessionBeanRemote = carSessionBeanRemote;
     }
 
     public void runApp() {
@@ -70,7 +84,7 @@ public class MainApp {
                             System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                         }
                     } else if (response == 3) {
-                        //doSearchCar();
+                        doSearchCar();
                     } else if (response == 4) {
                         break;
                     } else {
@@ -155,9 +169,9 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    //doSearchCar();
+                    doSearchCar();
                 } else if (response == 2) {
-                    //doReserveCar();
+                    doReserveCar();
                 } else if (response == 3) {
                     doCancelReservation();
                 } else if (response == 4) {
@@ -174,6 +188,89 @@ public class MainApp {
                 break;
             }
         }
+    }
+
+    private void doSearchCar() {
+        System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
+        Scanner scanner = new Scanner(System.in);
+        String startDate = "";
+        String startTime = "";
+        String endDate = "";
+        String endTime = "";
+        LocalDateTime pickUpDateTime;
+        LocalDateTime returnDateTime;
+        long pickupOutletId;
+        long returnOutletId;
+        long makeModelId;
+        long categoryId;
+        boolean available;
+
+        System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
+        startDate = scanner.nextLine().trim();
+        System.out.print("Enter pickup time in the format HH:MM> ");
+        startTime = scanner.nextLine().trim();
+        pickUpDateTime = LocalDateTime.parse(startDate + "T" + startTime);
+        System.out.print("Enter return date in the format YYYY-MM-DD> ");
+        endDate = scanner.nextLine().trim();
+        System.out.print("Enter return time in the format HH:MM> ");
+        endTime = scanner.nextLine().trim();
+        returnDateTime = LocalDateTime.parse(endDate + "T" + endTime);
+
+        List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
+
+        System.out.println("-----------------------------------\n");
+        for (Outlet o : outlets) {
+            System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress()
+                    + " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
+        }
+        System.out.println("-----------------------------------\n");
+
+        System.out.print("Enter pickup outlet ID> ");
+        pickupOutletId = scanner.nextLong();
+        scanner.nextLine();
+        System.out.print("Enter return outlet ID> ");
+        returnOutletId = scanner.nextLong();
+        scanner.nextLine();
+
+        System.out.print("Do you want to search by Make and Model? (Y/N)> ");
+        String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
+        if (searchByMakeModel.equals("y")) {
+            List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
+
+            System.out.println("-----------------------------------\n");
+            for (CarModel carModel : carModels) {
+                System.out.println(carModel.toString());
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Enter Make and Model ID> ");
+            makeModelId = scanner.nextLong();
+            scanner.nextLine();
+            
+            available = carSessionBeanRemote.searchCarByMakeModel(makeModelId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+
+        } else {
+            List<CarCategory> carCategories = carCategorySessionBeanRemote.retrieveAllCarCategories();
+
+            System.out.println("-----------------------------------\n");
+            for (CarCategory carCategory : carCategories) {
+                System.out.println(carCategory.toString());
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Enter Category ID> ");
+            categoryId = scanner.nextLong();
+            scanner.nextLine();
+
+            available = carSessionBeanRemote.searchCarByCategory(categoryId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+
+        }
+
+        // NOT DONE
+    }
+
+    private void doReserveCar() {
+        System.out.println("*** CaRMSRC System :: Customer :: Reserve Car ***\n");
+        Scanner scanner = new Scanner(System.in);
+        // NOT DONE
     }
 
     private void doCancelReservation() {

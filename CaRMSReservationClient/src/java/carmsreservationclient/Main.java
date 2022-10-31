@@ -6,8 +6,11 @@
 package carmsreservationclient;
 
 import ejb.session.stateless.CarCategorySessionBeanRemote;
+import ejb.session.stateless.CarModelSessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import javax.ejb.EJB;
@@ -19,24 +22,25 @@ import javax.ejb.EJB;
 public class Main {
 
     @EJB
+    private static CarSessionBeanRemote carSessionBeanRemote;
+    @EJB
+    private static CarModelSessionBeanRemote carModelSessionBeanRemote; 
+    @EJB
+    private static OutletSessionBeanRemote outletSessionBeanRemote;
+    @EJB
     private static ReservationSessionBeanRemote reservationSessionBeanRemote;
-
     @EJB
     private static CustomerSessionBeanRemote customerSessionBeanRemote;
-
     @EJB
     private static CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     @EJB
     private static RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     @EJB
     private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
-    
-    
-    
-    
 
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(customerSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, reservationSessionBeanRemote);
+        MainApp mainApp = new MainApp(customerSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote,
+                reservationSessionBeanRemote, outletSessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote);
         mainApp.runApp();
     }
 }

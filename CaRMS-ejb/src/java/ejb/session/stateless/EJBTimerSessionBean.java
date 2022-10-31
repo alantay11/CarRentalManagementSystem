@@ -7,13 +7,13 @@ package ejb.session.stateless;
 
 import javax.ejb.EJB;
 import javax.ejb.Schedule;
-import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 
 /**
  *
  * @author Uni
  */
-@Stateful
+@Stateless
 public class EJBTimerSessionBean implements EJBTimerSessionBeanRemote, EJBTimerSessionBeanLocal {
 
     @EJB

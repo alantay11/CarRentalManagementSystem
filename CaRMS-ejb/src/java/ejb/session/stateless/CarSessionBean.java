@@ -9,8 +9,10 @@ import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Outlet;
+import entity.Reservation;
 import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -118,5 +120,33 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
             return false;
         }
+    }
+
+    @Override
+    public boolean searchCarByMakeModel(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) {
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModeId");
+        query.setParameter("makeModeId", makeModelId);
+        int totalAvailableCars = query.getResultList().size();
+        
+        
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+        reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime);
+        List<Reservation> clashingReservations = reservationQuery.getResultList();
+
+        return totalAvailableCars > clashingReservations.size();
+    }
+
+    @Override
+    public boolean searchCarByCategory(long categoryId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) {
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carCategory = :categoryId");
+        query.setParameter("categoryId", categoryId);
+        int totalAvailableCars = query.getResultList().size();
+        
+        
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+        reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime);
+        List<Reservation> clashingReservations = reservationQuery.getResultList();
+
+        return totalAvailableCars > clashingReservations.size();
     }
 }
