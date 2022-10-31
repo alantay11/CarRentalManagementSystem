@@ -29,7 +29,7 @@ public class CreditCard implements Serializable {
     @Column(nullable = false, length = 32)
     private String nameonCC;
     @Column(nullable = false, length = 16)
-    private int ccNumber;
+    private String ccNumber;
     @Column(nullable = false, length = 3)
     private String cvv;
     @Future
@@ -40,7 +40,7 @@ public class CreditCard implements Serializable {
     public CreditCard() {
     }
 
-    public CreditCard(String nameonCC, int ccNumber, String cvv, LocalDate expiryDate) {
+    public CreditCard(String nameonCC, String ccNumber, String cvv, LocalDate expiryDate) {
         this.nameonCC = nameonCC;
         this.ccNumber = ccNumber;
         this.cvv = cvv;
@@ -63,11 +63,11 @@ public class CreditCard implements Serializable {
         this.nameonCC = nameonCC;
     }
 
-    public int getCcNumber() {
+    public String getCcNumber() {
         return ccNumber;
     }
 
-    public void setCcNumber(int ccNumber) {
+    public void setCcNumber(String ccNumber) {
         this.ccNumber = ccNumber;
     }
 

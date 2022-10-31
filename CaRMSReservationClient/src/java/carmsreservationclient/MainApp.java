@@ -8,12 +8,14 @@ package carmsreservationclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CreditCardSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.CarCategory;
 import entity.CarModel;
+import entity.CreditCard;
 import entity.Customer;
 import entity.Outlet;
 import entity.Reservation;
@@ -21,7 +23,10 @@ import exception.CustomerNotFoundException;
 import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
 import exception.OutletIsClosedException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -41,6 +46,7 @@ public class MainApp {
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private Customer currentCustomer;
     private CarSessionBeanRemote carSessionBeanRemote;
+    private CreditCardSessionBeanRemote creditCardSessionBeanRemote;
 
     public MainApp() {
     }
@@ -48,7 +54,7 @@ public class MainApp {
     public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
             CarCategorySessionBeanRemote carCategorySessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote,
             OutletSessionBeanRemote outletSessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote,
-            CarSessionBeanRemote carSessionBeanRemote) {
+            CarSessionBeanRemote carSessionBeanRemote, CreditCardSessionBeanRemote creditCardSessionBeanRemote) {
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
@@ -56,6 +62,7 @@ public class MainApp {
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
+        this.creditCardSessionBeanRemote = creditCardSessionBeanRemote;
     }
 
     public void runApp() {
@@ -311,11 +318,67 @@ public class MainApp {
         Reservation reservation = doSearchCar();
 
         if (reservation != null) {
-            reservation = reservationSessionBeanRemote.createReservation(reservation);
+
+            CreditCard creditCard = doSaveCreditCard();
+            currentCustomer.setCreditCard(creditCard);
+
+            System.out.print("\nDo you want to pay for the reservation now? (Y/N)> ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (confirmation.equals("y")) {
+
+                // calculate rentalrate costs and request payment then set reservation and create
+                BigDecimal paymentAmount = new BigDecimal("0.00");
+                
+                paymentAmount = rentalRateSessionBeanRemote.calculateTotalCost(reservation);
+                
+                System.out.println("\nReservation paid\n");
+                reservation.setPaymentAmount(paymentAmount);
+                reservation = reservationSessionBeanRemote.createReservation(reservation);
+            } else {
+                System.out.println("\nPayment will be required upon pickup\n");
+                reservation = reservationSessionBeanRemote.createReservation(reservation);
+
+            }
 
             System.out.println("\nNew " + reservation.toString() + " created\n");
         }
         // NOT DONE
+    }
+
+    private CreditCard doSaveCreditCard() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("\nPlease enter credit card details");
+        CreditCard creditCard = new CreditCard();
+        String nameOnCC = "";
+        String ccNumber = "";
+        String cvv = "";
+        LocalDate expiryDate;
+
+        while (true) {
+            try {
+                System.out.print("Enter name on credit card> ");
+                nameOnCC = scanner.nextLine().trim();
+                creditCard.setNameonCC(nameOnCC);
+                System.out.print("Enter credit card number> ");
+                ccNumber = scanner.nextLine().trim();
+                creditCard.setCcNumber(ccNumber);
+                System.out.print("Enter credit card cvv> ");
+                cvv = scanner.nextLine().trim();
+                creditCard.setCvv(cvv);
+
+                System.out.print("Enter expiry date in the format YYYY-MM> ");
+                String expiry = scanner.nextLine().trim() + "-01";
+                expiryDate = LocalDate.parse(expiry);
+                expiryDate = YearMonth.from(expiryDate).atEndOfMonth();
+                System.out.println(expiryDate);
+                creditCard.setExpiryDate(expiryDate);
+
+                return creditCardSessionBeanRemote.createCreditCard(creditCard, currentCustomer.getCustomerId());
+
+            } catch (DateTimeParseException ex) {
+                System.out.println("Invalid date or time entered, please try again");
+            }
+        }
     }
 
     private void doCancelReservation() {

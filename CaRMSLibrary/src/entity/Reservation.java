@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,10 @@ public class Reservation implements Serializable {
     private LocalDateTime returnTime;
     @Column(columnDefinition = "boolean default false")
     private boolean isCancelled;
+    @Column(nullable = false, precision = 11, scale = 2)
+    private BigDecimal paymentAmount;
+    @Column(nullable = false, precision = 11, scale = 2)
+    private BigDecimal refundAmount;
 
     @ManyToMany
     private List<RentalRate> rentalRateList;
@@ -43,17 +48,17 @@ public class Reservation implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Customer customer;
-    
+
     @ManyToOne
     @JoinColumn
-    private Car car;    
+    private Car car;
     @ManyToOne
     @JoinColumn
     private CarModel carModel;
     @ManyToOne
     @JoinColumn
     private CarCategory carCategory;
-    
+
     @ManyToOne
     private Outlet departureOutlet;
     @ManyToOne
@@ -66,6 +71,24 @@ public class Reservation implements Serializable {
     public Reservation() {
         this.rentalRateList = new ArrayList<>();
         this.isCancelled = false;
+        this.paymentAmount = new BigDecimal("0.00");
+        this.refundAmount = new BigDecimal("0.00");
+    }
+
+    public BigDecimal getPaymentAmount() {
+        return paymentAmount;
+    }
+
+    public void setPaymentAmount(BigDecimal paymentAmount) {
+        this.paymentAmount = paymentAmount;
+    }
+
+    public BigDecimal getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(BigDecimal refundAmount) {
+        this.refundAmount = refundAmount;
     }
 
     public CarCategory getCarCategory() {
@@ -186,11 +209,11 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "Reservation with id " + this.reservationId + ", pick up time " + this.pickupTime.toString().replace("T", ", ") + 
-                " from outlet " + this.departureOutlet +
-                ", return time " + this.returnTime.toString().replace("T", ", ") + 
-                " to outlet " + this.destinationOutlet +
-                " for car " + this.car + " with rental rates " + this.rentalRateList;
+        return "Reservation with id " + this.reservationId + ", pick up time " + this.pickupTime.toString().replace("T", ", ")
+                + " from outlet " + this.departureOutlet
+                + ", return time " + this.returnTime.toString().replace("T", ", ")
+                + " to outlet " + this.destinationOutlet
+                + " for car " + this.car + " with rental rates " + this.rentalRateList;
     }
 
 }

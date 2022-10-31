@@ -56,4 +56,9 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         return customer;
     }
 
+    @Override
+    public Customer retrieveCustomer(long customerId) {
+        return em.find(Customer.class, customerId);
+    }
+
 }

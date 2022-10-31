@@ -8,6 +8,7 @@ package carmsreservationclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CreditCardSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
@@ -21,6 +22,8 @@ import javax.ejb.EJB;
  */
 public class Main {
 
+    @EJB
+    private static CreditCardSessionBeanRemote creditCardSessionBeanRemote;
     @EJB
     private static CarSessionBeanRemote carSessionBeanRemote;
     @EJB
@@ -40,7 +43,7 @@ public class Main {
 
     public static void main(String[] args) {
         MainApp mainApp = new MainApp(customerSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote,
-                reservationSessionBeanRemote, outletSessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote);
+                reservationSessionBeanRemote, outletSessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, creditCardSessionBeanRemote);
         mainApp.runApp();
     }
 }

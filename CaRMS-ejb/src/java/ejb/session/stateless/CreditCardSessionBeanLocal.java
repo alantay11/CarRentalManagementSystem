@@ -5,8 +5,6 @@
  */
 package ejb.session.stateless;
 
-import entity.Customer;
-import exception.CustomerNotFoundException;
 import javax.ejb.Local;
 
 /**
@@ -14,10 +12,6 @@ import javax.ejb.Local;
  * @author Uni
  */
 @Local
-public interface CustomerSessionBeanLocal {
-
-    Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException ;
-
-    Customer retrieveCustomer(long customerId);
+public interface CreditCardSessionBeanLocal {
     
 }

@@ -7,8 +7,12 @@ package ejb.session.stateless;
 
 import entity.CarCategory;
 import entity.RentalRate;
+import entity.Reservation;
 import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -32,12 +36,11 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @Override
     public RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException {
         em.persist(rentalRate);
-        
+
         CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategory(carCategoryId);
         carCategory.getRentalRateList().add(rentalRate);
 
         //em.merge(carCategory);
-        
         em.flush();
 
         return rentalRate;
@@ -47,7 +50,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     public List<RentalRate> retrieveAllRentalRates() {
         Query query = em.createQuery("SELECT r FROM RentalRate r ORDER BY r.carCategory, r.startDateTime");
         List<RentalRate> rentalRates = query.getResultList();
-        
+
         for (RentalRate r : rentalRates) {
             r.getReservationList().size();
         }
@@ -69,10 +72,10 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     public RentalRate updateRentalRate(RentalRate rentalRate, long oldCarCategoryId, long newCarCategoryId) throws InvalidIdException {
         CarCategory oldCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(oldCarCategoryId);
         oldCarCategory.getRentalRateList().remove(rentalRate);
-        
+
         CarCategory newCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(newCarCategoryId);
         newCarCategory.getRentalRateList().add(rentalRate);
-        
+
         em.merge(rentalRate);
         em.flush();
 
@@ -95,7 +98,6 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         carCategory.setRentalRateList(rentalRateList);
 
         //em.merge(carCategory);
-
         if (rentalRate.getReservationList().isEmpty()) {
             em.remove(rentalRateId);
             return true;
@@ -105,4 +107,24 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             return false;
         }
     }
+
+    @Override
+    public BigDecimal calculateTotalCost(Reservation reservation) {
+
+        return null;
+    }
+
+    @Override
+    public List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) {
+        // get every rate that ends after pickuptime or starts before the returntime for this category
+        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory = : carCategoryId AND r.startDateTime <= :returnTime OR r.endDateTime >= :pickupTime");
+        query.setParameter("carCategoryId", carCategoryId).setParameter("pickupTime", pickupTime).setParameter("returnTime", returnTime);
+
+        // get cheapest rates for the reservation somehow 
+        
+        
+        List<RentalRate> rentalRates = query.getResultList();
+        return rentalRates;
+    }
+
 }
