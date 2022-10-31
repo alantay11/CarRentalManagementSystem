@@ -16,3 +16,6 @@
 /dist/
 /HolidayReservationSystemClient/dist/
 /HolidayReservationSystemClient/build/
+/HolidayReservationSystemWebClient/nbproject/private/
+/HolidayReservationSystemWebClient/dist/
+/HolidayReservationSystemWebClient/build/
