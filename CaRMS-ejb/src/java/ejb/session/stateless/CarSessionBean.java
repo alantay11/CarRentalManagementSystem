@@ -12,6 +12,7 @@ import entity.Outlet;
 import entity.Reservation;
 import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
+import exception.OutletIsClosedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.ejb.EJB;
@@ -123,7 +124,18 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public boolean searchCarByMakeModel(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) {
+    public boolean searchCarByMakeModel(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) throws OutletIsClosedException {
+        Outlet pickupOutlet = outletSessionBean.retrieveOutlet(pickupOutletId);
+        Outlet returnOutlet = outletSessionBean.retrieveOutlet(returnOutletId);
+
+        if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime())) {
+            throw new OutletIsClosedException("Your pickup time is before the outlet's opening time");
+        }
+
+        if (returnDateTime.toLocalTime().isAfter(returnOutlet.getClosingTime())) {
+            throw new OutletIsClosedException("Your return time is after the outlet's closing time");
+        }
+
         Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModeId");
         query.setParameter("makeModeId", makeModelId);
         int totalAvailableCars = query.getResultList().size();

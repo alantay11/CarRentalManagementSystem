@@ -20,7 +20,9 @@ import entity.Reservation;
 import exception.CustomerNotFoundException;
 import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
+import exception.OutletIsClosedException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -210,83 +212,93 @@ public class MainApp {
         Reservation reservation = new Reservation();
         reservation.setCustomer(currentCustomer);
 
-        System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
-        startDate = scanner.nextLine().trim();
-        System.out.print("Enter pickup time in the format HH:MM> ");
-        startTime = scanner.nextLine().trim();
-        pickUpDateTime = LocalDateTime.parse(startDate + "T" + startTime);
-        reservation.setPickupTime(pickUpDateTime);
-
-        System.out.print("Enter return date in the format YYYY-MM-DD> ");
-        endDate = scanner.nextLine().trim();
-        System.out.print("Enter return time in the format HH:MM> ");
-        endTime = scanner.nextLine().trim();
-        returnDateTime = LocalDateTime.parse(endDate + "T" + endTime);
-        reservation.setReturnTime(returnDateTime);
-
-        List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
-
-        System.out.println("\nOutlets");
-        System.out.println("-----------------------------------");
-        for (Outlet o : outlets) {
-            System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress()
-                    + " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
-        }
-        System.out.println("-----------------------------------\n");
-
-        System.out.print("Enter pickup outlet ID> ");
-        pickupOutletId = scanner.nextLong();
-        scanner.nextLine();
-        reservation.setDepartureOutlet(outletSessionBeanRemote.retrieveOutlet(pickupOutletId));
-
-        System.out.print("Enter return outlet ID> ");
-        returnOutletId = scanner.nextLong();
-        scanner.nextLine();
-        reservation.setDestinationOutlet(outletSessionBeanRemote.retrieveOutlet(returnOutletId));
-
-        System.out.print("Do you want to search by Make and Model? (Y/N)> ");
-        String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
-        if (searchByMakeModel.equals("y")) {
-            List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
-
-            System.out.println("-----------------------------------\n");
-            for (CarModel carModel : carModels) {
-                System.out.println(carModel.toString());
-            }
-            System.out.println("-----------------------------------\n");
-            System.out.print("Enter Make and Model ID> ");
-            makeModelId = scanner.nextLong();
-            scanner.nextLine();
-            reservation.setCarModel(carModelSessionBeanRemote.retrieveCarModel(makeModelId));
-
-            available = carSessionBeanRemote.searchCarByMakeModel(makeModelId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
-
-        } else {
+        while (true) {
             try {
-                List<CarCategory> carCategories = carCategorySessionBeanRemote.retrieveAllCarCategories();
+                System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
+                startDate = scanner.nextLine().trim();
+                System.out.print("Enter pickup time in the format HH:MM> ");
+                startTime = scanner.nextLine().trim();
+                pickUpDateTime = LocalDateTime.parse(startDate + "T" + startTime);
+                reservation.setPickupTime(pickUpDateTime);
 
-                System.out.println("-----------------------------------\n");
-                for (CarCategory carCategory : carCategories) {
-                    System.out.println(carCategory.toString());
+                System.out.print("Enter return date in the format YYYY-MM-DD> ");
+                endDate = scanner.nextLine().trim();
+                System.out.print("Enter return time in the format HH:MM> ");
+                endTime = scanner.nextLine().trim();
+                returnDateTime = LocalDateTime.parse(endDate + "T" + endTime);
+                reservation.setReturnTime(returnDateTime);
+
+                List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
+
+                System.out.println("\nOutlets");
+                System.out.println("-----------------------------------");
+                for (Outlet o : outlets) {
+                    System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress()
+                            + " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
                 }
                 System.out.println("-----------------------------------\n");
-                System.out.print("Enter Category ID> ");
-                categoryId = scanner.nextLong();
+
+                System.out.print("Enter pickup outlet ID> ");
+                pickupOutletId = scanner.nextLong();
                 scanner.nextLine();
-                reservation.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(categoryId));
+                reservation.setDepartureOutlet(outletSessionBeanRemote.retrieveOutlet(pickupOutletId));
 
-                available = carSessionBeanRemote.searchCarByCategory(categoryId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
-            } catch (InvalidIdException ex) {
-                System.out.println("\nInvalid ID entered!\n");
+                System.out.print("Enter return outlet ID> ");
+                returnOutletId = scanner.nextLong();
+                scanner.nextLine();
+                reservation.setDestinationOutlet(outletSessionBeanRemote.retrieveOutlet(returnOutletId));
+
+                System.out.print("Do you want to search by Make and Model? (Y/N)> ");
+                String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
+                if (searchByMakeModel.equals("y")) {
+                    List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
+
+                    System.out.println("-----------------------------------\n");
+                    for (CarModel carModel : carModels) {
+                        System.out.println(carModel.toString());
+                    }
+                    System.out.println("-----------------------------------\n");
+                    System.out.print("Enter Make and Model ID> ");
+                    makeModelId = scanner.nextLong();
+                    scanner.nextLine();
+                    reservation.setCarModel(carModelSessionBeanRemote.retrieveCarModel(makeModelId));
+
+                    available = carSessionBeanRemote.searchCarByMakeModel(makeModelId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+
+                } else {
+                    try {
+                        List<CarCategory> carCategories = carCategorySessionBeanRemote.retrieveAllCarCategories();
+
+                        System.out.println("-----------------------------------\n");
+                        for (CarCategory carCategory : carCategories) {
+                            System.out.println(carCategory.toString());
+                        }
+                        System.out.println("-----------------------------------\n");
+                        System.out.print("Enter Category ID> ");
+                        categoryId = scanner.nextLong();
+                        scanner.nextLine();
+                        reservation.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(categoryId));
+
+                        available = carSessionBeanRemote.searchCarByCategory(categoryId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+                    } catch (InvalidIdException ex) {
+                        System.out.println("\nInvalid ID entered!\n");
+                    }
+
+                }
+
+                if (available) {
+                    System.out.println("A car is available for reservation\n");
+                } else {
+                    System.out.println("No cars are available for the specified times and outlets\n");
+                    reservation = null;
+                }
+                break;
+            } catch (DateTimeParseException ex) {
+                System.out.println("Invalid date or time entered, please try again");
+            } catch (OutletIsClosedException ex) {
+                System.out.println(ex);
+
             }
-
-        }
-
-        if (available) {
-            System.out.println("A car is available for reservation\n");
-        } else {
-            System.out.println("No cars are available for the specified times and outlets\n");
-            reservation = null;
         }
         return reservation;
         // NOT DONE

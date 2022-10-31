@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import exception.InvalidIdException;
+import exception.OutletIsClosedException;
 import java.time.LocalDateTime;
 import java.util.List;
 import javax.ejb.Local;
@@ -28,7 +29,7 @@ public interface CarSessionBeanLocal {
 
     public boolean deleteCar(long carId) throws InvalidIdException;
 
-    boolean searchCarByMakeModel(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId);
+    boolean searchCarByMakeModel(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) throws OutletIsClosedException;
 
     boolean searchCarByCategory(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId);
 
