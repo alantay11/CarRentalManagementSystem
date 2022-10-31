@@ -161,7 +161,7 @@ public class MainApp {
                 } else if (response == 3) {
                     //doCancelReservation();
                 } else if (response == 4) {
-                    //doViewReservationDetails();
+                    doViewReservationDetails();
                 } else if (response == 5) {
                     doViewAllMyReservations();
                 } else if (response == 6) {
@@ -177,8 +177,24 @@ public class MainApp {
     }
     
     private List<Reservation> getAllMyReservations() {
-        return reservationSessionBeanRemote.retrieveAllMyReservations(currentCustomer.getId());
-        
+        return reservationSessionBeanRemote.retrieveAllMyReservations(currentCustomer.getId());        
+    }
+    
+    private void doViewReservationDetails() {
+        Scanner scanner = new Scanner(System.in);
+        List<Reservation> reservations = getAllMyReservations();
+        for (Reservation r : reservations) {
+            System.out.println("ID: " + r.getReservationId()+ ", Pickup at: " + r.getPickupTime() + " from " + r.getDepartureOutlet());
+        }
+        System.out.println("-----------------------------------\n");
+         System.out.print("Enter ID of reservation you want to view> ");
+        long reservationId = scanner.nextLong();
+        scanner.nextLine();
+        Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
+        System.out.println("\n" + reservation.toString() + "\n");
+        System.out.print("Press enter to continue>");
+        scanner.nextLine();
+        System.out.println();
     }
     
     private void doViewAllMyReservations() {

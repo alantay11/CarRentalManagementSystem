@@ -46,9 +46,9 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private Car car;
 
-    @OneToOne
+    @ManyToOne
     private Outlet departureOutlet;
-    @OneToOne
+    @ManyToOne
     private Outlet destinationOutlet;
 
     /* Not sure if this is necessary

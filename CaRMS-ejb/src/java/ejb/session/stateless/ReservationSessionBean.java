@@ -25,16 +25,21 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @Override
     public List<Reservation> retrieveAllMyReservations(long customerId) {
         Query query = em.createQuery("SELECT r from Reservation r where r.customer.customerId = :customerId");
-        
+
         List<Reservation> reservations = query.getResultList();
-        
+
         for (Reservation r : reservations) {
             r.getRentalRateList().size();
         }
-        
+
         return reservations;
     }
 
-    
-    
+    @Override
+    public Reservation retrieveReservation(long reservationid) {
+        Reservation reservation = em.find(Reservation.class, reservationid);
+        reservation.getRentalRateList().size();
+        return reservation;
+    }
+
 }

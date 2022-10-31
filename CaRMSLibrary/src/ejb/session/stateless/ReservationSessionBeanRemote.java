@@ -17,5 +17,7 @@ import javax.ejb.Remote;
 public interface ReservationSessionBeanRemote {
 
     List<Reservation> retrieveAllMyReservations(long customerId);
+
+    Reservation retrieveReservation(long reservationid);
     
 }

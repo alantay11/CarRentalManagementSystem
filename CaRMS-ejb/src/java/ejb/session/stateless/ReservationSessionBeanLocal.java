@@ -17,5 +17,7 @@ import javax.ejb.Local;
 public interface ReservationSessionBeanLocal {
 
     List<Reservation> retrieveAllMyReservations(long customerId);
+
+    Reservation retrieveReservation(long reservationid);
     
 }
