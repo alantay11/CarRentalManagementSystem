@@ -7,7 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -36,9 +36,9 @@ public class RentalRate implements Serializable {
     @Column(nullable = false, precision = 11, scale = 2)
     private BigDecimal ratePerDay;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime startDateTime;
+    private LocalDate startDate;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime endDateTime;
+    private LocalDate endDate;
     @Column(nullable = false)
     private boolean enabled;
 
@@ -86,20 +86,20 @@ public class RentalRate implements Serializable {
         this.ratePerDay = ratePerDay;
     }
 
-    public LocalDateTime getStartDateTime() {
-        return startDateTime;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateTime(LocalDateTime startDateTime) {
-        this.startDateTime = startDateTime;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDateTime() {
-        return endDateTime;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
-        this.endDateTime = endDateTime;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public List<Reservation> getReservationList() {
@@ -141,7 +141,7 @@ public class RentalRate implements Serializable {
     @Override
     public String toString() {
         return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay
-                + ", start date of " + this.startDateTime.toString().replace("T", ", ") + " and end date of " + this.endDateTime.toString().replace("T", ", ")
+                + ", start date of " + this.startDate.toString().replace("T", ", ") + " and end date of " + this.endDate.toString().replace("T", ", ")
                 //+ " for category " + this.carCategory 
                 + ((enabled) ? "" : "DISABLED");
     }
