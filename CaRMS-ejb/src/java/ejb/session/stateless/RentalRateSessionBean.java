@@ -10,7 +10,9 @@ import entity.RentalRate;
 import entity.Reservation;
 import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
+import exception.NoRentalRateAvailableException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +50,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
     @Override
     public List<RentalRate> retrieveAllRentalRates() {
-        Query query = em.createQuery("SELECT r FROM RentalRate r ORDER BY r.carCategory, r.startDateTime");
+        Query query = em.createQuery("SELECT r FROM RentalRate r ORDER BY r.carCategory, r.startDate");
         List<RentalRate> rentalRates = query.getResultList();
 
         for (RentalRate r : rentalRates) {
@@ -109,30 +111,53 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
-    public BigDecimal calculateTotalCost(Reservation reservation) {
+    public BigDecimal calculateTotalCost(Reservation reservation) throws NoRentalRateAvailableException {
+        LocalDateTime pickupTime = reservation.getPickupTime();
+        LocalDateTime returnTime = reservation.getReturnTime();
+        long carCategoryId = reservation.getCarCategory().getCarCategoryId();
+        List<RentalRate> bestRates = retrieveApplicableRentalRates(pickupTime, returnTime, carCategoryId);
+        
+        BigDecimal total = new BigDecimal("0");
+        for (RentalRate rate : bestRates) {
+            total.add(rate.getRatePerDay());
+        }
 
-        return null;
+        return total;
     }
 
     @Override
-    public List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) {
-        // get every rate that ends after pickuptime or starts before the returntime for this category
-        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory = : carCategoryId AND r.startDateTime <= :returnTime OR r.endDateTime >= :pickupTime");
-        query.setParameter("carCategoryId", carCategoryId).setParameter("pickupTime", pickupTime).setParameter("returnTime", returnTime);
+    public List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException {
+        Duration duration = Duration.between(pickupTime, returnTime);
+        long days = Math.round(Math.ceil(duration.toDays()));
+        System.out.println("days = " + days);
+        List<RentalRate> bestRentalRates = new ArrayList<>();
+        LocalDateTime time = pickupTime;
+
+        for (int i = 0; i < days; i++) {
+            bestRentalRates.add(findBestRentalRateFor24Hours(time, carCategoryId));
+            time = time.plusDays(1);
+        }
 
         // get cheapest rates for the reservation somehow
         // only 1 rate applies per day
         // find cheapest for the first 24h
         // and continue
-        //asking prof abt this
-        List<RentalRate> rentalRates = query.getResultList();
-        List<RentalRate> bestRentalRates = new ArrayList<>();
-        for (RentalRate r : rentalRates) {
             ////if good add to bestRentalRates
-            
-        }
-        
+
         return bestRentalRates;
+    }
+
+    private RentalRate findBestRentalRateFor24Hours(LocalDateTime time, long carCategoryId) throws NoRentalRateAvailableException {
+        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory = : carCategoryId AND r.endDate >= :time ORDER BY r.ratePerDay");
+        query.setParameter("carCategoryId", carCategoryId).setParameter("time", time);
+
+        RentalRate bestRate = (RentalRate) query.getResultList().get(0);
+
+        if (bestRate == null) {
+            throw new NoRentalRateAvailableException();
+        } else {
+            return bestRate;
+        }
     }
 
 }

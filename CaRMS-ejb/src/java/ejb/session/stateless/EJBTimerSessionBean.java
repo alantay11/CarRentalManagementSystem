@@ -19,8 +19,7 @@ public class EJBTimerSessionBean implements EJBTimerSessionBeanRemote, EJBTimerS
     @EJB
     private ReservationSessionBeanLocal reservationSessionBean;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+   
     @Schedule(dayOfMonth = "*", hour = "0", info = "allocateCarsToCurrentDayReservations")
     @Override
     public void allocateCarsToCurrentDayReservations() {

@@ -9,6 +9,7 @@ import entity.RentalRate;
 import entity.Reservation;
 import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
+import exception.NoRentalRateAvailableException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,8 +35,8 @@ public interface RentalRateSessionBeanRemote {
 
     boolean deleteRentalRate(long rentalRateId);
 
-    BigDecimal calculateTotalCost(Reservation reservation);
+    BigDecimal calculateTotalCost(Reservation reservation) throws NoRentalRateAvailableException;
 
-    List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId);
+    List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException;
     
 }

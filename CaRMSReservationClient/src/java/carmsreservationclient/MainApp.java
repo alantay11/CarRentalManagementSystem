@@ -22,6 +22,7 @@ import entity.Reservation;
 import exception.CustomerNotFoundException;
 import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
+import exception.NoRentalRateAvailableException;
 import exception.OutletIsClosedException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -314,6 +315,8 @@ public class MainApp {
     private void doReserveCar() {
         System.out.println("*** CaRMSRC System :: Customer :: Reserve Car ***\n");
         Scanner scanner = new Scanner(System.in);
+        
+        try {
 
         Reservation reservation = doSearchCar();
 
@@ -331,7 +334,7 @@ public class MainApp {
                 
                 paymentAmount = rentalRateSessionBeanRemote.calculateTotalCost(reservation);
                 
-                System.out.println("\nReservation paid\n");
+                System.out.println("\nReservation of amount: " + paymentAmount.toString() + " paid using " + creditCard.getCcNumber() + "\n");
                 reservation.setPaymentAmount(paymentAmount);
                 reservation = reservationSessionBeanRemote.createReservation(reservation);
             } else {
@@ -341,6 +344,9 @@ public class MainApp {
             }
 
             System.out.println("\nNew " + reservation.toString() + " created\n");
+        }
+        } catch (NoRentalRateAvailableException ex) {
+            System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
         }
         // NOT DONE
     }
