@@ -140,8 +140,9 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         Duration duration = Duration.between(pickupTime, returnTime);
         System.out.println("pickup = " + pickupTime + " return = " + returnTime);
         System.out.println("duration = " + duration);
-
-        long days = Math.round(Math.ceil(duration.toDays()));
+        
+        long hours = duration.toHours();
+        long days = Math.round(Math.ceil(hours / 24.0));
         System.out.println("duration in days = " + duration.toDays());
         System.out.println("days = " + days);
         List<RentalRate> bestRentalRates = new ArrayList<>();
@@ -156,7 +157,6 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         // only 1 rate applies per day
         // find cheapest for the first 24h
         // and continue
-        ////if good add to bestRentalRates
         System.out.println("bestRentalRates = " + bestRentalRates);
         return bestRentalRates;
     }

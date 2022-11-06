@@ -12,7 +12,6 @@ import entity.CarCategory;
 import entity.RentalRate;
 import exception.InvalidIdException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;

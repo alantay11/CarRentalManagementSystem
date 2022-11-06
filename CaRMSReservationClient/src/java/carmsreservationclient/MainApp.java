@@ -399,35 +399,57 @@ public class MainApp {
         LocalDateTime pickup = reservation.getPickupTime();
 
         BigDecimal penalty = calculatePenalty(totalCost, pickup);
+        BigDecimal refund = totalCost.subtract(penalty);
+        //System.out.println("total " + totalCost + " pickup " + pickup + " penalty " + penalty);
 
-        System.out.print("\nConfirm cancellation of " + reservation.toString() + "?"
-                + "A penalty of $" + penalty + " will be imposed (Y/N)> ");
+        if (reservation.isPaid()) {
+            System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
+                    + " A penalty of $" + penalty + " will be imposed.");
+            System.out.print("You will be refunded $" + refund + " (Y/N)> ");
 
-        String confirmation = scanner.nextLine().trim().toLowerCase();
-        if (confirmation.equals("y")) {
-            reservationSessionBeanRemote.cancelReservation(reservationId);
-            System.out.println("\n" + reservation.toString() + " cancelled\n");
-            System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (confirmation.equals("y")) {
+                reservationSessionBeanRemote.cancelReservation(reservationId, refund);
+                System.out.println("\n" + reservation.toString() + " cancelled\n");
+                System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
 
+            } else {
+                System.out.println("\nCancellation cancelled\n");
+            }
         } else {
-            System.out.println("\nCancellation cancelled\n");
+            System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
+                    + " You will be charged a penalty of $" + penalty + " (Y/N)> ");
+
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (confirmation.equals("y")) {
+                reservationSessionBeanRemote.cancelReservation(reservationId, refund);
+                System.out.println("\n" + reservation.toString() + " cancelled\n");
+                System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+
+            } else {
+                System.out.println("\nCancellation cancelled\n");
+            }
         }
+
     }
 
     private BigDecimal calculatePenalty(BigDecimal totalCost, LocalDateTime pickup) {
         BigDecimal penalty = new BigDecimal("0.00");
 
-        if (LocalDateTime.now().minusDays(14).isBefore(pickup)) {
-
-        } else if (LocalDateTime.now().minusDays(7).isBefore(pickup)) {
+        if (LocalDateTime.now().isBefore(pickup.minusDays(14))) {
+            //System.out.println("more than 14 before");
+        } else if (LocalDateTime.now().isBefore(pickup.minusDays(7))) {
             penalty = totalCost.multiply(new BigDecimal("0.2"));
-        } else if (LocalDateTime.now().minusDays(3).isBefore(pickup)) {
+            //System.out.println("14 to 7 before");
+        } else if (LocalDateTime.now().isBefore(pickup.minusDays(3))) {
             penalty = totalCost.multiply(new BigDecimal("0.5"));
+            //System.out.println("7 to 3 before");
         } else if (LocalDateTime.now().isBefore(pickup)) {
             penalty = totalCost.multiply(new BigDecimal("0.7"));
+            //System.out.println("3 or less before");
         }
 
-        return penalty;
+        return penalty.setScale(2);
     }
 
     private List<Reservation> getAllMyReservations() {

@@ -140,7 +140,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         query.setParameter("makeModelId", makeModelId).setParameter("address", pickupOutlet.getAddress());
         int totalAvailableCars = query.getResultList().size();
 
-        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.cancelled = false AND r.departureOutlet.address = :address AND r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE (r.cancelled = false AND r.departureOutlet.address = :address) AND (r.returnTime >= :pickupTime OR (r.pickupTime BETWEEN :pickupTime AND :returnTime))");
         reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime).setParameter("address", pickupOutlet.getAddress());
         List<Reservation> clashingReservations = reservationQuery.getResultList();
 
@@ -161,7 +161,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         query.setParameter("makeModelId", makeModelId).setParameter("address", pickupOutlet.getAddress());
         int totalAvailableCars = query.getResultList().size();
 
-        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.cancelled = false AND r.departureOutlet.address != :address AND r.returnTime - 2 >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE (r.cancelled = false AND r.departureOutlet.address != :address) AND (r.returnTime - 2 >= :pickupTime OR (r.pickupTime BETWEEN :pickupTime AND :returnTime))");
         reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime).setParameter("address", pickupOutlet.getAddress());
         List<Reservation> clashingReservations = reservationQuery.getResultList();
 
@@ -188,7 +188,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         query.setParameter("categoryId", categoryId);
         int totalAvailableCars = query.getResultList().size();
 
-        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.cancelled = false AND r.returnTime >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.cancelled = false AND (r.returnTime >= :pickupTime OR (r.pickupTime BETWEEN :pickupTime AND :returnTime))");
         reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime);
         List<Reservation> clashingReservations = reservationQuery.getResultList();
 
@@ -209,7 +209,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         query.setParameter("categoryId", categoryId).setParameter("address", pickupOutlet.getAddress());
         int totalAvailableCars = query.getResultList().size();
 
-        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE r.cancelled = false AND r.departureOutlet.address != :address AND r.returnTime - 2 >= :pickupTime OR r.pickupTime BETWEEN :pickupTime AND :returnTime");
+        Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE (r.cancelled = false AND r.departureOutlet.address != :address) AND (r.returnTime - 2 >= :pickupTime OR (r.pickupTime BETWEEN :pickupTime AND :returnTime))");
         reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime).setParameter("address", pickupOutlet.getAddress());
         List<Reservation> clashingReservations = reservationQuery.getResultList();
 
