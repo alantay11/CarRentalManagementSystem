@@ -108,10 +108,10 @@ public class SalesManagerModule {
             scanner.nextLine();
             System.out.print("Enter start date in the format YYYY-MM-DD> ");
             startDate = scanner.nextLine().trim();
-            rentalRate.setStartDate(LocalDate.parse(startDate));
+            rentalRate.setStartDate(LocalDateTime.parse(startDate + "T00:00:00"));
             System.out.print("Enter end date in the format YYYY-MM-DD> ");
             endDate = scanner.nextLine().trim();
-            rentalRate.setEndDate(LocalDate.parse(endDate));
+            rentalRate.setEndDate(LocalDateTime.parse(endDate + "T23:59:59"));
 
             rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate, carCategoryId);
 
@@ -217,11 +217,11 @@ public class SalesManagerModule {
                     } else if (response == 4) {
                         System.out.print("Enter start date in the format YYYY-MM-DD> ");
                         startDate = scanner.nextLine().trim();
-                        rentalRate.setStartDate(LocalDate.parse(startDate));
+                        rentalRate.setStartDate(LocalDateTime.parse(startDate + "T00:00:00"));
                     } else if (response == 5) {
                         System.out.print("Enter end date in the format YYYY-MM-DD> ");
                         endDate = scanner.nextLine().trim();
-                        rentalRate.setStartDate(LocalDate.parse(endDate));
+                        rentalRate.setStartDate(LocalDateTime.parse(endDate + "T23:59:59"));
                     } else if (response == 6) {
                         break;
                     } else {

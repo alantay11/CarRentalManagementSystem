@@ -54,7 +54,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @Override
     public void cancelReservation(long reservationId) {
         Reservation reservation = retrieveReservation(reservationId);
-        reservation.setIsCancelled(true);
+        reservation.setCancelled(true);
     }
 
 }

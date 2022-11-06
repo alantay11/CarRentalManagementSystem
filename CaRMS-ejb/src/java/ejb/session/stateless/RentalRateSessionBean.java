@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.CarCategory;
 import entity.RentalRate;
 import entity.Reservation;
+import exception.InvalidCarCategoryNameException;
 import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
 import exception.NoRentalRateAvailableException;
@@ -114,12 +115,21 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     public BigDecimal calculateTotalCost(Reservation reservation) throws NoRentalRateAvailableException {
         LocalDateTime pickupTime = reservation.getPickupTime();
         LocalDateTime returnTime = reservation.getReturnTime();
-        long carCategoryId = reservation.getCarCategory().getCarCategoryId();
+        CarCategory carCategory = reservation.getCarCategory();
+        long carCategoryId = 0;
+        try {
+            carCategoryId = carCategorySessionBeanLocal.retrieveCarCategoryUsingName(carCategory.getCarCategoryName()).getCarCategoryId();
+        } catch (InvalidCarCategoryNameException ex) {
+            System.out.println("Somehow you got an invalid car category");
+        }
+
         List<RentalRate> bestRates = retrieveApplicableRentalRates(pickupTime, returnTime, carCategoryId);
-        
-        BigDecimal total = new BigDecimal("0");
+        System.out.println("bestRates = " + bestRates);
+
+        BigDecimal total = new BigDecimal("0.00");
         for (RentalRate rate : bestRates) {
-            total.add(rate.getRatePerDay());
+            total = total.add(rate.getRatePerDay());
+            System.out.println("total =" + total + " rate perday = " + rate.getRatePerDay());
         }
 
         return total;
@@ -128,7 +138,11 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @Override
     public List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException {
         Duration duration = Duration.between(pickupTime, returnTime);
+        System.out.println("pickup = " + pickupTime + " return = " + returnTime);
+        System.out.println("duration = " + duration);
+
         long days = Math.round(Math.ceil(duration.toDays()));
+        System.out.println("duration in days = " + duration.toDays());
         System.out.println("days = " + days);
         List<RentalRate> bestRentalRates = new ArrayList<>();
         LocalDateTime time = pickupTime;
@@ -142,21 +156,22 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         // only 1 rate applies per day
         // find cheapest for the first 24h
         // and continue
-            ////if good add to bestRentalRates
-
+        ////if good add to bestRentalRates
+        System.out.println("bestRentalRates = " + bestRentalRates);
         return bestRentalRates;
     }
 
     private RentalRate findBestRentalRateFor24Hours(LocalDateTime time, long carCategoryId) throws NoRentalRateAvailableException {
-        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory = : carCategoryId AND r.endDate >= :time ORDER BY r.ratePerDay");
+        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.endDate >= :time ORDER BY r.ratePerDay");
         query.setParameter("carCategoryId", carCategoryId).setParameter("time", time);
+        System.out.println(query.getResultList());//
 
-        RentalRate bestRate = (RentalRate) query.getResultList().get(0);
+        List<RentalRate> bestRates = query.getResultList();
 
-        if (bestRate == null) {
+        if (bestRates.isEmpty()) {
             throw new NoRentalRateAvailableException();
         } else {
-            return bestRate;
+            return bestRates.get(0);
         }
     }
 

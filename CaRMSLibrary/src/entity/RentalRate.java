@@ -7,7 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -36,9 +36,9 @@ public class RentalRate implements Serializable {
     @Column(nullable = false, precision = 11, scale = 2)
     private BigDecimal ratePerDay;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDate startDate;
+    private LocalDateTime startDate;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDate endDate;
+    private LocalDateTime endDate;
     @Column(nullable = false)
     private boolean enabled;
 
@@ -86,19 +86,19 @@ public class RentalRate implements Serializable {
         this.ratePerDay = ratePerDay;
     }
 
-    public LocalDate getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(LocalDate startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public LocalDate getEndDate() {
+    public LocalDateTime getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(LocalDate endDate) {
+    public void setEndDate(LocalDateTime endDate) {
         this.endDate = endDate;
     }
 
