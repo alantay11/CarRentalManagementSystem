@@ -35,8 +35,10 @@ public class Reservation implements Serializable {
     private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime returnTime;
-    @Column(columnDefinition = "boolean default false")
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isCancelled;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean requiresTransfer;
     @Column(nullable = false, precision = 11, scale = 2)
     private BigDecimal paymentAmount;
     @Column(nullable = false, precision = 11, scale = 2)
@@ -71,8 +73,17 @@ public class Reservation implements Serializable {
     public Reservation() {
         this.rentalRateList = new ArrayList<>();
         this.isCancelled = false;
+        this.requiresTransfer = false;
         this.paymentAmount = new BigDecimal("0.00");
         this.refundAmount = new BigDecimal("0.00");
+    }
+
+    public boolean isRequiresTransfer() {
+        return requiresTransfer;
+    }
+
+    public void setRequiresTransfer(boolean requiresTransfer) {
+        this.requiresTransfer = requiresTransfer;
     }
 
     public BigDecimal getPaymentAmount() {
