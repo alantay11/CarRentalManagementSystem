@@ -111,7 +111,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         carModel.setCarList(carList);
         em.merge(carCategory);
 
-        if (car.getCarStatus().equals(CarStatusEnum.INOUTLET)) {
+        if (car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) { // might need to fix this check
             em.remove(car);
 
             return true;
@@ -128,12 +128,16 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Outlet pickupOutlet = outletSessionBean.retrieveOutlet(pickupOutletId);
         Outlet returnOutlet = outletSessionBean.retrieveOutlet(returnOutletId);
 
-        if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime())) {
-            throw new OutletIsClosedException("Your pickup time is before the outlet's opening time");
+        if (pickupOutlet.getOpeningTime() != null) {
+            if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime())) {
+                throw new OutletIsClosedException("Your pickup time is before the outlet's opening time");
+            }
         }
 
-        if (returnDateTime.toLocalTime().isAfter(returnOutlet.getClosingTime())) {
-            throw new OutletIsClosedException("Your return time is after the outlet's closing time");
+        if (returnOutlet.getClosingTime() != null) {
+            if (returnDateTime.toLocalTime().isAfter(returnOutlet.getClosingTime())) {
+                throw new OutletIsClosedException("Your return time is after the outlet's closing time");
+            }
         }
 
         Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModelId AND c.currentOutlet.address = :address");
@@ -176,12 +180,16 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Outlet pickupOutlet = outletSessionBean.retrieveOutlet(pickupOutletId);
         Outlet returnOutlet = outletSessionBean.retrieveOutlet(returnOutletId);
 
-        if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime())) {
-            throw new OutletIsClosedException("Your pickup time is before the outlet's opening time");
+        if (pickupOutlet.getOpeningTime() != null) {
+            if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime())) {
+                throw new OutletIsClosedException("Your pickup time is before the outlet's opening time");
+            }
         }
 
-        if (returnDateTime.toLocalTime().isAfter(returnOutlet.getClosingTime())) {
-            throw new OutletIsClosedException("Your return time is after the outlet's closing time");
+        if (returnOutlet.getClosingTime() != null) {
+            if (returnDateTime.toLocalTime().isAfter(returnOutlet.getClosingTime())) {
+                throw new OutletIsClosedException("Your return time is after the outlet's closing time");
+            }
         }
 
         Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carCategory.carCategoryId = :categoryId");

@@ -312,12 +312,12 @@ public class OperationsManagerModule {
             color = scanner.nextLine().trim();
             car.setColor(color);
 
-            System.out.print("Enter status (Outlet/Rented)> ");
+            System.out.print("Enter status (Available/Repair)> ");
             carStatus = scanner.nextLine().trim();
-            if (carStatus.toLowerCase().equals("outlet")) {
-                car.setCarStatus(CarStatusEnum.INOUTLET);
-            } else if (carStatus.toLowerCase().equals("rented")) {
-                car.setCarStatus(CarStatusEnum.ONRENTAL);
+            if (carStatus.toLowerCase().equals("available")) {
+                car.setCarStatus(CarStatusEnum.AVAILABLE);
+            } else if (carStatus.toLowerCase().equals("repair")) {
+                car.setCarStatus(CarStatusEnum.REPAIR);
             }
 
             List<Outlet> outletList = outletSessionBeanRemote.retrieveAllOutlets();
@@ -429,12 +429,12 @@ public class OperationsManagerModule {
                             System.out.println("Enter Car Color> ");
                             car.setColor(scanner.nextLine().trim());
                         } else if (response == 3) {
-                            System.out.println("Enter Car Status> ");
+                            System.out.print("Enter status (Available/Repair)> ");
                             carStatus = scanner.nextLine().trim();
-                            if (CarStatusEnum.INOUTLET.equals(carStatus)) {
-                                car.setCarStatus(CarStatusEnum.INOUTLET);
-                            } else if (carStatus.equals(CarStatusEnum.ONRENTAL)) {
-                                car.setCarStatus(CarStatusEnum.ONRENTAL);
+                            if (carStatus.toLowerCase().equals("available")) {
+                                car.setCarStatus(CarStatusEnum.AVAILABLE);
+                            } else if (carStatus.toLowerCase().equals("repair")) {
+                                car.setCarStatus(CarStatusEnum.REPAIR);
                             }
                         } else if (response == 4) {
                             System.out.println("Enter Car Location> ");

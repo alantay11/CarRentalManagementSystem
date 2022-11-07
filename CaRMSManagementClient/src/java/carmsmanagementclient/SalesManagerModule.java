@@ -10,6 +10,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.CarCategory;
 import entity.RentalRate;
+import enumeration.RentalRateEnum;
 import exception.InvalidIdException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -83,7 +84,10 @@ public class SalesManagerModule {
             Scanner scanner = new Scanner(System.in);
             RentalRate rentalRate = new RentalRate();
             String startDate = "";
+            String startTime = "";
             String endDate = "";
+            String endTime = "";
+            String type = "";
 
             System.out.println("*** CaRMSMC System :: Sales Manager :: Create Rental Rate ***\n");
             System.out.print("Enter rate name> ");
@@ -102,15 +106,29 @@ public class SalesManagerModule {
             long carCategoryId = scanner.nextLong();
             rentalRate.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
 
+            System.out.print("Enter type (Default/Promotion/Peak)> ");
+            type = scanner.nextLine().trim();
+            if (type.toLowerCase().equals("default")) {
+                rentalRate.setRateType(RentalRateEnum.Default);
+            } else if (type.toLowerCase().equals("promotion")) {
+                rentalRate.setRateType(RentalRateEnum.Promotion);
+            } else if (type.toLowerCase().equals("peak")) {
+                rentalRate.setRateType(RentalRateEnum.Peak);
+            }
+
             System.out.print("Enter rate per day> ");
             rentalRate.setRatePerDay(new BigDecimal(scanner.nextDouble()));
             scanner.nextLine();
             System.out.print("Enter start date in the format YYYY-MM-DD> ");
             startDate = scanner.nextLine().trim();
-            rentalRate.setStartDate(LocalDateTime.parse(startDate + "T00:00:00"));
+            System.out.print("Enter start time in the format HH:MM> ");
+            startTime = scanner.nextLine().trim();
+            rentalRate.setStartDate(LocalDateTime.parse(startDate + "T" + startTime));
             System.out.print("Enter end date in the format YYYY-MM-DD> ");
             endDate = scanner.nextLine().trim();
-            rentalRate.setEndDate(LocalDateTime.parse(endDate + "T23:59:59"));
+            System.out.print("Enter end time in the format HH:MM> ");
+            endTime = scanner.nextLine().trim();
+            rentalRate.setEndDate(LocalDateTime.parse(endDate + "T" + endTime));
 
             rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate, carCategoryId);
 
@@ -172,7 +190,9 @@ public class SalesManagerModule {
         long newCarCategoryId = oldCarCategoryId;
 
         String startDate = "";
+        String startTime = "";
         String endDate = "";
+        String endTime = "";
 
         while (true) {
             System.out.println("-----------------------------------");
@@ -216,11 +236,14 @@ public class SalesManagerModule {
                     } else if (response == 4) {
                         System.out.print("Enter start date in the format YYYY-MM-DD> ");
                         startDate = scanner.nextLine().trim();
-                        rentalRate.setStartDate(LocalDateTime.parse(startDate + "T00:00:00"));
-                    } else if (response == 5) {
+                        System.out.print("Enter start time in the format HH:MM> ");
+                        startTime = scanner.nextLine().trim();
+                        rentalRate.setStartDate(LocalDateTime.parse(startDate + "T" + startTime));
                         System.out.print("Enter end date in the format YYYY-MM-DD> ");
                         endDate = scanner.nextLine().trim();
-                        rentalRate.setStartDate(LocalDateTime.parse(endDate + "T23:59:59"));
+                        System.out.print("Enter end time in the format HH:MM> ");
+                        endTime = scanner.nextLine().trim();
+                        rentalRate.setEndDate(LocalDateTime.parse(endDate + "T" + endTime));
                     } else if (response == 6) {
                         break;
                     } else {
