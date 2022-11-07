@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.CarCategory;
 import entity.RentalRate;
 import entity.Reservation;
+import enumeration.RentalRateEnum;
 import exception.InvalidCarCategoryNameException;
 import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
@@ -140,7 +141,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         Duration duration = Duration.between(pickupTime, returnTime);
         System.out.println("pickup = " + pickupTime + " return = " + returnTime);
         System.out.println("duration = " + duration);
-        
+
         long hours = duration.toHours();
         long days = Math.round(Math.ceil(hours / 24.0));
         System.out.println("duration in days = " + duration.toDays());
@@ -167,12 +168,39 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         System.out.println(query.getResultList());//
 
         List<RentalRate> bestRates = query.getResultList();
-
         if (bestRates.isEmpty()) {
             throw new NoRentalRateAvailableException();
-        } else {
-            return bestRates.get(0);
         }
-    }
 
+        boolean promoAvailable = false;
+        boolean peakForced = false;
+
+        for (RentalRate rate : bestRates) { // checking what kinds of rates are available
+            if (rate.getRateType().equals(RentalRateEnum.Peak)) {
+                peakForced = true;
+            }
+            if (rate.getRateType().equals(RentalRateEnum.Promotion)) {
+                promoAvailable = true;
+            }
+        }
+
+        if (peakForced && !promoAvailable) { // no promo but got peak
+            for (RentalRate rate : bestRates) {
+                if (rate.getRateType().equals(RentalRateEnum.Peak)) {
+                    return rate;
+                }
+            }
+        }
+
+        if (promoAvailable || (promoAvailable && peakForced)) { // if promo it overrides everything
+            for (RentalRate rate : bestRates) {
+                if (rate.getRateType().equals(RentalRateEnum.Promotion)) {
+                    return rate;
+                }
+            }
+        }
+
+        // only default rate available
+        return bestRates.get(0);
+    }
 }

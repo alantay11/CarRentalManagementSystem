@@ -11,6 +11,6 @@ package enumeration;
  */
 public enum RentalRateEnum {
     Default,
-    Promotion,
-    Peak;
+    Peak,
+    Promotion;
 }
