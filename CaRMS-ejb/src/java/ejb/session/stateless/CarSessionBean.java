@@ -14,6 +14,7 @@ import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
 import exception.OutletIsClosedException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -140,28 +141,67 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             }
         }
 
-        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModelId AND c.currentOutlet.address = :address");
-        query.setParameter("makeModelId", makeModelId).setParameter("address", pickupOutlet.getAddress());
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModelId");
+        query.setParameter("makeModelId", makeModelId);
         int totalAvailableCars = query.getResultList().size();
 
+        Query reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.carModelId = :makeModelId AND r.cancelled = false"); // all reservations that are for the same makemodel
+        reservationQuery.setParameter("makeModelId", makeModelId);
+
+        List<Reservation> reservations = query.getResultList();
+        int clashingReservations = 0;
+
+        for (Reservation reservation : reservations) {
+
+            if (reservation.getPickupTime().isBefore(pickupDateTime)) { // starts before the new one
+                if (reservation.getReturnTime().isAfter(pickupDateTime)) { // ends after the new one starts
+                    clashingReservations++;
+                } else if (reservation.getReturnTime().equals(pickupDateTime)) { // returns at the same time the new one starts
+                    if (!(reservation.getDestinationOutlet().getOutletId().equals(pickupOutletId))) { // return for old one is at different outlet from new one pickup outlet
+                        clashingReservations++;
+                    }
+                } else if (reservation.getReturnTime().isBefore(pickupDateTime) && reservation.getReturnTime().isAfter(pickupDateTime.minusHours(2))) { // cannot make it for dispatch
+                    if (!(reservation.getDestinationOutlet().getOutletId().equals(pickupOutletId))) { // return for old one is at different outlet from new one pickup outlet
+                        clashingReservations++;
+                    }
+                }
+            } else if (reservation.getPickupTime().equals(pickupDateTime)) { // both start same time
+                clashingReservations++;
+            } else if (reservation.getPickupTime().isAfter(pickupDateTime) && reservation.getPickupTime().isBefore(returnDateTime)) { // old one starts after new one and end before new one ends
+                clashingReservations++;
+            } else if (reservation.getPickupTime().isEqual(returnDateTime)) { // old one starts when new one ends
+                if (!(reservation.getDepartureOutlet().getOutletId().equals(returnOutletId))) { // pickup for old one is at different outlet from new one return outlet
+                    clashingReservations++;
+                }
+            } else if (reservation.getPickupTime().isAfter(returnDateTime) && reservation.getPickupTime().isBefore(returnDateTime.plusHours(2))) { // old one starts after new one ends but starts before 2 hours elapsed
+                if (!(reservation.getDepartureOutlet().getOutletId().equals(returnOutletId))) { // return for old one is at different outlet from new one pickup outlet, cannot make it for dispatch
+                    clashingReservations++;
+                }
+            }
+
+        }
+
+        return totalAvailableCars > clashingReservations;
+
+        /*
         Query reservationQuery = em.createQuery("SELECT r from Reservation r WHERE (r.cancelled = false AND r.departureOutlet.address = :address) AND (r.returnTime >= :pickupTime OR (r.pickupTime BETWEEN :pickupTime AND :returnTime))");
         reservationQuery.setParameter("pickupTime", pickupDateTime).setParameter("returnTime", returnDateTime).setParameter("address", pickupOutlet.getAddress());
         List<Reservation> clashingReservations = reservationQuery.getResultList();
 
         System.out.println(clashingReservations);
         System.out.println("numclashes = " + clashingReservations.size() + "numAvailCars = " + totalAvailableCars);
-
         if (totalAvailableCars > clashingReservations.size()) {
             return true;
         } else {
             return searchForDispatchableCarByMakeModel(makeModelId, pickupDateTime, returnDateTime, pickupOutletId, returnOutletId);
-        }
+        }*/
     }
 
+    /*
     private boolean searchForDispatchableCarByMakeModel(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) {
         Outlet pickupOutlet = outletSessionBean.retrieveOutlet(pickupOutletId);
 
-        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModelId AND c.currentOutlet.address != :address");
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carModelId = :makeModelId AND c.currentOutlet.address != :address"); //cars not in this outlet
         query.setParameter("makeModelId", makeModelId).setParameter("address", pickupOutlet.getAddress());
         int totalAvailableCars = query.getResultList().size();
 
@@ -173,7 +213,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         System.out.println("numclashes = " + clashingReservations.size() + "numAvailCars = " + totalAvailableCars);
 
         return totalAvailableCars > clashingReservations.size();
-    }
+    }*/
 
     @Override
     public boolean searchCarByCategory(long categoryId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) throws OutletIsClosedException {
@@ -192,6 +232,52 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             }
         }
 
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carCategory.carCategoryId = :categoryId");
+        query.setParameter("categoryId", categoryId);
+        int totalAvailableCars = query.getResultList().size();
+
+        Query reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE c.model.carCategory.carCategoryId = :categoryId AND r.cancelled = false"); // all reservations that are for the same category
+        reservationQuery.setParameter("categoryId", categoryId);
+
+        List<Reservation> reservations = query.getResultList();
+        int clashingReservations = 0;
+
+        for (Reservation reservation : reservations) {
+
+            if (reservation.getPickupTime().isBefore(pickupDateTime)) { // starts before the new one
+                if (reservation.getReturnTime().isAfter(pickupDateTime)) { // ends after the new one starts
+                    clashingReservations++;
+                } else if (reservation.getReturnTime().equals(pickupDateTime)) { // returns at the same time the new one starts
+                    if (!(reservation.getDestinationOutlet().getOutletId().equals(pickupOutletId))) { // return for old one is at different outlet from new one pickup outlet
+                        clashingReservations++;
+                    }
+                } else if (reservation.getReturnTime().isBefore(pickupDateTime) && reservation.getReturnTime().isAfter(pickupDateTime.minusHours(2))) { // cannot make it for dispatch
+                    if (!(reservation.getDestinationOutlet().getOutletId().equals(pickupOutletId))) { // return for old one is at different outlet from new one pickup outlet
+                        clashingReservations++;
+                    }
+                }
+            } else if (reservation.getPickupTime().equals(pickupDateTime)) { // both start same time
+                clashingReservations++;
+            } else if (reservation.getPickupTime().isAfter(pickupDateTime) && reservation.getPickupTime().isBefore(returnDateTime)) { // old one starts after new one and end before new one ends
+                clashingReservations++;
+            } else if (reservation.getPickupTime().isEqual(returnDateTime)) { // old one starts when new one ends
+                if (!(reservation.getDepartureOutlet().getOutletId().equals(returnOutletId))) { // pickup for old one is at different outlet from new one return outlet
+                    clashingReservations++;
+                }
+            } else if (reservation.getPickupTime().isAfter(returnDateTime) && reservation.getPickupTime().isBefore(returnDateTime.plusHours(2))) { // old one starts after new one ends but starts before 2 hours elapsed
+                if (!(reservation.getDepartureOutlet().getOutletId().equals(returnOutletId))) { // return for old one is at different outlet from new one pickup outlet, cannot make it for dispatch
+                    clashingReservations++;
+                }
+            }
+
+        }
+
+        return totalAvailableCars > clashingReservations;
+
+    }
+}
+
+/*
         Query query = em.createQuery("SELECT c FROM Car c WHERE c.enabled = TRUE AND c.model.carCategory.carCategoryId = :categoryId");
         query.setParameter("categoryId", categoryId);
         int totalAvailableCars = query.getResultList().size();
@@ -226,4 +312,4 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
         return totalAvailableCars > clashingReservations.size();
     }
-}
+}*/
