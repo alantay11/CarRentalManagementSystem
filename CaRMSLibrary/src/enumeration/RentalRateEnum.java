@@ -9,10 +9,8 @@ package enumeration;
  *
  * @author Uni
  */
-public enum EmployeeAccessRightEnum {
-    SYSTEMADMINISTRATOR,
-    CUSTOMERSERVICEEXECUTIVE,
-    SALESMANAGER,
-    OPERATIONSMANAGER,
-    EMPLOYEE;
+public enum RentalRateEnum {
+    Default,
+    Peak,
+    Promotion;
 }

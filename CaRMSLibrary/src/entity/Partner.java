@@ -28,6 +28,8 @@ public class Partner implements Serializable {
     private Long partnerId;
 
     @Column(nullable = false, length = 32)
+    private String name;
+    @Column(nullable = false, length = 32)
     private String username;
     @Column(nullable = false, length = 32)
     private String password;
@@ -37,6 +39,14 @@ public class Partner implements Serializable {
 
     public Partner() {
         this.customerList = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUsername() {

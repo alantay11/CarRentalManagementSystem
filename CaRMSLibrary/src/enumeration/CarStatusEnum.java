@@ -10,7 +10,7 @@ package enumeration;
  * @author Uni
  */
 public enum CarStatusEnum {
-    INOUTLET,
-    RESERVED,
-    ONRENTAL;
+    AVAILABLE,
+    REPAIR,
+    RESERVED;
 }

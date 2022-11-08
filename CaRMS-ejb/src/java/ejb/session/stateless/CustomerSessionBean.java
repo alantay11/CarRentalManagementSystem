@@ -6,9 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Customer;
-import entity.Employee;
 import exception.CustomerNotFoundException;
-import exception.EmployeeNotFoundException;
 import exception.InvalidLoginCredentialException;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;

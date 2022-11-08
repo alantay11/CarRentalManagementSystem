@@ -41,7 +41,6 @@ public class Car implements Serializable {
     private CarStatusEnum carStatus;
     @Column(nullable = false)
     private boolean enabled;
-
    
     @ManyToOne
     @JoinColumn(nullable = false)

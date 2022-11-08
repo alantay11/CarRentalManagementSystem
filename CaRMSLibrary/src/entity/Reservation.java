@@ -35,8 +35,12 @@ public class Reservation implements Serializable {
     private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime returnTime;
-    @Column(columnDefinition = "boolean default false")
-    private boolean isCancelled;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean cancelled;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean requiresTransfer;
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean paid;
     @Column(nullable = false, precision = 11, scale = 2)
     private BigDecimal paymentAmount;
     @Column(nullable = false, precision = 11, scale = 2)
@@ -70,9 +74,27 @@ public class Reservation implements Serializable {
      */
     public Reservation() {
         this.rentalRateList = new ArrayList<>();
-        this.isCancelled = false;
+        this.cancelled = false;
+        this.requiresTransfer = false;
+        this.paid = false;
         this.paymentAmount = new BigDecimal("0.00");
         this.refundAmount = new BigDecimal("0.00");
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
+    public boolean isRequiresTransfer() {
+        return requiresTransfer;
+    }
+
+    public void setRequiresTransfer(boolean requiresTransfer) {
+        this.requiresTransfer = requiresTransfer;
     }
 
     public BigDecimal getPaymentAmount() {
@@ -155,12 +177,12 @@ public class Reservation implements Serializable {
         this.customer = customer;
     }
 
-    public boolean isIsCancelled() {
-        return isCancelled;
+    public boolean isCancelled() {
+        return cancelled;
     }
 
-    public void setIsCancelled(boolean isCancelled) {
-        this.isCancelled = isCancelled;
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     public Car getCar() {

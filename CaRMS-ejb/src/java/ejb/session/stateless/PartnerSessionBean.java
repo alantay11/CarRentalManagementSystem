@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Partner;
+import exception.InvalidLoginCredentialException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -29,6 +30,30 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         return partner;
     }
 
+        @Override
+    public Partner partnerLogin(String username, String password) throws InvalidLoginCredentialException {
+
+        Partner partner = retrievePartnerByUsername(username);
+
+        if (partner.getPassword().equals(password)) {
+            return partner;
+        } else {
+            throw new InvalidLoginCredentialException("Username does not exist or invalid password!");
+        }
+    }
+
+    @Override
+    public Partner retrievePartnerByUsername(String username) {
+        Query query = em.createQuery("SELECT p FROM Partner p WHERE p.username = :username");
+        query.setParameter("username", username);
+        if (query.getResultList().isEmpty()) {
+            //throw new CustomerNotFoundException();
+        }
+        Partner partner = (Partner) query.getResultList().get(0);
+        return partner;
+    }
+
+    
     @Override
     public Partner retrievePartner(long partnerId) {
         Partner partner = em.find(Partner.class, partnerId);

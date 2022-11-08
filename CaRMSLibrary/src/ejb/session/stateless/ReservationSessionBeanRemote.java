@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.ejb.Remote;
 
@@ -20,7 +21,7 @@ public interface ReservationSessionBeanRemote {
 
     Reservation retrieveReservation(long reservationid);
 
-    void cancelReservation(long reservationId);
+    void cancelReservation(long reservationId, BigDecimal refundAmount);
 
     Reservation createReservation(Reservation reservation);
     

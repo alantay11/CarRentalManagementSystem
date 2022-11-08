@@ -10,7 +10,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.CarCategory;
 import entity.RentalRate;
-import exception.InvalidCarCategoryNameException;
+import enumeration.RentalRateEnum;
 import exception.InvalidIdException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -87,6 +87,7 @@ public class SalesManagerModule {
             String startTime = "";
             String endDate = "";
             String endTime = "";
+            String type = "";
 
             System.out.println("*** CaRMSMC System :: Sales Manager :: Create Rental Rate ***\n");
             System.out.print("Enter rate name> ");
@@ -105,6 +106,16 @@ public class SalesManagerModule {
             long carCategoryId = scanner.nextLong();
             rentalRate.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
 
+            System.out.print("Enter type (Default/Promotion/Peak)> ");
+            type = scanner.nextLine().trim();
+            if (type.toLowerCase().equals("default")) {
+                rentalRate.setRateType(RentalRateEnum.Default);
+            } else if (type.toLowerCase().equals("promotion")) {
+                rentalRate.setRateType(RentalRateEnum.Promotion);
+            } else if (type.toLowerCase().equals("peak")) {
+                rentalRate.setRateType(RentalRateEnum.Peak);
+            }
+
             System.out.print("Enter rate per day> ");
             rentalRate.setRatePerDay(new BigDecimal(scanner.nextDouble()));
             scanner.nextLine();
@@ -112,12 +123,12 @@ public class SalesManagerModule {
             startDate = scanner.nextLine().trim();
             System.out.print("Enter start time in the format HH:MM> ");
             startTime = scanner.nextLine().trim();
-            rentalRate.setStartDateTime(LocalDateTime.parse(startDate + "T" + startTime));
+            rentalRate.setStartDate(LocalDateTime.parse(startDate + "T" + startTime));
             System.out.print("Enter end date in the format YYYY-MM-DD> ");
             endDate = scanner.nextLine().trim();
             System.out.print("Enter end time in the format HH:MM> ");
             endTime = scanner.nextLine().trim();
-            rentalRate.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime));
+            rentalRate.setEndDate(LocalDateTime.parse(endDate + "T" + endTime));
 
             rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate, carCategoryId);
 
@@ -188,8 +199,8 @@ public class SalesManagerModule {
             System.out.println("1: Edit Rate Name: " + rentalRate.getRateName());
             System.out.println("2: Edit Car Category: " + rentalRate.getCarCategory());
             System.out.println("3: Edit Rate per Day: $" + rentalRate.getRatePerDay());
-            System.out.println("4: Edit Start Date & Time: " + rentalRate.getStartDateTime().toString().replace("T", " "));
-            System.out.println("5: Edit End Date & Time: " + rentalRate.getEndDateTime().toString().replace("T", " "));
+            System.out.println("4: Edit Start Date & Time: " + rentalRate.getStartDate().toString().replace("T", " "));
+            System.out.println("5: Edit End Date & Time: " + rentalRate.getEndDate().toString().replace("T", " "));
             System.out.println("6: Finish");
             System.out.println("-----------------------------------\n");
             response = 0;
@@ -227,13 +238,12 @@ public class SalesManagerModule {
                         startDate = scanner.nextLine().trim();
                         System.out.print("Enter start time in the format HH:MM> ");
                         startTime = scanner.nextLine().trim();
-                        rentalRate.setStartDateTime(LocalDateTime.parse(startDate + "T" + startTime));
-                    } else if (response == 5) {
+                        rentalRate.setStartDate(LocalDateTime.parse(startDate + "T" + startTime));
                         System.out.print("Enter end date in the format YYYY-MM-DD> ");
                         endDate = scanner.nextLine().trim();
                         System.out.print("Enter end time in the format HH:MM> ");
                         endTime = scanner.nextLine().trim();
-                        rentalRate.setEndDateTime(LocalDateTime.parse(endDate + "T" + endTime));
+                        rentalRate.setEndDate(LocalDateTime.parse(endDate + "T" + endTime));
                     } else if (response == 6) {
                         break;
                     } else {

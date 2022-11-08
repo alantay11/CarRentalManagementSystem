@@ -5,6 +5,7 @@
  */
 package entity;
 
+import enumeration.RentalRateEnum;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,11 +39,13 @@ public class RentalRate implements Serializable {
     @Column(nullable = false, precision = 11, scale = 2)
     private BigDecimal ratePerDay;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime startDateTime;
+    private LocalDateTime startDate;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    private LocalDateTime endDateTime;
+    private LocalDateTime endDate;
     @Column(nullable = false)
     private boolean enabled;
+    @Enumerated(EnumType.STRING)
+    private RentalRateEnum rateType;
 
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -52,6 +57,14 @@ public class RentalRate implements Serializable {
     public RentalRate() {
         this.enabled = true;
         this.reservationList = new ArrayList<>();
+    }
+
+    public RentalRateEnum getRateType() {
+        return rateType;
+    }
+
+    public void setRateType(RentalRateEnum rateType) {
+        this.rateType = rateType;
     }
 
     public CarCategory getCarCategory() {
@@ -86,20 +99,20 @@ public class RentalRate implements Serializable {
         this.ratePerDay = ratePerDay;
     }
 
-    public LocalDateTime getStartDateTime() {
-        return startDateTime;
+    public LocalDateTime getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateTime(LocalDateTime startDateTime) {
-        this.startDateTime = startDateTime;
+    public void setStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDateTime getEndDateTime() {
-        return endDateTime;
+    public LocalDateTime getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateTime(LocalDateTime endDateTime) {
-        this.endDateTime = endDateTime;
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
     }
 
     public List<Reservation> getReservationList() {
@@ -141,7 +154,7 @@ public class RentalRate implements Serializable {
     @Override
     public String toString() {
         return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay
-                + ", start date of " + this.startDateTime.toString().replace("T", ", ") + " and end date of " + this.endDateTime.toString().replace("T", ", ")
+                + ", start date of " + this.startDate.toString().replace("T", ", ") + " and end date of " + this.endDate.toString().replace("T", ", ")
                 //+ " for category " + this.carCategory 
                 + ((enabled) ? "" : "DISABLED");
     }

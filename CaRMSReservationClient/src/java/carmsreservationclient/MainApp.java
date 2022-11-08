@@ -22,6 +22,7 @@ import entity.Reservation;
 import exception.CustomerNotFoundException;
 import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
+import exception.NoRentalRateAvailableException;
 import exception.OutletIsClosedException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -315,39 +316,42 @@ public class MainApp {
         System.out.println("*** CaRMSRC System :: Customer :: Reserve Car ***\n");
         Scanner scanner = new Scanner(System.in);
 
-        Reservation reservation = doSearchCar();
+        try {
 
-        if (reservation != null) {
+            Reservation reservation = doSearchCar();
 
-            CreditCard creditCard = doSaveCreditCard();
-            currentCustomer.setCreditCard(creditCard);
+            if (reservation != null) {
 
-            System.out.print("\nDo you want to pay for the reservation now? (Y/N)> ");
-            String confirmation = scanner.nextLine().trim().toLowerCase();
-            if (confirmation.equals("y")) {
-
-                // calculate rentalrate costs and request payment then set reservation and create
+                CreditCard creditCard = doSaveCreditCard();
+                currentCustomer.setCreditCard(creditCard);
                 BigDecimal paymentAmount = new BigDecimal("0.00");
-                
                 paymentAmount = rentalRateSessionBeanRemote.calculateTotalCost(reservation);
-                
-                System.out.println("\nReservation paid\n");
                 reservation.setPaymentAmount(paymentAmount);
-                reservation = reservationSessionBeanRemote.createReservation(reservation);
-            } else {
-                System.out.println("\nPayment will be required upon pickup\n");
-                reservation = reservationSessionBeanRemote.createReservation(reservation);
 
+                System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
+                String confirmation = scanner.nextLine().trim().toLowerCase();
+                if (confirmation.equals("y")) {
+                    // calculate rentalrate costs and request payment then set reservation and create
+                    System.out.println("\nReservation of amount: $" + paymentAmount.toString() + " paid using " + creditCard.getCcNumber() + "\n");
+                    reservation.setPaid(true);
+                    reservation = reservationSessionBeanRemote.createReservation(reservation);
+                } else {
+                    System.out.println("\nPayment will be required upon pickup\n");
+                    reservation = reservationSessionBeanRemote.createReservation(reservation);
+
+                }
+
+                System.out.println("\nNew " + reservation.toString() + " created\n");
             }
-
-            System.out.println("\nNew " + reservation.toString() + " created\n");
+        } catch (NoRentalRateAvailableException ex) {
+            System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
         }
         // NOT DONE
     }
 
     private CreditCard doSaveCreditCard() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("\nPlease enter credit card details");
+        System.out.println("\nPlease enter credit card details");
         CreditCard creditCard = new CreditCard();
         String nameOnCC = "";
         String ccNumber = "";
@@ -385,19 +389,67 @@ public class MainApp {
         System.out.println("*** CaRMSRC System :: Customer :: Cancel Reservation ***\n");
         Scanner scanner = new Scanner(System.in);
 
-        doViewAllMyReservations();
+        doViewAllMyActiveReservations();
         System.out.print("Enter ID of reservation you want to delete> ");
         long reservationId = scanner.nextLong();
         Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
         scanner.nextLine();
-        System.out.print("\nConfirm cancellation of " + reservation.toString() + "? (Y/N)> ");
-        String confirmation = scanner.nextLine().trim().toLowerCase();
-        if (confirmation.equals("y")) {
-            reservationSessionBeanRemote.cancelReservation(reservationId);
-            System.out.println("\n" + reservation.toString() + " cancelled\n");
+
+        BigDecimal totalCost = reservation.getPaymentAmount();
+        LocalDateTime pickup = reservation.getPickupTime();
+
+        BigDecimal penalty = calculatePenalty(totalCost, pickup);
+        BigDecimal refund = totalCost.subtract(penalty);
+        //System.out.println("total " + totalCost + " pickup " + pickup + " penalty " + penalty);
+
+        if (reservation.isPaid()) {
+            System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
+                    + " A penalty of $" + penalty + " will be imposed.");
+            System.out.print("You will be refunded $" + refund + " (Y/N)> ");
+
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (confirmation.equals("y")) {
+                reservationSessionBeanRemote.cancelReservation(reservationId, refund);
+                System.out.println("\n" + reservation.toString() + " cancelled\n");
+                System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+
+            } else {
+                System.out.println("\nCancellation cancelled\n");
+            }
         } else {
-            System.out.println("\nCancellation cancelled\n");
+            System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
+                    + " You will be charged a penalty of $" + penalty + " (Y/N)> ");
+
+            String confirmation = scanner.nextLine().trim().toLowerCase();
+            if (confirmation.equals("y")) {
+                reservationSessionBeanRemote.cancelReservation(reservationId, refund);
+                System.out.println("\n" + reservation.toString() + " cancelled\n");
+                System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+
+            } else {
+                System.out.println("\nCancellation cancelled\n");
+            }
         }
+
+    }
+
+    private BigDecimal calculatePenalty(BigDecimal totalCost, LocalDateTime pickup) {
+        BigDecimal penalty = new BigDecimal("0.00");
+
+        if (LocalDateTime.now().isBefore(pickup.minusDays(14))) {
+            //System.out.println("more than 14 before");
+        } else if (LocalDateTime.now().isBefore(pickup.minusDays(7))) {
+            penalty = totalCost.multiply(new BigDecimal("0.2"));
+            //System.out.println("14 to 7 before");
+        } else if (LocalDateTime.now().isBefore(pickup.minusDays(3))) {
+            penalty = totalCost.multiply(new BigDecimal("0.5"));
+            //System.out.println("7 to 3 before");
+        } else if (LocalDateTime.now().isBefore(pickup)) {
+            penalty = totalCost.multiply(new BigDecimal("0.7"));
+            //System.out.println("3 or less before");
+        }
+
+        return penalty.setScale(2);
     }
 
     private List<Reservation> getAllMyReservations() {
@@ -430,6 +482,21 @@ public class MainApp {
         System.out.println("\n-----------------------------------");
         for (Reservation r : reservations) {
             System.out.println(r.toString());//"ID: " + r.getReservationId()+ ", Rate Name: " + r.get());
+        }
+        System.out.println("-----------------------------------\n");
+        System.out.print("Press enter to continue>");
+        scanner.nextLine();
+    }
+
+    private void doViewAllMyActiveReservations() {
+        System.out.println("*** CaRMSRC System :: Customer :: View All My Reservations ***\n");
+        Scanner scanner = new Scanner(System.in);
+        List<Reservation> reservations = getAllMyReservations();
+        System.out.println("\n-----------------------------------");
+        for (Reservation r : reservations) {
+            if (!r.isCancelled()) {
+                System.out.println(r.toString());//"ID: " + r.getReservationId()+ ", Rate Name: " + r.get());
+            }
         }
         System.out.println("-----------------------------------\n");
         System.out.print("Press enter to continue>");

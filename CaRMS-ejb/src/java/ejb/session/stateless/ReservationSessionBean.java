@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -52,9 +53,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public void cancelReservation(long reservationId) {
+    public void cancelReservation(long reservationId, BigDecimal refundAmount) {
         Reservation reservation = retrieveReservation(reservationId);
-        reservation.setIsCancelled(true);
+        reservation.setCancelled(true);
+        reservation.setPaid(true); // whether paid before or not it is considered done when cancelled
+        reservation.setRefundAmount(refundAmount);
     }
 
 }
