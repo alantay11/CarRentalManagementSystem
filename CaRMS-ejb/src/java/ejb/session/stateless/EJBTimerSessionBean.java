@@ -126,20 +126,88 @@ public class EJBTimerSessionBean implements EJBTimerSessionBeanRemote, EJBTimerS
                             break;
                         }
                         
-                        // if on rental n not at desired outlet but somehow can transit in time
-                        else if () {
+                        // if on rental and car's destination outlet is NOT the reservation's next pickup outlet
+                        else if (car.getCarStatus() == CarStatusEnum.RESERVED &&
+                                !(car.getReservation().getDestinationOutlet().getOutletId().equals(reservation.getDepartureOutlet().getOutletId()))) {
                             
+                            // check if it can make it to pickuptime factoring in 2h transit time
+                            if (!(car.getReservation().getReturnTime().isAfter(reservation.getPickupTime().minusHours(2)))) {
+                                
+                                // generate dispatch record
+                                transitDriverDispatchSessionBean.createNewDispatchRecord(reservation, new TransitDriverDispatch());
+
+                                car.setReservation(reservation);
+                                car.setCarStatus(CarStatusEnum.RESERVED);
+                                reservation.setCar(car);
+                                break;
+                            }
+                        }                    
+                    }                
+                }
+            } 
+            
+            // car from category
+            else {
+                List<Car> carsMatchCategory = carSessionBean.retrieveAllCarsByCategory(carCategory.getCarCategoryId());
+                
+                for (Car car : carsMatchCategory) {
+                    
+                    // if car is active n unreserved
+                    if (car.isEnabled() && !(car.getCarStatus() == CarStatusEnum.RESERVED)) {
+                        
+                        // prioritise those tt are avail in pickup outlet 
+                        if (car.getCarStatus() == CarStatusEnum.AVAILABLE && 
+                                car.getCurrentOutlet().getOutletId().equals(reservation.getDepartureOutlet().getOutletId())) {
+                            car.setReservation(reservation);
+                            car.setCarStatus(CarStatusEnum.RESERVED);
+                            reservation.setCar(car);
+                            break;
                         }
                         
-                    } 
+                        // those in pickup outlet tt come back on time
+                        else if (car.getCarStatus()  == CarStatusEnum.RESERVED) {
+                            if (car.getReservation().getReturnTime().isBefore(reservation.getPickupTime()) &&
+                                    car.getReservation().getDestinationOutlet().getOutletId().equals(reservation.getDestinationOutlet().getOutletId())) {
+                                car.setReservation(reservation);
+                                car.setCarStatus(CarStatusEnum.RESERVED);
+                                reservation.setCar(car);
+                                break;
+                            }
+                        }
                         
-                    
-                    
-                    
+                        // else if it's not at desired outlet
+                        else if (car.getCarStatus()  == CarStatusEnum.AVAILABLE &&
+                                !(car.getCurrentOutlet().getOutletId().equals(reservation.getDepartureOutlet().getOutletId()))) {
+                            
+                            // generate dispatch record
+                            transitDriverDispatchSessionBean.createNewDispatchRecord(reservation, new TransitDriverDispatch());
+                            
+                            car.setReservation(reservation);
+                            car.setCarStatus(CarStatusEnum.RESERVED);
+                            reservation.setCar(car);
+                            break;
+                        }
+                        
+                        // if on rental and car's destination outlet is NOT the reservation's next pickup outlet
+                        else if (car.getCarStatus() == CarStatusEnum.RESERVED &&
+                                !(car.getReservation().getDestinationOutlet().getOutletId().equals(reservation.getDepartureOutlet().getOutletId()))) {
+                            
+                            // check if it can make it to pickuptime factoring in 2h transit time
+                            if (!(car.getReservation().getReturnTime().isAfter(reservation.getPickupTime().minusHours(2)))) {
+                                
+                                // generate dispatch record
+                                transitDriverDispatchSessionBean.createNewDispatchRecord(reservation, new TransitDriverDispatch());
+
+                                car.setReservation(reservation);
+                                car.setCarStatus(CarStatusEnum.RESERVED);
+                                reservation.setCar(car);
+                                break;
+                            }
+                        }                       
+                    }
                 }
-                
-                
             }
+            em.flush();
         }
     }
 
