@@ -36,6 +36,8 @@ public class Partner implements Serializable {
 
     @OneToMany(mappedBy = "partner")
     private List<Customer> customerList;
+    @OneToMany(mappedBy = "partner")
+    private List<Reservation> reservationList;
 
     public Partner() {
         this.customerList = new ArrayList<>();
@@ -79,6 +81,14 @@ public class Partner implements Serializable {
 
     public void setCustomerList(List<Customer> customerList) {
         this.customerList = customerList;
+    }
+
+    public List<Reservation> getReservationList() {
+        return reservationList;
+    }
+
+    public void setReservationList(List<Reservation> reservationList) {
+        this.reservationList = reservationList;
     }
 
     @Override
