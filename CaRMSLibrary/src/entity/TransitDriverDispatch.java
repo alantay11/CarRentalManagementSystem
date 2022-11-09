@@ -44,6 +44,11 @@ public class TransitDriverDispatch implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet destinationOutlet;
+   
+    @OneToOne
+    @JoinColumn(nullable = false)
+    private Reservation reservation;
+    
 
     public TransitDriverDispatch() {
     }
@@ -103,6 +108,14 @@ public class TransitDriverDispatch implements Serializable {
 
     public void setDestinationOutlet(Outlet destinationOutlet) {
         this.destinationOutlet = destinationOutlet;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
     public Long getTransitDriverDispatchId() {

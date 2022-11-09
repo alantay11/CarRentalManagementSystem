@@ -5,10 +5,13 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Outlet;
 import entity.Reservation;
+import entity.TransitDriverDispatch;
+import enumeration.CarStatusEnum;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +32,9 @@ import javax.persistence.PersistenceContext;
 public class EJBTimerSessionBean implements EJBTimerSessionBeanRemote, EJBTimerSessionBeanLocal {
 
     @EJB
+    private TransitDriverDispatchSessionBeanLocal transitDriverDispatchSessionBean;
+
+    @EJB
     private OutletSessionBeanLocal outletSessionBean;
 
     @EJB
@@ -36,6 +42,7 @@ public class EJBTimerSessionBean implements EJBTimerSessionBeanRemote, EJBTimerS
    
     @EJB
     private CarSessionBeanLocal carSessionBean;
+    
     
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -62,11 +69,11 @@ public class EJBTimerSessionBean implements EJBTimerSessionBeanRemote, EJBTimerS
         }
         triggerCarAllocation(finalReservationList);
     }
-    
+       
     
     private void triggerCarAllocation(List<Reservation> currDayReservationList) {
         for (Reservation reservation : currDayReservationList) {
-            // requires a car of a specific make and model, (can be null)
+            // requires a car of a specific make and model,
             CarModel carModel = reservation.getCarModel();
             
             // or just any car from a particular category
@@ -75,7 +82,62 @@ public class EJBTimerSessionBean implements EJBTimerSessionBeanRemote, EJBTimerS
             // allocation of cars that are not currently in the particular outlet physically
             Outlet pickUpOutlet = reservation.getDepartureOutlet();
             
-            if () {
+            
+            // since can be null 
+            if (carModel != null) {
+                // get all matching cars of this model 
+                List<Car> carsOfMatchingMakeAndModel = carSessionBean.retrieveAllCarsByModel(carModel.getCarModelId());
+                
+                for (Car car : carsOfMatchingMakeAndModel) {
+                    
+                    // if car is active n unreserved
+                    if (car.isEnabled() && !(car.getCarStatus() == CarStatusEnum.RESERVED)) {
+                        
+                        // prioritise those tt are avail in pickup outlet 
+                        if (car.getCarStatus() == CarStatusEnum.AVAILABLE && 
+                                car.getCurrentOutlet().getOutletId().equals(reservation.getDepartureOutlet().getOutletId())) {
+                            car.setReservation(reservation);
+                            car.setCarStatus(CarStatusEnum.RESERVED);
+                            reservation.setCar(car);
+                            break;
+                        } 
+                        
+                        // those in pickup outlet tt come back on time
+                        else if (car.getCarStatus()  == CarStatusEnum.RESERVED) {
+                            if (car.getReservation().getReturnTime().isBefore(reservation.getPickupTime()) &&
+                                    car.getReservation().getDestinationOutlet().getOutletId().equals(reservation.getDestinationOutlet().getOutletId())) {
+                                car.setReservation(reservation);
+                                car.setCarStatus(CarStatusEnum.RESERVED);
+                                reservation.setCar(car);
+                                break;
+                            }
+                        } 
+                        
+                        // else if it's not at desired outlet
+                        else if (car.getCarStatus()  == CarStatusEnum.AVAILABLE &&
+                                !(car.getCurrentOutlet().getOutletId().equals(reservation.getDepartureOutlet().getOutletId()))) {
+                            
+                            // generate dispatch record
+                            transitDriverDispatchSessionBean.createNewDispatchRecord(reservation, new TransitDriverDispatch());
+                            
+                            car.setReservation(reservation);
+                            car.setCarStatus(CarStatusEnum.RESERVED);
+                            reservation.setCar(car);
+                            break;
+                        }
+                        
+                        // if on rental n not at desired outlet but somehow can transit in time
+                        else if () {
+                            
+                        }
+                        
+                    } 
+                        
+                    
+                    
+                    
+                }
+                
                 
             }
         }

@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -53,8 +54,7 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private Customer customer;
 
-    @ManyToOne
-    @JoinColumn
+    @OneToOne
     private Car car;
     @ManyToOne
     @JoinColumn
@@ -68,10 +68,12 @@ public class Reservation implements Serializable {
     @ManyToOne
     private Outlet destinationOutlet;
 
-    /* Not sure if this is necessary
-    @OneToOne(optional = true)
+
+    @OneToOne(mappedBy = "reservation",optional = true)
     private TransitDriverDispatch transitDriverDispatch;
-     */
+    
+    
+    
     public Reservation() {
         this.rentalRateList = new ArrayList<>();
         this.cancelled = false;
@@ -207,6 +209,14 @@ public class Reservation implements Serializable {
 
     public void setDestinationOutlet(Outlet destinationOutlet) {
         this.destinationOutlet = destinationOutlet;
+    }
+
+    public TransitDriverDispatch getTransitDriverDispatch() {
+        return transitDriverDispatch;
+    }
+
+    public void setTransitDriverDispatch(TransitDriverDispatch transitDriverDispatch) {
+        this.transitDriverDispatch = transitDriverDispatch;
     }
 
     @Override

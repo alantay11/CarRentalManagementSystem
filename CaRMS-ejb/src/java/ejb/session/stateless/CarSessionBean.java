@@ -275,6 +275,32 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         return totalAvailableCars > clashingReservations;
 
     }
+    
+    @Override
+    public List<Car> retrieveAllCarsByModel(Long carModelId) {
+        List<Car> allCars = retrieveAllCars();
+        
+        List<Car> carsWithThisModel = new ArrayList<>();
+        for (Car car : allCars) {
+            if (car.getModel().getCarModelId().equals(carModelId)) {
+                carsWithThisModel.add(car);
+            }
+        }
+        return carsWithThisModel;
+    }
+    
+    @Override
+    public List<Car> retrieveAllCarsByCategory(Long carCategoryId) {
+        List<Car> allCars = retrieveAllCars();
+        
+        List<Car> carsWithThisCategory = new ArrayList<>();
+        for (Car car : allCars) {
+            if (car.getModel().getCarCategory().getCarCategoryId().equals(carCategoryId)) {
+                carsWithThisCategory.add(car);
+            }
+        }
+        return carsWithThisCategory;
+    }
 }
 
 /*

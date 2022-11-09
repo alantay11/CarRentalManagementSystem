@@ -45,6 +45,9 @@ public class Car implements Serializable {
     @ManyToOne
     @JoinColumn(nullable = false)
     private CarModel model;
+    
+    @OneToOne(mappedBy = "car")
+    private Reservation reservation;
 
     @OneToMany(mappedBy = "car")
     private List<Reservation> reservationList;
@@ -121,6 +124,14 @@ public class Car implements Serializable {
 
     public void setReservationList(List<Reservation> reservationList) {
         this.reservationList = reservationList;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
     }
 
     public Outlet getCurrentOutlet() {

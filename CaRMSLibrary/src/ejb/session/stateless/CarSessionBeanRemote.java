@@ -33,4 +33,9 @@ public interface CarSessionBeanRemote {
 
     boolean searchCarByCategory(long makeModelId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) throws OutletIsClosedException;
 
+    public List<Car> retrieveAllCarsByModel(Long carModelId);
+    
+    public List<Car> retrieveAllCarsByCategory(Long carCategoryId);
+
+
 }
