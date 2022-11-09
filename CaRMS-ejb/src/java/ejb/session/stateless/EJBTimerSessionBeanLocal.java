@@ -14,6 +14,6 @@ import javax.ejb.Local;
 @Local
 public interface EJBTimerSessionBeanLocal {
 
-    void allocateCarsToCurrentDayReservations();
+    void allocateCarsTimer();
     
 }

@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -20,4 +21,8 @@ public interface ReservationSessionBeanLocal {
 
     Reservation retrieveReservation(long reservationid);
     
+    public List<Reservation> retrieveAllReservations();
+
+    public List<Reservation> retrieveReservationByDate(LocalDate currDate);
+
 }

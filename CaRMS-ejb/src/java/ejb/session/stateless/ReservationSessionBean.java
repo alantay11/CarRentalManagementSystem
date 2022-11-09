@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.Reservation;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -51,6 +53,27 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         reservation.getRentalRateList().size();
         return reservation;
     }
+    
+    @Override
+    public List<Reservation> retrieveAllReservations() {
+        Query query = em.createQuery("SELECT r FROM Reservation r");
+        return query.getResultList();
+    }
+    
+    @Override
+    public List<Reservation> retrieveReservationByDate(LocalDate currDate) {
+        List<Reservation> allReservations = retrieveAllReservations();
+        List<Reservation> currDayReservations = new ArrayList<>();
+        
+        for (Reservation r : allReservations) {
+            if (r.getPickupTime().toLocalDate().isEqual(currDate)) {
+                currDayReservations.add(r);
+            }
+        }
+        return currDayReservations;
+    }
+    
+    
 
     @Override
     public void cancelReservation(long reservationId, BigDecimal refundAmount) {

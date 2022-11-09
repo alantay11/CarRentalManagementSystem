@@ -14,6 +14,6 @@ import javax.ejb.Remote;
 @Remote
 public interface EJBTimerSessionBeanRemote {
 
-    void allocateCarsToCurrentDayReservations();
+    void allocateCarsTimer();
     
 }
