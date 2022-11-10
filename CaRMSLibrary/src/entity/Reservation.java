@@ -72,6 +72,9 @@ public class Reservation implements Serializable {
     @OneToOne(mappedBy = "reservation",optional = true)
     private TransitDriverDispatch transitDriverDispatch;
     
+    @ManyToOne
+    @JoinColumn(nullable = true)
+    private Partner partner;
     
     
     public Reservation() {
@@ -217,6 +220,14 @@ public class Reservation implements Serializable {
 
     public void setTransitDriverDispatch(TransitDriverDispatch transitDriverDispatch) {
         this.transitDriverDispatch = transitDriverDispatch;
+    }
+
+    public Partner getPartner() {
+        return partner;
+    }
+
+    public void setPartner(Partner partner) {
+        this.partner = partner;
     }
 
     @Override

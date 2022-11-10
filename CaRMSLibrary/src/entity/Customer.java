@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -54,7 +55,8 @@ public class Customer implements Serializable {
     @OneToMany(mappedBy = "customer")
     private List<Reservation> reservationList;
 
-    @ManyToOne(optional = true)
+    @ManyToOne
+    @JoinColumn(nullable = true)
     private Partner partner;
 
     public Customer() {
