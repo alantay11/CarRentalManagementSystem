@@ -27,6 +27,7 @@ import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
 import exception.NoRentalRateAvailableException;
 import exception.OutletIsClosedException;
+import exception.ReservationRecordNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -83,7 +84,7 @@ public class MainApp {
         validator = validatorFactory.getValidator();
     }
 
-    public void runApp() {
+    public void runApp() throws ReservationRecordNotFoundException {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
@@ -123,7 +124,7 @@ public class MainApp {
         }
     }
 
-    private void doLogin() {
+    private void doLogin() throws ReservationRecordNotFoundException {
         Scanner scanner = new Scanner(System.in);
         String username = "";
         String password = "";
@@ -191,7 +192,7 @@ public class MainApp {
 
     }
 
-    private void customerMenu() {
+    private void customerMenu() throws ReservationRecordNotFoundException {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
@@ -414,7 +415,7 @@ public class MainApp {
         }
     }
 
-    private void doCancelReservation() {
+    private void doCancelReservation() throws ReservationRecordNotFoundException {
         System.out.println("*** CaRMSRC System :: Customer :: Cancel Reservation ***\n");
         Scanner scanner = new Scanner(System.in);
 
@@ -485,7 +486,7 @@ public class MainApp {
         return reservationSessionBeanRemote.retrieveAllMyReservations(currentCustomer.getId());
     }
 
-    private void doViewReservationDetails() {
+    private void doViewReservationDetails() throws ReservationRecordNotFoundException {
         System.out.println("*** CaRMSRC System :: Customer :: View Reservation Details ***\n");
         Scanner scanner = new Scanner(System.in);
         List<Reservation> reservations = getAllMyReservations();

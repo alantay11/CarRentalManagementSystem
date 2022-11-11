@@ -8,6 +8,12 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
+import entity.Car;
+import entity.Reservation;
+import enumeration.CarStatusEnum;
+import exception.ReservationRecordNotFoundException;
+import exception.UpdateReservationStatusFailException;
 import java.util.Scanner;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -25,6 +31,7 @@ public class CustomerServiceExecutiveModule {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
     public CustomerServiceExecutiveModule() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -35,6 +42,7 @@ public class CustomerServiceExecutiveModule {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBean;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
@@ -56,9 +64,9 @@ public class CustomerServiceExecutiveModule {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    //doPickupCar();
+                    doPickupCar();
                 } else if (response == 2) {
-                    //doReturnCar();
+                    doReturnCar();
                 } else if (response == 3) {
                     break;
                 } else {
@@ -71,5 +79,46 @@ public class CustomerServiceExecutiveModule {
             }
         }
 
+    }
+    
+    public void doPickupCar() {
+        
+        try {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter reservation ID> ");
+        Long reservationId = scanner.nextLong();
+        
+        // update reservation to reserved
+        reservationSessionBeanRemote.updateReservationStatus(reservationId);
+        
+        Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
+        }
+        
+        catch (UpdateReservationStatusFailException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ReservationRecordNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+      
+    }
+    
+    public void doReturnCar() {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Enter reservation ID> ");
+            Long reservationId = scanner.nextLong();
+            
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
+            
+            // set all back to normal
+            Car car = reservation.getCar();
+            car.setCarStatus(CarStatusEnum.AVAILABLE);
+            car.setCurrentOutlet(reservation.getDestinationOutlet());
+            
+            car.setReservation(null);
+            reservation.setCar(null);
+        } catch (ReservationRecordNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 }

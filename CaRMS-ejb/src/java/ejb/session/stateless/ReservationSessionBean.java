@@ -6,10 +6,15 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import enumeration.CarStatusEnum;
+import exception.ReservationRecordNotFoundException;
+import exception.UpdateReservationStatusFailException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -48,10 +53,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public Reservation retrieveReservation(long reservationid) {
-        Reservation reservation = em.find(Reservation.class, reservationid);
+    public Reservation retrieveReservation(long reservationId) throws ReservationRecordNotFoundException {
+        Reservation reservation = em.find(Reservation.class, reservationId);
         reservation.getRentalRateList().size();
-        return reservation;
+        
+        if (reservation != null) {
+            return reservation;
+        } else {
+            throw new ReservationRecordNotFoundException(("Reservation ID " + reservationId + " does not exist!"));
+        }
     }
     
     @Override
@@ -73,14 +83,33 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         return currDayReservations;
     }
     
-    
-
     @Override
     public void cancelReservation(long reservationId, BigDecimal refundAmount) {
-        Reservation reservation = retrieveReservation(reservationId);
-        reservation.setCancelled(true);
-        reservation.setPaid(true); // whether paid before or not it is considered done when cancelled
-        reservation.setRefundAmount(refundAmount);
+        try {
+            Reservation reservation = retrieveReservation(reservationId);
+            reservation.setCancelled(true);
+            reservation.setPaid(true); // whether paid before or not it is considered done when cancelled
+            reservation.setRefundAmount(refundAmount);
+        } catch (ReservationRecordNotFoundException ex) {
+            Logger.getLogger(ReservationSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
+    @Override
+    public void updateReservationStatus(long reservationId) throws UpdateReservationStatusFailException {
+        
+        try {
+            Reservation reservation = retrieveReservation(reservationId);
+            
+            // set as reserved
+            reservation.getCar().setCarStatus(CarStatusEnum.RESERVED);
+            reservation.getCar().setCurrentOutlet(null);
+            em.flush();
+        } 
+        
+        catch (ReservationRecordNotFoundException ex) {
+            throw new UpdateReservationStatusFailException("Reservation Id " + reservationId + " does not exist.");
+        }     
+    }
+    
 }

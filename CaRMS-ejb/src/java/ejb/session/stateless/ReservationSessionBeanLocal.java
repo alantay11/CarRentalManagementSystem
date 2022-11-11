@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import exception.ReservationRecordNotFoundException;
+import exception.UpdateReservationStatusFailException;
 import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
@@ -19,10 +21,12 @@ public interface ReservationSessionBeanLocal {
 
     List<Reservation> retrieveAllMyReservations(long customerId);
 
-    Reservation retrieveReservation(long reservationid);
+    Reservation retrieveReservation(long reservationId) throws ReservationRecordNotFoundException;
     
     public List<Reservation> retrieveAllReservations();
 
     public List<Reservation> retrieveReservationByDate(LocalDate currDate);
+
+    public void updateReservationStatus(long reservationId) throws UpdateReservationStatusFailException;
 
 }

@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import exception.ReservationRecordNotFoundException;
+import exception.UpdateReservationStatusFailException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +22,7 @@ public interface ReservationSessionBeanRemote {
 
     List<Reservation> retrieveAllMyReservations(long customerId);
 
-    Reservation retrieveReservation(long reservationid);
+    Reservation retrieveReservation(long reservationId) throws ReservationRecordNotFoundException;
 
     void cancelReservation(long reservationId, BigDecimal refundAmount);
 
@@ -29,5 +31,7 @@ public interface ReservationSessionBeanRemote {
     public List<Reservation> retrieveAllReservations();
 
     public List<Reservation> retrieveReservationByDate(LocalDate currDate);
+
+    public void updateReservationStatus(long reservationId) throws UpdateReservationStatusFailException;
     
 }
