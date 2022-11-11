@@ -11,16 +11,24 @@ import entity.CarModel;
 import entity.Outlet;
 import entity.Reservation;
 import enumeration.CarStatusEnum;
+import exception.CarExistException;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
 import exception.OutletIsClosedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -38,28 +46,47 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
+    public CarSessionBean() {
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        this.validator = validatorFactory.getValidator();
+    }
+
     // usecase #18
     @Override
-    public Car createCar(Car car, long carModelId, long outletId) {
-        em.persist(car);
+    public Car createCar(Car car, long carModelId, long outletId) throws CarExistException, InputDataValidationException {
+        Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
 
-        // since car belongs to car model, add to carlist within carmodel
-        CarModel carModel = carModelSessionBeanLocal.retrieveCarModel(carModelId);
-        carModel.getCarList().add(car);
+        if (constraintViolations.isEmpty()) {
+            try {
+                em.persist(car);
 
-        // since car has to be sorted by category, make sure it is connected
-        CarCategory carCategory = carModel.getCarCategory();
-        carCategory.getCarList().add(car);
+                // since car belongs to car model, add to carlist within carmodel
+                CarModel carModel = carModelSessionBeanLocal.retrieveCarModel(carModelId);
+                carModel.getCarList().add(car);
 
-        // since car belongs to outlet, add to carlist within outler
-        Outlet outlet = outletSessionBean.retrieveOutlet(outletId);
-        outlet.getCarList().add(car);
-        //em.merge(carCategory);        
-        //em.merge(carModel);        
+                // since car has to be sorted by category, make sure it is connected
+                CarCategory carCategory = carModel.getCarCategory();
+                carCategory.getCarList().add(car);
 
-        em.flush();
+                // since car belongs to outlet, add to carlist within outler
+                Outlet outlet = outletSessionBean.retrieveOutlet(outletId);
+                outlet.getCarList().add(car);
+                //em.merge(carCategory);        
+                //em.merge(carModel);        
 
-        return car;
+                em.flush();
+
+                return car;
+            } catch (PersistenceException ex) {
+                throw new CarExistException();
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
+
     }
 
     // usecase #19: category, make, model and license plate number
@@ -86,11 +113,17 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     // usecase #21
     @Override
-    public Car updateCar(Car car) {
-        em.merge(car);
-        em.flush();
+    public Car updateCar(Car car) throws InputDataValidationException {
+        Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
 
-        return car;
+        if (constraintViolations.isEmpty()) {
+            em.merge(car);
+            em.flush();
+
+            return car;
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     // usecase #22
@@ -214,7 +247,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
         return totalAvailableCars > clashingReservations.size();
     }*/
-
     @Override
     public boolean searchCarByCategory(long categoryId, LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) throws OutletIsClosedException {
         Outlet pickupOutlet = outletSessionBean.retrieveOutlet(pickupOutletId);
@@ -275,11 +307,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         return totalAvailableCars > clashingReservations;
 
     }
-    
+
     @Override
     public List<Car> retrieveAllCarsByModel(Long carModelId) {
         List<Car> allCars = retrieveAllCars();
-        
+
         List<Car> carsWithThisModel = new ArrayList<>();
         for (Car car : allCars) {
             if (car.getModel().getCarModelId().equals(carModelId)) {
@@ -288,11 +320,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         return carsWithThisModel;
     }
-    
+
     @Override
     public List<Car> retrieveAllCarsByCategory(Long carCategoryId) {
         List<Car> allCars = retrieveAllCars();
-        
+
         List<Car> carsWithThisCategory = new ArrayList<>();
         for (Car car : allCars) {
             if (car.getModel().getCarCategory().getCarCategoryId().equals(carCategoryId)) {
@@ -301,6 +333,17 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         return carsWithThisCategory;
     }
+
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
+    }
+
 }
 
 /*

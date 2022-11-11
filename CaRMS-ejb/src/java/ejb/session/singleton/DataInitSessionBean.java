@@ -22,6 +22,8 @@ import entity.RentalRate;
 import enumeration.CarStatusEnum;
 import enumeration.EmployeeAccessRightEnum;
 import enumeration.RentalRateEnum;
+import exception.CarExistException;
+import exception.CarModelExistException;
 import exception.InputDataValidationException;
 import exception.InvalidIdException;
 import exception.RentalRateExistException;
@@ -167,12 +169,18 @@ public class DataInitSessionBean {
         audiA6.setModel("A6");
 
         if (em.find(CarModel.class, 1l) == null) {
-            toyotaCorolla = carModelSessionBean.createCarModel(toyotaCorolla);
-            hondaCivic = carModelSessionBean.createCarModel(hondaCivic);
-            nissanSunny = carModelSessionBean.createCarModel(nissanSunny);
-            mercedesEClass = carModelSessionBean.createCarModel(mercedesEClass);
-            bmw5Series = carModelSessionBean.createCarModel(bmw5Series);
-            audiA6 = carModelSessionBean.createCarModel(audiA6);
+            try {
+                toyotaCorolla = carModelSessionBean.createCarModel(toyotaCorolla);
+                hondaCivic = carModelSessionBean.createCarModel(hondaCivic);
+                nissanSunny = carModelSessionBean.createCarModel(nissanSunny);
+                mercedesEClass = carModelSessionBean.createCarModel(mercedesEClass);
+                bmw5Series = carModelSessionBean.createCarModel(bmw5Series);
+                audiA6 = carModelSessionBean.createCarModel(audiA6);
+            } catch (CarModelExistException ex) {
+                System.out.println("Why does it exist");
+            } catch (InputDataValidationException ex) {
+                System.out.println("How can it be invalid carmodel");
+            }
         }
         //////////
 
@@ -262,18 +270,24 @@ public class DataInitSessionBean {
         LS00C4A6.setLicensePlateNum("LS00C4A6");
 
         if (em.find(Car.class, 1l) == null) {
-            carSessionBean.createCar(SS00A1TC, SS00A1TC.getModel().getCarModelId(), SS00A1TC.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00A2TC, SS00A2TC.getModel().getCarModelId(), SS00A2TC.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00A3TC, SS00A3TC.getModel().getCarModelId(), SS00A3TC.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00B1HC, SS00B1HC.getModel().getCarModelId(), SS00B1HC.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00B2HC, SS00B2HC.getModel().getCarModelId(), SS00B2HC.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00B3HC, SS00B3HC.getModel().getCarModelId(), SS00B3HC.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00C1NS, SS00C1NS.getModel().getCarModelId(), SS00C1NS.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00C2NS, SS00C2NS.getModel().getCarModelId(), SS00C2NS.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(SS00C3NS, SS00C3NS.getModel().getCarModelId(), SS00C3NS.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(LS00A4ME, LS00A4ME.getModel().getCarModelId(), LS00A4ME.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(LS00B4B5, LS00B4B5.getModel().getCarModelId(), LS00B4B5.getCurrentOutlet().getOutletId());
-            carSessionBean.createCar(LS00C4A6, LS00C4A6.getModel().getCarModelId(), LS00C4A6.getCurrentOutlet().getOutletId());
+            try {
+                carSessionBean.createCar(SS00A1TC, SS00A1TC.getModel().getCarModelId(), SS00A1TC.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00A2TC, SS00A2TC.getModel().getCarModelId(), SS00A2TC.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00A3TC, SS00A3TC.getModel().getCarModelId(), SS00A3TC.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00B1HC, SS00B1HC.getModel().getCarModelId(), SS00B1HC.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00B2HC, SS00B2HC.getModel().getCarModelId(), SS00B2HC.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00B3HC, SS00B3HC.getModel().getCarModelId(), SS00B3HC.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00C1NS, SS00C1NS.getModel().getCarModelId(), SS00C1NS.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00C2NS, SS00C2NS.getModel().getCarModelId(), SS00C2NS.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(SS00C3NS, SS00C3NS.getModel().getCarModelId(), SS00C3NS.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(LS00A4ME, LS00A4ME.getModel().getCarModelId(), LS00A4ME.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(LS00B4B5, LS00B4B5.getModel().getCarModelId(), LS00B4B5.getCurrentOutlet().getOutletId());
+                carSessionBean.createCar(LS00C4A6, LS00C4A6.getModel().getCarModelId(), LS00C4A6.getCurrentOutlet().getOutletId());
+            } catch (CarExistException ex) {
+                System.out.println("why does car already exist");
+            } catch (InputDataValidationException ex) {
+                System.out.println("why is car invalid");
+            }
         }
         ////////// 
 

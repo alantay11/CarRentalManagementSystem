@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import exception.CarExistException;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
 import exception.OutletIsClosedException;
 import java.time.LocalDateTime;
@@ -19,13 +21,13 @@ import javax.ejb.Local;
 @Local
 public interface CarSessionBeanLocal {
 
-    public Car createCar(Car car, long carModelId, long outletId);
+    public Car createCar(Car car, long carModelId, long outletId) throws CarExistException, InputDataValidationException;
 
     public List<Car> retrieveAllCars();
 
     public Car retrieveCar(long carId) throws InvalidIdException;
 
-    public Car updateCar(Car car);
+    public Car updateCar(Car car) throws InputDataValidationException;
 
     public boolean deleteCar(long carId) throws InvalidIdException;
 

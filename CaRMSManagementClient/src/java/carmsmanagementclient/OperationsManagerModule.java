@@ -17,10 +17,15 @@ import entity.CarModel;
 import entity.Outlet;
 import entity.RentalRate;
 import enumeration.CarStatusEnum;
+import exception.CarExistException;
+import exception.CarModelExistException;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -31,7 +36,7 @@ import javax.validation.ValidatorFactory;
  * @author Uni
  */
 public class OperationsManagerModule {
-    
+
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
@@ -58,7 +63,7 @@ public class OperationsManagerModule {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
-        
+
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
@@ -113,7 +118,7 @@ public class OperationsManagerModule {
                 } else if (response == 11) {
                     // doAssignTransitDriver();
                 } else if (response == 12) {
-                    //doUpdateTransitDriverDispatchRecord();
+                    // doUpdateTransitDriverDispatchRecord();
                 } else if (response == 13) {
                     break;
                 } else {
@@ -161,10 +166,19 @@ public class OperationsManagerModule {
             model = scanner.nextLine().trim();
             carModel.setModel(model);
 
-            carModel = carModelSessionBeanRemote.createCarModel(carModel);
-
-            System.out.println("\nNew " + carModel.toString() + " created\n");
-
+            Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
+            if (constraintViolations.isEmpty()) {
+                try {
+                    carModel = carModelSessionBeanRemote.createCarModel(carModel);
+                    System.out.println("\nNew " + carModel.toString() + " created\n");
+                } catch (CarModelExistException ex) {
+                    System.out.println("Car Make and Model already exists!\n");
+                } catch (InputDataValidationException ex) {
+                    System.out.println(ex.getMessage() + "\n");
+                }
+            } else {
+                showInputDataValidationErrorsForCarModel(constraintViolations);
+            }
         } catch (InvalidIdException ex) {
             System.out.println("You have entered an invalid ID!\n");
         }
@@ -257,8 +271,19 @@ public class OperationsManagerModule {
         System.out.print("\nConfirm update of " + carModel.toString() + "? (Y/N)> ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
         if (confirmation.equals("y")) {
-            carModel = carModelSessionBeanRemote.updateCarModel(carModel);
-            System.out.println("\n" + carModel.toString() + " updated\n");
+            Set<ConstraintViolation<CarModel>> constraintViolations = validator.validate(carModel);
+
+            if (constraintViolations.isEmpty()) {
+                try {
+
+                    carModel = carModelSessionBeanRemote.updateCarModel(carModel);
+                    System.out.println("\n" + carModel.toString() + " updated\n");
+                } catch (InputDataValidationException ex) {
+                    System.out.println(ex.getMessage() + "\n");
+                }
+            } else {
+                showInputDataValidationErrorsForCarModel(constraintViolations);
+            }
         } else {
             System.out.println("\nUpdate cancelled\n");
         }
@@ -292,70 +317,78 @@ public class OperationsManagerModule {
 
     // case #5
     public void doCreateNewCar() {
-        try {
-            Scanner scanner = new Scanner(System.in);
-            Car car = new Car();
-            String licensePlateNum = "";
-            String color = "";
-            String carStatus;
+        Scanner scanner = new Scanner(System.in);
+        Car car = new Car();
+        String licensePlateNum = "";
+        String color = "";
+        String carStatus;
 
-            System.out.println("*** CaRMSMC System :: Operations Manager :: Create Car ***\n");
+        System.out.println("*** CaRMSMC System :: Operations Manager :: Create Car ***\n");
 
-            // create car for particular make and model 
-            List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
+        // create car for particular make and model 
+        List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
 
-            int counter = 1;
-            System.out.println("\n-----------------------------------");
-            for (CarModel cm : carModelList) {
-                System.out.println(counter + ": " + cm.toString());
-                counter++;
+        int counter = 1;
+        System.out.println("\n-----------------------------------");
+        for (CarModel cm : carModelList) {
+            System.out.println(counter + ": " + cm.toString());
+            counter++;
+        }
+        System.out.println("-----------------------------------\n");
+        System.out.print("Enter ID of car model> ");
+        long carModelId = scanner.nextLong();
+        car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
+        scanner.nextLine();
+
+        // create new car with license plate number, colour, status 
+        // (in outlet or on rental) and location (specific customer or outlet).
+        System.out.print("Enter license plate number> ");
+        licensePlateNum = scanner.nextLine().trim();
+        car.setLicensePlateNum(licensePlateNum);
+
+        System.out.print("Enter color> ");
+        color = scanner.nextLine().trim();
+        car.setColor(color);
+
+        System.out.print("Enter status (Available/Repair)> ");
+        carStatus = scanner.nextLine().trim();
+        if (carStatus.toLowerCase().equals("available")) {
+            car.setCarStatus(CarStatusEnum.AVAILABLE);
+        } else if (carStatus.toLowerCase().equals("repair")) {
+            car.setCarStatus(CarStatusEnum.REPAIR);
+        }
+
+        List<Outlet> outletList = outletSessionBeanRemote.retrieveAllOutlets();
+        counter = 1;
+        System.out.println("\n-----------------------------------");
+        for (Outlet o : outletList) {
+            System.out.println(counter + ": " + o.toString());
+            counter++;
+        }
+        System.out.println("-----------------------------------\n");
+        System.out.print("Enter ID of outlet> ");
+        long outletId = scanner.nextLong();
+        car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
+        scanner.nextLine();
+
+        Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
+
+        if (constraintViolations.isEmpty()) {
+            try {
+                car = carSessionBeanRemote.createCar(car, carModelId, outletId);
+            } catch (CarExistException ex) {
+                System.out.println("Car already exists!\n");
+            } catch (InputDataValidationException ex) {
+                System.out.println(ex.getMessage() + "\n");
             }
-            System.out.println("-----------------------------------\n");
-            System.out.print("Enter ID of car model> ");
-            long carModelId = scanner.nextLong();
-            car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
-            scanner.nextLine();
-
-            // create new car with license plate number, colour, status 
-            // (in outlet or on rental) and location (specific customer or outlet).
-            System.out.print("Enter license plate number> ");
-            licensePlateNum = scanner.nextLine().trim();
-            car.setLicensePlateNum(licensePlateNum);
-
-            System.out.print("Enter color> ");
-            color = scanner.nextLine().trim();
-            car.setColor(color);
-
-            System.out.print("Enter status (Available/Repair)> ");
-            carStatus = scanner.nextLine().trim();
-            if (carStatus.toLowerCase().equals("available")) {
-                car.setCarStatus(CarStatusEnum.AVAILABLE);
-            } else if (carStatus.toLowerCase().equals("repair")) {
-                car.setCarStatus(CarStatusEnum.REPAIR);
-            }
-
-            List<Outlet> outletList = outletSessionBeanRemote.retrieveAllOutlets();
-            counter = 1;
-            System.out.println("\n-----------------------------------");
-            for (Outlet o : outletList) {
-                System.out.println(counter + ": " + o.toString());
-                counter++;
-            }
-            System.out.println("-----------------------------------\n");
-            System.out.print("Enter ID of outlet> ");
-            long outletId = scanner.nextLong();
-            car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
-            scanner.nextLine();
-
-            car = carSessionBeanRemote.createCar(car, carModelId, outletId);
 
             System.out.println("\nNew " + car.toString() + " created\n");
-        } catch (Exception ex) {
-            System.out.println("You have entered an invalid field!\n");
+        } else {
+            showInputDataValidationErrorsForCar(constraintViolations);
         }
     }
 
-    // case #6
+// case #6
     private List<Car> getAllCars() {
         List<Car> carList = carSessionBeanRemote.retrieveAllCars();
         return carList;
@@ -473,8 +506,19 @@ public class OperationsManagerModule {
             System.out.print("\nConfirm update of " + car.toString() + "? (Y/N)> ");
             String confirmation = scanner.nextLine().trim().toLowerCase();
             if (confirmation.equals("y")) {
-                car = carSessionBeanRemote.updateCar(car);
-                System.out.println("\n" + car.toString() + " updated\n");
+
+                Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
+
+                if (constraintViolations.isEmpty()) {
+                    try {
+                        car = carSessionBeanRemote.updateCar(car);
+                        System.out.println("\n" + car.toString() + " updated\n");
+                    } catch (InputDataValidationException ex) {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
+                } else {
+                    showInputDataValidationErrorsForCar(constraintViolations);
+                }
             } else {
                 System.out.println("\nUpdate cancelled\n");
             }
@@ -521,7 +565,7 @@ public class OperationsManagerModule {
 
         System.out.println("\nPlease try again......\n");
     }
-    
+
     // cm
     private void showInputDataValidationErrorsForCarModel(Set<ConstraintViolation<CarModel>> constraintViolations) {
         System.out.println("\nInput data validation error!:");
@@ -532,5 +576,5 @@ public class OperationsManagerModule {
 
         System.out.println("\nPlease try again......\n");
     }
-    
+
 }
