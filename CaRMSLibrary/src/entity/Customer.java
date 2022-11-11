@@ -17,6 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -31,22 +33,40 @@ public class Customer implements Serializable {
     private Long customerId;
 
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String firstName;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String lastName;
     @Column(nullable = false, length = 32, unique = true)
+    @NotNull
+    @Size(min = 1, max = 32)
     private String email;
-    @Column(nullable = false, length = 16)
+    @Column(nullable = false, length = 8)
+    @NotNull
+    @Size(min = 8, max = 8)
     private String contactNumber;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String addressLine1;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String addressLine2;
     @Column(nullable = false, length = 12)
+    @NotNull
+    @Size(min = 4, max = 12)
     private String postalCode;
     @Column(nullable = false, length = 32, unique = true)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String username;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String password;
 
     @OneToOne(optional = true)
@@ -197,9 +217,9 @@ public class Customer implements Serializable {
 
     @Override
     public String toString() {
-        return "Customer: " + this.customerId + " with name " + this.firstName + " " + this.lastName + ", email of " + this.email +
-                ", contact number of " + this.contactNumber + ", address of " + this.addressLine1 + "\n" + this.addressLine2 +
-                ", username of " + this.username + " and password " + this.password;
+        return "Customer: " + this.customerId + " with name " + this.firstName + " " + this.lastName + ", email of " + this.email
+                + ", contact number of " + this.contactNumber + ", address of " + this.addressLine1 + "\n" + this.addressLine2
+                + ", username of " + this.username + " and password " + this.password;
     }
 
 }

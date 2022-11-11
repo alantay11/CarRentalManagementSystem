@@ -15,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -29,11 +31,13 @@ public class Outlet implements Serializable {
     private Long outletId;
 
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String address;
 
-    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalTime openingTime;
-    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalTime closingTime;
 
     @OneToMany(mappedBy = "currentOutlet")

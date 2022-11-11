@@ -20,6 +20,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -34,12 +36,18 @@ public class Car implements Serializable {
     private Long carId;
 
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 3, max = 32)
     private String licensePlateNum;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 3, max = 32)
     private String color;
     @Enumerated(EnumType.STRING)
+    @NotNull
     private CarStatusEnum carStatus;
     @Column(nullable = false)
+    @NotNull
     private boolean enabled;
    
     @ManyToOne

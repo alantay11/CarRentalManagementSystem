@@ -16,6 +16,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -30,19 +32,23 @@ public class CarModel implements Serializable {
     private Long carModelId;
 
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String make;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String model;
     @Column(nullable = false)
+    @NotNull
     private boolean enabled;
-    
+
     @OneToMany(mappedBy = "model")
     private List<Car> carList;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
-
 
     public CarModel() {
         this.enabled = true;
@@ -53,8 +59,6 @@ public class CarModel implements Serializable {
         this.make = make;
         this.model = model;
     }
-    
-    
 
     public boolean isEnabled() {
         return enabled;

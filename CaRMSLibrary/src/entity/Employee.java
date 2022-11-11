@@ -17,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -29,28 +31,37 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
-    
+
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String firstName;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String lastName;
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String username;
     @Column(nullable = false, length = 32)
-    private String password;    
+    @NotNull
+    @Size(min = 2, max = 32)
+    private String password;
     @Enumerated(EnumType.STRING)
-    private EmployeeAccessRightEnum accessRight; 
-    
+    @NotNull
+    private EmployeeAccessRightEnum accessRight;
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet assignedOutlet;
-    
+
     @OneToOne(optional = true)
     private TransitDriverDispatch transitDriverDispatchRecord;
 
     public Employee() {
     }
-    
+
     public Employee(String firstName, String lastName, String username, String password, EmployeeAccessRightEnum accessRight) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -67,8 +78,6 @@ public class Employee implements Serializable {
         this.accessRight = accessRight;
         this.assignedOutlet = assignedOutlet;
     }
-    
-    
 
     public Employee(String firstName, String lastName, String username, String password, EmployeeAccessRightEnum accessRight, Outlet assignedOutlet, TransitDriverDispatch transitDriverDispatch) {
         this.firstName = firstName;
@@ -135,7 +144,7 @@ public class Employee implements Serializable {
     public void setTransitDriverDispatchRecord(TransitDriverDispatch transitDriverDispatchRecord) {
         this.transitDriverDispatchRecord = transitDriverDispatchRecord;
     }
-    
+
     public Long getEmployeeId() {
         return employeeId;
     }
@@ -168,5 +177,5 @@ public class Employee implements Serializable {
     public String toString() {
         return "Employee with id " + this.employeeId + ", name " + this.firstName + " " + this.lastName + ", username " + this.username + ", access right" + this.accessRight;
     }
-    
+
 }

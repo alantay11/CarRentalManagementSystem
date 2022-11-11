@@ -21,6 +21,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -35,14 +38,19 @@ public class RentalRate implements Serializable {
     private Long rentalRateRecordId;
 
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String rateName;
     @Column(nullable = false, precision = 11, scale = 2)
+    @NotNull
+    @Digits(integer = 6, fraction = 2)
     private BigDecimal ratePerDay;
-    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime startDate;
-    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(columnDefinition = "TIMESTAMP")
     private LocalDateTime endDate;
     @Column(nullable = false)
+    @NotNull
     private boolean enabled;
     @Enumerated(EnumType.STRING)
     private RentalRateEnum rateType;
@@ -154,7 +162,6 @@ public class RentalRate implements Serializable {
     @Override
     public String toString() {
         return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay
-                
                 + ((startDate == null) ? ", always valid" : (", start date of " + this.startDate.toString().replace("T", ", ") + " and end date of " + this.endDate.toString().replace("T", ", ")))
                 //+ " for category " + this.carCategory 
                 + ((enabled) ? " ENABLED" : " DISABLED");

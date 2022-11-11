@@ -13,6 +13,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Future;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -27,15 +29,21 @@ public class CreditCard implements Serializable {
     private Long ccId;
 
     @Column(nullable = false, length = 32)
+    @NotNull
+    @Size(min = 2, max = 32)
     private String nameonCC;
     @Column(nullable = false, length = 16)
+    @NotNull
+    @Size(min = 16, max = 16)
     private String ccNumber;
     @Column(nullable = false, length = 3)
+    @NotNull
+    @Size(min = 3, max = 3)
     private String cvv;
     @Future
+    @NotNull
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDate expiryDate;
-
 
     public CreditCard() {
     }

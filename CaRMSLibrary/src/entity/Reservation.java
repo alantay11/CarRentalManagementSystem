@@ -19,6 +19,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -33,18 +35,25 @@ public class Reservation implements Serializable {
     private Long reservationId;
 
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @NotNull
     private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @NotNull
     private LocalDateTime returnTime;
     @Column(nullable = false, columnDefinition = "boolean default false")
+    @NotNull
     private boolean cancelled;
     @Column(nullable = false, columnDefinition = "boolean default false")
+    @NotNull
     private boolean requiresTransfer;
     @Column(nullable = false, columnDefinition = "boolean default false")
+    @NotNull
     private boolean paid;
     @Column(nullable = false, precision = 11, scale = 2)
+    @Digits(integer = 6, fraction = 2)
     private BigDecimal paymentAmount;
     @Column(nullable = false, precision = 11, scale = 2)
+    @Digits(integer = 6, fraction = 2)
     private BigDecimal refundAmount;
 
     @ManyToMany

@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -29,8 +30,10 @@ public class TransitDriverDispatch implements Serializable {
     private Long transitDriverDispatchId;
 
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @NotNull
     private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    @NotNull
     private LocalDateTime dropoffTime;
 
     @OneToOne(mappedBy = "transitDriverDispatchRecord")
