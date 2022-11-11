@@ -99,28 +99,38 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
-    public RentalRate updateRentalRate(RentalRate rentalRate, long oldCarCategoryId, long newCarCategoryId) throws InvalidIdException {
-        CarCategory oldCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(oldCarCategoryId);
-        oldCarCategory.getRentalRateList().remove(rentalRate);
+    public RentalRate updateRentalRate(RentalRate rentalRate, long oldCarCategoryId, long newCarCategoryId) throws InvalidIdException, InputDataValidationException {
+        Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rentalRate);
 
-        CarCategory newCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(newCarCategoryId);
-        newCarCategory.getRentalRateList().add(rentalRate);
+        if (constraintViolations.isEmpty()) {
+            CarCategory oldCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(oldCarCategoryId);
+            oldCarCategory.getRentalRateList().remove(rentalRate);
 
-        em.merge(rentalRate);
-        em.flush();
+            CarCategory newCarCategory = carCategorySessionBeanLocal.retrieveCarCategory(newCarCategoryId);
+            newCarCategory.getRentalRateList().add(rentalRate);
 
-        return rentalRate;
+            em.merge(rentalRate);
+            em.flush();
+
+            return rentalRate;
+
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     @Override
-    public RentalRate retrieveRentalRate(long rentalRateId) {
-        RentalRate rentalRate = em.find(RentalRate.class, rentalRateId);
+    public RentalRate retrieveRentalRate(long rentalRateId
+    ) {
+        RentalRate rentalRate = em.find(RentalRate.class,
+                rentalRateId);
         rentalRate.getReservationList().size();
         return rentalRate;
     }
 
     @Override
-    public boolean deleteRentalRate(long rentalRateId) {
+    public boolean deleteRentalRate(long rentalRateId
+    ) {
         RentalRate rentalRate = retrieveRentalRate(rentalRateId);
         CarCategory carCategory = rentalRate.getCarCategory();
         List<RentalRate> rentalRateList = carCategory.getRentalRateList();
@@ -163,7 +173,8 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
-    public List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException {
+    public List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime,
+            long carCategoryId) throws NoRentalRateAvailableException {
         Duration duration = Duration.between(pickupTime, returnTime);
         System.out.println("pickup = " + pickupTime + " return = " + returnTime);
         System.out.println("duration = " + duration);

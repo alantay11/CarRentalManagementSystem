@@ -156,7 +156,7 @@ public class SalesManagerModule {
 
                     System.out.println("\nNew " + rentalRate.toString() + " created\n");
                 } catch (InputDataValidationException ex) {
-                    System.out.println("You have entered an invalid ID!\n");
+                    System.out.println(ex.getMessage() + "\n");
                 } catch (RentalRateExistException ex) {
                     System.out.println("Rental rate already exists!\n");
                 }
@@ -291,11 +291,17 @@ public class SalesManagerModule {
         System.out.print("\nConfirm update of " + rentalRate.toString() + "? (Y/N)> ");
         String confirmation = scanner.nextLine().trim().toLowerCase();
         if (confirmation.equals("y")) {
-            try {
-                rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate, oldCarCategoryId, newCarCategoryId);
-                System.out.println("\n" + rentalRate.toString() + " updated\n");
-            } catch (InvalidIdException exception) {
-                System.out.println("\nYou have entered an invalid ID!\n");
+            Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rentalRate);
+
+            if (constraintViolations.isEmpty()) {
+                try {
+                    rentalRate = rentalRateSessionBeanRemote.updateRentalRate(rentalRate, oldCarCategoryId, newCarCategoryId);
+                    System.out.println("\n" + rentalRate.toString() + " updated\n");
+                } catch (InvalidIdException exception) {
+                    System.out.println("\nYou have entered an invalid ID!\n");
+                } catch (InputDataValidationException ex) {
+                    System.out.println(ex.getMessage() + "\n");
+                }
             }
         } else {
             System.out.println("\nUpdate cancelled\n");
