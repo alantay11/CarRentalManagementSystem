@@ -104,6 +104,7 @@ public class SalesManagerModule {
             System.out.println("-----------------------------------\n");
             System.out.print("Enter ID of car category> ");
             long carCategoryId = scanner.nextLong();
+            scanner.nextLine();
             rentalRate.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(carCategoryId));
 
             System.out.print("Enter type (Default/Promotion/Peak)> ");

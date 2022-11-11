@@ -154,8 +154,9 @@ public class RentalRate implements Serializable {
     @Override
     public String toString() {
         return "Rental Rate: " + this.rentalRateRecordId + " with name " + this.rateName + ", rate of $" + this.ratePerDay
-                + ", start date of " + this.startDate.toString().replace("T", ", ") + " and end date of " + this.endDate.toString().replace("T", ", ")
+                
+                + ((startDate == null) ? ", always valid" : (", start date of " + this.startDate.toString().replace("T", ", ") + " and end date of " + this.endDate.toString().replace("T", ", ")))
                 //+ " for category " + this.carCategory 
-                + ((enabled) ? "" : "DISABLED");
+                + ((enabled) ? " ENABLED" : " DISABLED");
     }
 }
