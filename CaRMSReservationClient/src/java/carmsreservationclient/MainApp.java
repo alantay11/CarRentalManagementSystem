@@ -18,6 +18,7 @@ import entity.CarModel;
 import entity.CreditCard;
 import entity.Customer;
 import entity.Outlet;
+import entity.RentalRate;
 import entity.Reservation;
 import exception.CustomerNotFoundException;
 import exception.InvalidIdException;
@@ -32,12 +33,20 @@ import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
  * @author Uni
  */
 public class MainApp {
+    
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
@@ -50,6 +59,8 @@ public class MainApp {
     private CreditCardSessionBeanRemote creditCardSessionBeanRemote;
 
     public MainApp() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
@@ -64,6 +75,8 @@ public class MainApp {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.creditCardSessionBeanRemote = creditCardSessionBeanRemote;
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public void runApp() {
@@ -501,5 +514,25 @@ public class MainApp {
         System.out.println("-----------------------------------\n");
         System.out.print("Press enter to continue>");
         scanner.nextLine();
+    }
+    
+     private void showInputDataValidationErrorsForRentalRate(Set<ConstraintViolation<RentalRate>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+     
+      private void showInputDataValidationErrorsForCustomer(Set<ConstraintViolation<Customer>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
     }
 }
