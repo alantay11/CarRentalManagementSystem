@@ -9,26 +9,36 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import java.util.Scanner;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
  * @author Uni
  */
 public class CustomerServiceExecutiveModule {
-    
+
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
 
     public CustomerServiceExecutiveModule() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public CustomerServiceExecutiveModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBean) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBean;
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
-    
+
     public void customerServiceExecutiveMenu() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
@@ -60,6 +70,6 @@ public class CustomerServiceExecutiveModule {
                 break;
             }
         }
-        
+
     }
 }

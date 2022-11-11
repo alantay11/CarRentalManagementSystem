@@ -44,7 +44,7 @@ import javax.validation.ValidatorFactory;
  * @author Uni
  */
 public class MainApp {
-    
+
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
@@ -515,8 +515,8 @@ public class MainApp {
         System.out.print("Press enter to continue>");
         scanner.nextLine();
     }
-    
-     private void showInputDataValidationErrorsForRentalRate(Set<ConstraintViolation<RentalRate>> constraintViolations) {
+
+    private void showInputDataValidationErrorsForCustomer(Set<ConstraintViolation<Customer>> constraintViolations) {
         System.out.println("\nInput data validation error!:");
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
@@ -525,8 +525,8 @@ public class MainApp {
 
         System.out.println("\nPlease try again......\n");
     }
-     
-      private void showInputDataValidationErrorsForCustomer(Set<ConstraintViolation<Customer>> constraintViolations) {
+
+    private void showInputDataValidationErrorsForReservation(Set<ConstraintViolation<Reservation>> constraintViolations) {
         System.out.println("\nInput data validation error!:");
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
@@ -535,15 +535,5 @@ public class MainApp {
 
         System.out.println("\nPlease try again......\n");
     }
-      
-      private void showInputDataValidationErrorsForReservation(Set<ConstraintViolation<Reservation>> constraintViolations) {
-        System.out.println("\nInput data validation error!:");
 
-        for (ConstraintViolation constraintViolation : constraintViolations) {
-            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-        }
-
-        System.out.println("\nPlease try again......\n");
-    }
-   
 }
