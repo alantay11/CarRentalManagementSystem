@@ -9,20 +9,28 @@ import entity.CarCategory;
 import entity.RentalRate;
 import entity.Reservation;
 import enumeration.RentalRateEnum;
+import exception.InputDataValidationException;
 import exception.InvalidCarCategoryNameException;
 import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
 import exception.NoRentalRateAvailableException;
+import exception.RentalRateExistException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -37,17 +45,35 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
+    public RentalRateSessionBean() {
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        this.validator = validatorFactory.getValidator();
+    }
+
     @Override
-    public RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException {
-        em.persist(rentalRate);
+    public RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException, RentalRateExistException, InputDataValidationException {
+        Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rentalRate);
 
-        CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategory(carCategoryId);
-        carCategory.getRentalRateList().add(rentalRate);
+        if (constraintViolations.isEmpty()) {
+            try {
+                em.persist(rentalRate);
 
-        //em.merge(carCategory);
-        em.flush();
+                CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategory(carCategoryId);
+                carCategory.getRentalRateList().add(rentalRate);
 
-        return rentalRate;
+                //em.merge(carCategory);
+                em.flush();
+
+                return rentalRate;
+            } catch (PersistenceException ex) {
+                throw new RentalRateExistException();
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     @Override
@@ -202,5 +228,15 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
         // only default rate available
         return bestRates.get(0);
+    }
+
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
     }
 }

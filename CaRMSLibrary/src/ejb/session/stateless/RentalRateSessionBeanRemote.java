@@ -7,9 +7,11 @@ package ejb.session.stateless;
 
 import entity.RentalRate;
 import entity.Reservation;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
 import exception.InvalidRentalRateNameException;
 import exception.NoRentalRateAvailableException;
+import exception.RentalRateExistException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -23,7 +25,7 @@ import javax.ejb.Remote;
 @Remote
 public interface RentalRateSessionBeanRemote {
 
-    RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException ;
+    RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException, RentalRateExistException, InputDataValidationException;
 
     List<RentalRate> retrieveAllRentalRates();
 

@@ -11,13 +11,17 @@ import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.CarCategory;
 import entity.RentalRate;
 import enumeration.RentalRateEnum;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
+import exception.RentalRateExistException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -28,7 +32,7 @@ import javax.validation.ValidatorFactory;
  * @author Uni
  */
 public class SalesManagerModule {
-    
+
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
@@ -45,7 +49,7 @@ public class SalesManagerModule {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBean;
-        
+
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
@@ -144,9 +148,19 @@ public class SalesManagerModule {
             endTime = scanner.nextLine().trim();
             rentalRate.setEndDate(LocalDateTime.parse(endDate + "T" + endTime));
 
-            rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate, carCategoryId);
+            Set<ConstraintViolation<RentalRate>> constraintViolations = validator.validate(rentalRate);
 
-            System.out.println("\nNew " + rentalRate.toString() + " created\n");
+            if (constraintViolations.isEmpty()) {
+                try {
+                    rentalRate = rentalRateSessionBeanRemote.createRentalRate(rentalRate, carCategoryId);
+
+                    System.out.println("\nNew " + rentalRate.toString() + " created\n");
+                } catch (InputDataValidationException ex) {
+                    System.out.println("You have entered an invalid ID!\n");
+                } catch (RentalRateExistException ex) {
+                    System.out.println("Rental rate already exists!\n");
+                }
+            }
         } catch (InvalidIdException ex) {
             System.out.println("You have entered an invalid ID!\n");
         } catch (DateTimeParseException ex) {
@@ -311,8 +325,6 @@ public class SalesManagerModule {
         }
     }
 
-    
-    
     private void showInputDataValidationErrorsForRentalRate(Set<ConstraintViolation<RentalRate>> constraintViolations) {
         System.out.println("\nInput data validation error!:");
 

@@ -6,7 +6,9 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
+import exception.RentalRateExistException;
 import javax.ejb.Local;
 
 /**
@@ -16,7 +18,7 @@ import javax.ejb.Local;
 @Local
 public interface RentalRateSessionBeanLocal {
 
-    RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException;
+    RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException, RentalRateExistException, InputDataValidationException;
 
     RentalRate retrieveRentalRate(long rentalRateId);
 

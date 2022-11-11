@@ -22,10 +22,14 @@ import entity.RentalRate;
 import enumeration.CarStatusEnum;
 import enumeration.EmployeeAccessRightEnum;
 import enumeration.RentalRateEnum;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
+import exception.RentalRateExistException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -353,6 +357,10 @@ public class DataInitSessionBean {
             }
         } catch (InvalidIdException ex) {
             System.out.println("Invalid id probably not persisted properly");
+        } catch (RentalRateExistException ex) {
+            System.out.println("Why does it exist");
+        } catch (InputDataValidationException ex) {
+            System.out.println("How can this happen");
         }
         //////////
 
