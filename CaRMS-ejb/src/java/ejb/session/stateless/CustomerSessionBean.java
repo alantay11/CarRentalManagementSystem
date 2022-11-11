@@ -6,12 +6,20 @@
 package ejb.session.stateless;
 
 import entity.Customer;
+import exception.CustomerExistException;
 import exception.CustomerNotFoundException;
+import exception.InputDataValidationException;
 import exception.InvalidLoginCredentialException;
+import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -22,6 +30,14 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
+
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
+    public CustomerSessionBean() {
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        this.validator = validatorFactory.getValidator();
+    }
 
     @Override
     public Customer customerLogin(String username, String password) throws InvalidLoginCredentialException, CustomerNotFoundException {
@@ -48,10 +64,21 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
 
     @Override
-    public Customer createCustomer(Customer customer) {
-        em.persist(customer);
-        em.flush();
-        return customer;
+    public Customer createCustomer(Customer customer) throws CustomerExistException, InputDataValidationException {
+
+        Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
+
+        if (constraintViolations.isEmpty()) {
+            try {
+                em.persist(customer);
+                em.flush();
+                return customer;
+            } catch (PersistenceException ex) {
+                throw new CustomerExistException();
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     @Override
@@ -59,4 +86,13 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         return em.find(Customer.class, customerId);
     }
 
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Customer>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
+    }
 }

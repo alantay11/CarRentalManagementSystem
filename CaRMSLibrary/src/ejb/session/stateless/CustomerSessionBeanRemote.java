@@ -6,7 +6,9 @@
 package ejb.session.stateless;
 
 import entity.Customer;
+import exception.CustomerExistException;
 import exception.CustomerNotFoundException;
+import exception.InputDataValidationException;
 import exception.InvalidLoginCredentialException;
 import javax.ejb.Remote;
 
@@ -21,6 +23,6 @@ public interface CustomerSessionBeanRemote {
 
     Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException ;
 
-    Customer createCustomer(Customer customer);
+    Customer createCustomer(Customer customer) throws CustomerExistException, InputDataValidationException;
     
 }

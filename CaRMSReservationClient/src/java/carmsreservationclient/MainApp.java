@@ -20,7 +20,9 @@ import entity.Customer;
 import entity.Outlet;
 import entity.RentalRate;
 import entity.Reservation;
+import exception.CustomerExistException;
 import exception.CustomerNotFoundException;
+import exception.InputDataValidationException;
 import exception.InvalidIdException;
 import exception.InvalidLoginCredentialException;
 import exception.NoRentalRateAvailableException;
@@ -34,6 +36,8 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -169,7 +173,19 @@ public class MainApp {
         System.out.print("Enter postal code> ");
         customer.setPostalCode(scanner.nextLine().trim());
 
-        customer = customerSessionBeanRemote.createCustomer(customer);
+        Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
+        if (constraintViolations.isEmpty()) {
+            try {
+
+                customer = customerSessionBeanRemote.createCustomer(customer);
+            } catch (CustomerExistException ex) {
+                System.out.println("Customer already exists!\n");
+            } catch (InputDataValidationException ex) {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        } else {
+            showInputDataValidationErrorsForCustomer(constraintViolations);
+        }
 
         System.out.println("\nNew " + customer.toString() + " created\n");
 
@@ -527,6 +543,16 @@ public class MainApp {
     }
 
     private void showInputDataValidationErrorsForReservation(Set<ConstraintViolation<Reservation>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+
+    private void showInputDataValidationErrorsForCreditCard(Set<ConstraintViolation<CreditCard>> constraintViolations) {
         System.out.println("\nInput data validation error!:");
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
