@@ -15,16 +15,25 @@ import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Outlet;
+import entity.RentalRate;
 import enumeration.CarStatusEnum;
 import exception.InvalidIdException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
  * @author Uni
  */
 public class OperationsManagerModule {
+    
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
@@ -34,6 +43,8 @@ public class OperationsManagerModule {
     private OutletSessionBeanRemote outletSessionBeanRemote;
 
     public OperationsManagerModule() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public OperationsManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote,
@@ -47,6 +58,9 @@ public class OperationsManagerModule {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
+        
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public void operationsManagerMenu() {
@@ -497,4 +511,26 @@ public class OperationsManagerModule {
         }
     }
 
+    // car
+    private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
+    // cm
+    private void showInputDataValidationErrorsForCarModel(Set<ConstraintViolation<CarModel>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
 }
