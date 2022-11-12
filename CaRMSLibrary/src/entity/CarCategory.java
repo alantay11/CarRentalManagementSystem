@@ -110,7 +110,7 @@ public class CarCategory implements Serializable {
 
     @Override
     public String toString() {
-        return "CarCategory with id " + this.carCategoryId + ", name: " + this.carCategoryName;
+        return "CarCategory ID: " + this.carCategoryId + ", Name: " + this.carCategoryName;
     }
 
 }

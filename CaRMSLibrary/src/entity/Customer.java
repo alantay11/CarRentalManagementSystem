@@ -217,9 +217,9 @@ public class Customer implements Serializable {
 
     @Override
     public String toString() {
-        return "Customer: " + this.customerId + " with name " + this.firstName + " " + this.lastName + ", email of " + this.email
-                + ", contact number of " + this.contactNumber + ", address of " + this.addressLine1 + "\n" + this.addressLine2
-                + ", username of " + this.username + " and password " + this.password;
+        return "Customer ID: " + this.customerId + ", Name: " + this.firstName + " " + this.lastName + ", Email: " + this.email
+                + ", Contact Number: " + this.contactNumber + "\n" + "Address: " + this.addressLine1 + " " + this.addressLine2
+                + ", Username: " + this.username + ", Password: " + this.password;
     }
 
 }

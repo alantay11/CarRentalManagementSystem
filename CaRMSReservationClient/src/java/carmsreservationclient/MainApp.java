@@ -186,7 +186,7 @@ public class MainApp {
             showInputDataValidationErrorsForCustomer(constraintViolations);
         }
 
-        System.out.println("\nNew " + customer.toString() + " created\n");
+        System.out.println("\n" + customer.toString() + ", registered!\n");
 
     }
 
@@ -269,8 +269,7 @@ public class MainApp {
                 System.out.println("\nOutlets");
                 System.out.println("-----------------------------------");
                 for (Outlet o : outlets) {
-                    System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress()
-                            + " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
+                    System.out.println(o.toString());
                 }
                 System.out.println("-----------------------------------\n");
 
@@ -521,7 +520,7 @@ public class MainApp {
             List<Reservation> reservations = getAllMyReservations();
             System.out.println("\n-----------------------------------");
             for (Reservation r : reservations) {
-                System.out.println("ID: " + r.getReservationId() + ", Pickup at: " + r.getPickupTime() + " from " + r.getDepartureOutlet());
+                System.out.println("ID: " + r.getReservationId() + ", Pickup at: " + r.getPickupTime().toString().replace("T", ", ") + " from " + r.getDepartureOutlet());
             }
             System.out.println("-----------------------------------\n");
             System.out.print("Enter ID of reservation you want to view> ");
