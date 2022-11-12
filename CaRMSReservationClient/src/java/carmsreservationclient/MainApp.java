@@ -210,7 +210,7 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    doSearchCarForReservation();
+                    doSearchCar();
                 } else if (response == 2) {
                     doReserveCar();
                 } else if (response == 3) {
@@ -290,6 +290,16 @@ public class MainApp {
 
             if (available) {
                 System.out.println("A car is available for reservation\n");
+                /*if (reservation != null) {
+                    try {
+                        BigDecimal paymentAmount = new BigDecimal("0.00");
+                        paymentAmount = rentalRateSessionBeanRemote.calculateTotalCost(reservation);
+                        reservation.setPaymentAmount(paymentAmount);
+                        System.out.println("\nThe total cost of the reservation will be $" + paymentAmount);
+                    } catch (NoRentalRateAvailableException ex) {
+                        System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
+                    }
+                }      */          
             } else {
                 System.out.println("No cars are available for the specified times and outlets\n");
                 reservation = null;
@@ -400,6 +410,16 @@ public class MainApp {
                 System.out.println("Outlet is closed during your pickup or return times!");
             }
         }
+        if (reservation != null) {
+            try {
+                BigDecimal paymentAmount = new BigDecimal("0.00");
+                paymentAmount = rentalRateSessionBeanRemote.calculateTotalCost(reservation);
+                reservation.setPaymentAmount(paymentAmount);
+                System.out.println("\nThe total cost of the reservation will be $" + paymentAmount);
+            } catch (NoRentalRateAvailableException ex) {
+                System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
+            }
+        }
         return reservation;
     }
 
@@ -407,56 +427,51 @@ public class MainApp {
         System.out.println("*** CaRMSRC System :: Customer :: Reserve Car ***\n");
         Scanner scanner = new Scanner(System.in);
 
-        try {
-            Reservation reservation = doSearchCarForReservation();
+        Reservation reservation = doSearchCarForReservation();
 
-            if (reservation != null) {
-                CreditCard creditCard = doSaveCreditCard();
-                currentCustomer.setCreditCard(creditCard);
-                BigDecimal paymentAmount = new BigDecimal("0.00");
-                paymentAmount = rentalRateSessionBeanRemote.calculateTotalCost(reservation);
-                reservation.setPaymentAmount(paymentAmount);
+        if (reservation != null) {
+            CreditCard creditCard = doSaveCreditCard();
+            currentCustomer.setCreditCard(creditCard);
+            BigDecimal paymentAmount = reservation.getPaymentAmount();
 
-                System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
-                String confirmation = scanner.nextLine().trim().toLowerCase();
+            System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
+            String confirmation = scanner.nextLine().trim().toLowerCase();
 
-                if (confirmation.equals("y")) {
-                    // calculate rentalrate costs and request payment then set reservation and create
-                    System.out.println("\nReservation of amount: $" + paymentAmount.toString() + " paid using " + creditCard.getCcNumber() + "\n");
-                    reservation.setPaid(true);
-                    Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
-                    if (constraintViolations.isEmpty()) {
-                        try {
-                            reservation = reservationSessionBeanRemote.createReservation(reservation);
-                        } catch (ReservationExistException ex) {
-                            System.out.println("Reservation already exists!\n");
-                        } catch (InputDataValidationException ex) {
-                            System.out.println(ex.getMessage() + "\n");
-                        }
-                    } else {
-                        showInputDataValidationErrorsForReservation(constraintViolations);
+            if (confirmation.equals("y")) {
+                // calculate rentalrate costs and request payment then set reservation and create
+                System.out.println("\nReservation of amount: $" + paymentAmount.toString() + " paid using " + creditCard.getCcNumber() + "\n");
+                reservation.setPaid(true);
+                Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
+                if (constraintViolations.isEmpty()) {
+                    try {
+                        reservation = reservationSessionBeanRemote.createReservation(reservation);
+                    } catch (ReservationExistException ex) {
+                        System.out.println("Reservation already exists!\n");
+                    } catch (InputDataValidationException ex) {
+                        System.out.println(ex.getMessage() + "\n");
                     }
                 } else {
-                    System.out.println("\nPayment will be required upon pickup\n");
-                    Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
-                    if (constraintViolations.isEmpty()) {
-                        try {
-                            reservation = reservationSessionBeanRemote.createReservation(reservation);
-                        } catch (ReservationExistException ex) {
-                            System.out.println("Reservation already exists!\n");
-                        } catch (InputDataValidationException ex) {
-                            System.out.println(ex.getMessage() + "\n");
-                        }
-                    } else {
-                        showInputDataValidationErrorsForReservation(constraintViolations);
-                    }
-
-                    System.out.println("\nNew " + reservation.toString() + " created\n");
+                    showInputDataValidationErrorsForReservation(constraintViolations);
                 }
+            } else {
+                System.out.println("\nPayment will be required upon pickup\n");
+                Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
+                if (constraintViolations.isEmpty()) {
+                    try {
+                        reservation = reservationSessionBeanRemote.createReservation(reservation);
+                    } catch (ReservationExistException ex) {
+                        System.out.println("Reservation already exists!\n");
+                    } catch (InputDataValidationException ex) {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
+                } else {
+                    showInputDataValidationErrorsForReservation(constraintViolations);
+                }
+
+                System.out.println("\nNew " + reservation.toString() + " created\n");
             }
-        } catch (NoRentalRateAvailableException ex) {
-            System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
         }
+
         // NOT DONE
     }
 
