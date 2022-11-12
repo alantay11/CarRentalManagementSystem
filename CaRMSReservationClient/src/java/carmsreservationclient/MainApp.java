@@ -84,7 +84,7 @@ public class MainApp {
         validator = validatorFactory.getValidator();
     }
 
-    public void runApp() throws ReservationRecordNotFoundException {
+    public void runApp() {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
@@ -124,7 +124,7 @@ public class MainApp {
         }
     }
 
-    private void doLogin() throws ReservationRecordNotFoundException {
+    private void doLogin() {
         Scanner scanner = new Scanner(System.in);
         String username = "";
         String password = "";
@@ -192,7 +192,7 @@ public class MainApp {
 
     }
 
-    private void customerMenu() throws ReservationRecordNotFoundException {
+    private void customerMenu() {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
@@ -415,50 +415,54 @@ public class MainApp {
         }
     }
 
-    private void doCancelReservation() throws ReservationRecordNotFoundException {
-        System.out.println("*** CaRMSRC System :: Customer :: Cancel Reservation ***\n");
-        Scanner scanner = new Scanner(System.in);
+    private void doCancelReservation() {
+        try {
+            System.out.println("*** CaRMSRC System :: Customer :: Cancel Reservation ***\n");
+            Scanner scanner = new Scanner(System.in);
 
-        doViewAllMyActiveReservations();
-        System.out.print("Enter ID of reservation you want to delete> ");
-        long reservationId = scanner.nextLong();
-        Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
-        scanner.nextLine();
+            doViewAllMyActiveReservations();
+            System.out.print("Enter ID of reservation you want to delete> ");
+            long reservationId = scanner.nextLong();
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
+            scanner.nextLine();
 
-        BigDecimal totalCost = reservation.getPaymentAmount();
-        LocalDateTime pickup = reservation.getPickupTime();
+            BigDecimal totalCost = reservation.getPaymentAmount();
+            LocalDateTime pickup = reservation.getPickupTime();
 
-        BigDecimal penalty = calculatePenalty(totalCost, pickup);
-        BigDecimal refund = totalCost.subtract(penalty);
-        //System.out.println("total " + totalCost + " pickup " + pickup + " penalty " + penalty);
+            BigDecimal penalty = calculatePenalty(totalCost, pickup);
+            BigDecimal refund = totalCost.subtract(penalty);
+            //System.out.println("total " + totalCost + " pickup " + pickup + " penalty " + penalty);
 
-        if (reservation.isPaid()) {
-            System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
-                    + " A penalty of $" + penalty + " will be imposed.");
-            System.out.print("You will be refunded $" + refund + " (Y/N)> ");
+            if (reservation.isPaid()) {
+                System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
+                        + " A penalty of $" + penalty + " will be imposed.");
+                System.out.print("You will be refunded $" + refund + " (Y/N)> ");
 
-            String confirmation = scanner.nextLine().trim().toLowerCase();
-            if (confirmation.equals("y")) {
-                reservationSessionBeanRemote.cancelReservation(reservationId, refund);
-                System.out.println("\n" + reservation.toString() + " cancelled\n");
-                System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+                String confirmation = scanner.nextLine().trim().toLowerCase();
+                if (confirmation.equals("y")) {
+                    reservationSessionBeanRemote.cancelReservation(reservationId, refund);
+                    System.out.println("\n" + reservation.toString() + " cancelled\n");
+                    System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
 
+                } else {
+                    System.out.println("\nCancellation cancelled\n");
+                }
             } else {
-                System.out.println("\nCancellation cancelled\n");
-            }
-        } else {
-            System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
-                    + " You will be charged a penalty of $" + penalty + " (Y/N)> ");
+                System.out.println("\nConfirm cancellation of reservation with ID " + reservation.getReservationId() + "?"
+                        + " You will be charged a penalty of $" + penalty + " (Y/N)> ");
 
-            String confirmation = scanner.nextLine().trim().toLowerCase();
-            if (confirmation.equals("y")) {
-                reservationSessionBeanRemote.cancelReservation(reservationId, refund);
-                System.out.println("\n" + reservation.toString() + " cancelled\n");
-                System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+                String confirmation = scanner.nextLine().trim().toLowerCase();
+                if (confirmation.equals("y")) {
+                    reservationSessionBeanRemote.cancelReservation(reservationId, refund);
+                    System.out.println("\n" + reservation.toString() + " cancelled\n");
+                    System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
 
-            } else {
-                System.out.println("\nCancellation cancelled\n");
+                } else {
+                    System.out.println("\nCancellation cancelled\n");
+                }
             }
+        } catch (ReservationRecordNotFoundException ex) {
+            System.out.println("You have input an invalid reservation");
         }
 
     }
@@ -486,23 +490,27 @@ public class MainApp {
         return reservationSessionBeanRemote.retrieveAllMyReservations(currentCustomer.getId());
     }
 
-    private void doViewReservationDetails() throws ReservationRecordNotFoundException {
-        System.out.println("*** CaRMSRC System :: Customer :: View Reservation Details ***\n");
-        Scanner scanner = new Scanner(System.in);
-        List<Reservation> reservations = getAllMyReservations();
-        System.out.println("\n-----------------------------------");
-        for (Reservation r : reservations) {
-            System.out.println("ID: " + r.getReservationId() + ", Pickup at: " + r.getPickupTime() + " from " + r.getDepartureOutlet());
+    private void doViewReservationDetails() {
+        try {
+            System.out.println("*** CaRMSRC System :: Customer :: View Reservation Details ***\n");
+            Scanner scanner = new Scanner(System.in);
+            List<Reservation> reservations = getAllMyReservations();
+            System.out.println("\n-----------------------------------");
+            for (Reservation r : reservations) {
+                System.out.println("ID: " + r.getReservationId() + ", Pickup at: " + r.getPickupTime() + " from " + r.getDepartureOutlet());
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Enter ID of reservation you want to view> ");
+            long reservationId = scanner.nextLong();
+            scanner.nextLine();
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
+            System.out.println("\n" + reservation.toString() + "\n");
+            System.out.print("Press enter to continue>");
+            scanner.nextLine();
+            System.out.println();
+        } catch (ReservationRecordNotFoundException ex) {
+            System.out.println("You have input an invalid reservation");
         }
-        System.out.println("-----------------------------------\n");
-        System.out.print("Enter ID of reservation you want to view> ");
-        long reservationId = scanner.nextLong();
-        scanner.nextLine();
-        Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
-        System.out.println("\n" + reservation.toString() + "\n");
-        System.out.print("Press enter to continue>");
-        scanner.nextLine();
-        System.out.println();
     }
 
     private void doViewAllMyReservations() {
