@@ -8,19 +8,27 @@ package ejb.session.stateless;
 import entity.Car;
 import entity.Reservation;
 import enumeration.CarStatusEnum;
+import exception.InputDataValidationException;
+import exception.ReservationExistException;
 import exception.ReservationRecordNotFoundException;
 import exception.UpdateReservationStatusFailException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 /**
  *
@@ -35,12 +43,31 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
 
-    @Override
-    public Reservation createReservation(Reservation reservation) {
-        em.persist(reservation);
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
 
-        em.flush();
-        return reservation;
+    public ReservationSessionBean() {
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
+        this.validator = validatorFactory.getValidator();
+    }
+
+    @Override
+    public Reservation createReservation(Reservation reservation) throws ReservationExistException, InputDataValidationException {
+        Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
+
+        if (constraintViolations.isEmpty()) {
+            try {
+
+                em.persist(reservation);
+
+                em.flush();
+                return reservation;
+            } catch (PersistenceException ex) {
+                throw new ReservationExistException();
+            }
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
     }
 
     @Override
@@ -108,6 +135,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
             // set as reserved
             //reservation.getCar().setCarStatus(CarStatusEnum.RESERVED);
+            reservation.setPaid(true);
             reservation.getCar().setCurrentOutlet(null);
             em.flush();
             return reservation;
@@ -127,12 +155,22 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
             car.setReservation(null);
             reservation.setCar(null);
-            
+
             em.flush();
             return reservation;
         } catch (ReservationRecordNotFoundException ex) {
             throw new UpdateReservationStatusFailException("Reservation Id " + reservationId + " does not exist.");
-        }        
+        }
+    }
+
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Reservation>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
     }
 
 }

@@ -10,17 +10,21 @@ import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
-import entity.Car;
+import entity.CreditCard;
 import entity.Customer;
 import entity.Reservation;
-import enumeration.CarStatusEnum;
 import exception.CustomerNotFoundException;
+import exception.InputDataValidationException;
+import exception.ReservationExistException;
 import exception.ReservationRecordNotFoundException;
 import exception.UpdateReservationStatusFailException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -104,7 +108,8 @@ public class CustomerServiceExecutiveModule {
             System.out.println("-----------------------------------\n");*/
             System.out.print("Enter customer username> ");
             String customerUsername = scanner.nextLine().trim();
-            long customerId = customerSessionBeanRemote.retrieveCustomerByUsername(customerUsername).getCustomerId();
+            Customer customer = customerSessionBeanRemote.retrieveCustomerByUsername(customerUsername);
+            long customerId = customer.getCustomerId();
 
             List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllMyReservations(customerId);
 
@@ -118,8 +123,19 @@ public class CustomerServiceExecutiveModule {
             long reservationId = scanner.nextLong();
             scanner.nextLine();
 
-            // update reservation to reserved
-            Reservation reservation = reservationSessionBeanRemote.pickupCar(reservationId);
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
+
+            if (reservation.isPaid()) {
+                reservation = reservationSessionBeanRemote.pickupCar(reservationId);
+            } else {
+                BigDecimal paymentAmount = reservation.getPaymentAmount();
+                System.out.print("\nYou are required to pay $" + paymentAmount + " for the reservation");
+                CreditCard cc = customer.getCreditCard();
+
+                System.out.println("\nReservation of amount: $" + paymentAmount.toString() + " paid using " + cc.getCcNumber() + "\n");
+
+                reservation = reservationSessionBeanRemote.pickupCar(reservationId);
+            }
 
             System.out.println("Car picked up for " + reservation.toString());
 
@@ -127,6 +143,8 @@ public class CustomerServiceExecutiveModule {
             System.out.println("Pickup has failed, please try again");
         } catch (CustomerNotFoundException ex) {
             System.out.println("You have input an invalid username");
+        } catch (ReservationRecordNotFoundException ex) {
+            System.out.println("Reservation does not exist");
         }
     }
 

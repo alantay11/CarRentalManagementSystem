@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import exception.InputDataValidationException;
+import exception.ReservationExistException;
 import exception.ReservationRecordNotFoundException;
 import exception.UpdateReservationStatusFailException;
 import java.math.BigDecimal;
@@ -26,7 +28,7 @@ public interface ReservationSessionBeanRemote {
 
     void cancelReservation(long reservationId, BigDecimal refundAmount);
 
-    Reservation createReservation(Reservation reservation);
+    Reservation createReservation(Reservation reservation) throws ReservationExistException, InputDataValidationException;
 
     public List<Reservation> retrieveAllReservations();
 
