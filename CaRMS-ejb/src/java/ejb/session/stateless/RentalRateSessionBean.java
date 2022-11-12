@@ -197,7 +197,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     private RentalRate findBestRentalRateFor24Hours(LocalDateTime time, long carCategoryId) throws NoRentalRateAvailableException {
-        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND r.endDate >= :time ORDER BY r.ratePerDay");
+        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory.carCategoryId = :carCategoryId AND (r.endDate >= :time OR r.endDate = null) ORDER BY r.ratePerDay");
         query.setParameter("carCategoryId", carCategoryId).setParameter("time", time);
         System.out.println(query.getResultList());//
 
