@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +36,9 @@ public class Outlet implements Serializable {
     @Size(min = 2, max = 32)
     private String address;
 
-    @Column(columnDefinition = "TIMESTAMP")
-    private LocalTime openingTime;
-    @Column(columnDefinition = "TIMESTAMP")
+    @Column(columnDefinition = "TIME")
+    private LocalDateTime openingTime;
+    @Column(columnDefinition = "TIME")
     private LocalTime closingTime;
 
     @OneToMany(mappedBy = "currentOutlet")
@@ -69,11 +70,11 @@ public class Outlet implements Serializable {
         this.address = address;
     }
 
-    public LocalTime getOpeningTime() {
+    public LocalDateTime getOpeningTime() {
         return openingTime;
     }
 
-    public void setOpeningTime(LocalTime openingTime) {
+    public void setOpeningTime(LocalDateTime openingTime) {
         this.openingTime = openingTime;
     }
 

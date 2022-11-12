@@ -18,7 +18,6 @@ import entity.CarModel;
 import entity.CreditCard;
 import entity.Customer;
 import entity.Outlet;
-import entity.RentalRate;
 import entity.Reservation;
 import exception.CreditCardExistException;
 import exception.CustomerExistException;
@@ -39,8 +38,6 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -336,7 +333,6 @@ public class MainApp {
                 System.out.println("Invalid date or time entered, please try again");
             } catch (OutletIsClosedException ex) {
                 System.out.println(ex);
-
             }
         }
         return reservation;

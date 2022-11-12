@@ -5,7 +5,6 @@
  */
 package holidayreservationsystemwebclient;
 
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -27,24 +26,24 @@ import ws.client.partner.Reservation;
 public class MainApp {
 
     private PartnerWebService_Service partnerWebService_Service;
+    private PartnerWebService partnerWebServicePort;
 
     Partner currentPartner;
     Customer currentCustomer;
 
-    public MainApp(PartnerWebService_Service partnerWebService_Service) {
-        this.partnerWebService_Service = partnerWebService_Service;
+    public MainApp() {
+        this.partnerWebService_Service = new PartnerWebService_Service();
+        this.partnerWebServicePort = partnerWebService_Service.getPartnerWebServicePort();
     }
 
     public void runApp() {
-        PartnerWebService partnerWebServicePort = partnerWebService_Service.getPartnerWebServicePort();
-
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
 
         System.out.println("*** Welcome to the Holiday Reservation System (HRS) ***\n");
         while (true) {
-            System.out.println("1: Partner Login");
-            System.out.println("2: Partner Search Car");
+            System.out.println("1: Login");
+            System.out.println("2: Search Car");
             System.out.println("3: Exit\n");
             response = 0;
 
@@ -69,7 +68,7 @@ public class MainApp {
             }
         }
     }
-    
+
     public void partnerMenu() {
         Scanner scanner = new Scanner(System.in);
         Integer response;
@@ -94,11 +93,11 @@ public class MainApp {
                 } else if (response == 2) {
                     //doReserveCar();
                 } else if (response == 3) {
-                   // doCancelReservation();
+                    // doCancelReservation();
                 } else if (response == 4) {
-                   // doViewReservationDetails();
+                    // doViewReservationDetails();
                 } else if (response == 5) {
-                   // doViewAllMyReservations();
+                    // doViewAllMyReservations();
                 } else if (response == 6) {
                     break;
                 } else {
@@ -112,8 +111,6 @@ public class MainApp {
     }
 
     public void doLogin() {
-        PartnerWebService partnerWebServicePort = partnerWebService_Service.getPartnerWebServicePort();
-
         Scanner scanner = new Scanner(System.in);
         String username = "";
         String password = "";
@@ -136,8 +133,7 @@ public class MainApp {
             System.out.println("Invalid input, please try again!\n");
         }
     }
-    
-    
+
     private Reservation doSearchCar() {
         //System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
         Scanner scanner = new Scanner(System.in);
@@ -153,16 +149,83 @@ public class MainApp {
         long categoryId;
         boolean available = false;
         Reservation reservation = new Reservation();
-        
+
         // cannot copy paste, need manual coding
+        System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
+        startDate = scanner.nextLine().trim();
+        System.out.print("Enter pickup time in the format HH:MM> ");
+        startTime = scanner.nextLine().trim();
+        pickUpDateTime = LocalDateTime.parse(startDate + "T" + startTime);
+        System.out.print("Enter return date in the format YYYY-MM-DD> ");
+        endDate = scanner.nextLine().trim();
+        System.out.print("Enter return time in the format HH:MM> ");
+        endTime = scanner.nextLine().trim();
+        returnDateTime = LocalDateTime.parse(endDate + "T" + endTime);
+
+        List<Outlet> outlets = partnerWebServicePort.();
+
+        System.out.println("\nOutlets");
+        System.out.println("-----------------------------------");
+        for (Outlet o : outlets) {
+            System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress()
+                    + " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
+        }
+        System.out.println("-----------------------------------\n");
+
+        System.out.print("Enter pickup outlet ID> ");
+        pickupOutletId = scanner.nextLong();
+        scanner.nextLine();
+        reservation.setDepartureOutlet(outletSessionBeanRemote.retrieveOutlet(pickupOutletId));
+
+        System.out.print("Enter return outlet ID> ");
+        returnOutletId = scanner.nextLong();
+        scanner.nextLine();
+        reservation.setDestinationOutlet(outletSessionBeanRemote.retrieveOutlet(returnOutletId));
+
+        System.out.print("Do you want to search by Make and Model? (Y/N)> ");
+        String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
+        if (searchByMakeModel.equals("y")) {
+            List<CarModel> carModels = carModelSessionBeanRemote.retrieveAllCarModels();
+
+            System.out.println("-----------------------------------\n");
+            for (CarModel carModel : carModels) {
+                System.out.println(carModel.toString());
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Enter Make and Model ID> ");
+            makeModelId = scanner.nextLong();
+            scanner.nextLine();
+            reservation.setCarModel(carModelSessionBeanRemote.retrieveCarModel(makeModelId));
+
+            available = carSessionBeanRemote.searchCarByMakeModel(makeModelId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+
+        } else {
+            try {
+                List<CarCategory> carCategories = carCategorySessionBeanRemote.retrieveAllCarCategories();
+
+                System.out.println("-----------------------------------\n");
+                for (CarCategory carCategory : carCategories) {
+                    System.out.println(carCategory.toString());
+                }
+                System.out.println("-----------------------------------\n");
+                System.out.print("Enter Category ID> ");
+                categoryId = scanner.nextLong();
+                scanner.nextLine();
+                reservation.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategory(categoryId));
+
+                available = carSessionBeanRemote.searchCarByCategory(categoryId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+            } catch (InvalidIdException ex) {
+                System.out.println("\nInvalid ID entered!\n");
+            }
+
+        }
 
         return reservation;
         // NOT DONE
     }
-    
+
     private void doCancelReservation() {
-        
+
     }
-    
-    
+
 }

@@ -163,7 +163,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Outlet returnOutlet = outletSessionBean.retrieveOutlet(returnOutletId);
 
         if (pickupOutlet.getOpeningTime() != null) {
-            if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime())) {
+            if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime().toLocalTime())) {
                 throw new OutletIsClosedException("Your pickup time is before the outlet's opening time");
             }
         }
@@ -253,7 +253,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Outlet returnOutlet = outletSessionBean.retrieveOutlet(returnOutletId);
 
         if (pickupOutlet.getOpeningTime() != null) {
-            if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime())) {
+            if (pickupDateTime.toLocalTime().isBefore(pickupOutlet.getOpeningTime().toLocalTime())) {
                 throw new OutletIsClosedException("Your pickup time is before the outlet's opening time");
             }
         }

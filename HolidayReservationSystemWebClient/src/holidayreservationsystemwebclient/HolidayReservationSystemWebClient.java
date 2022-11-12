@@ -5,20 +5,14 @@
  */
 package holidayreservationsystemwebclient;
 
-import ws.client.partner.Partner;
-import ws.client.partner.PartnerWebService_Service;
-
 /**
  *
  * @author Uni
  */
 public class HolidayReservationSystemWebClient {
 
-    Partner currentPartner;
-
     public static void main(String[] args) {
-        PartnerWebService_Service partnerWebService_Service = new PartnerWebService_Service();
-        MainApp mainApp = new MainApp(partnerWebService_Service);
+        MainApp mainApp = new MainApp();
         mainApp.runApp();
     }
 }

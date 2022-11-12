@@ -5,10 +5,13 @@
  */
 package ejb.session.ws;
 
+import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
 import entity.Customer;
+import entity.Outlet;
 import entity.Partner;
 import exception.InvalidLoginCredentialException;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
@@ -24,6 +27,9 @@ import javax.persistence.PersistenceContext;
 @WebService(serviceName = "PartnerWebService")
 @Stateless()
 public class PartnerWebService {
+
+    @EJB
+    private OutletSessionBeanLocal outletSessionBean;
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
     private EntityManager em;
@@ -43,9 +49,12 @@ public class PartnerWebService {
         }
 
         //partner.setCustomerList(null); don't need?
-
-
         return partner;
+    }
+
+    @WebMethod(operationName = "retrieveAllOutlets")
+    public List<Outlet> retrieveAllOutlets() {
+        return outletSessionBean.retrieveAllOutlets();
     }
 
 }
