@@ -34,19 +34,19 @@ public class Employee implements Serializable {
 
     @Column(nullable = false, length = 32)
     @NotNull
-    @Size(min = 2, max = 32)
+    @Size(min = 1, max = 32)
     private String firstName;
     @Column(nullable = false, length = 32)
     @NotNull
-    @Size(min = 2, max = 32)
+    @Size(min = 1, max = 32)
     private String lastName;
     @Column(nullable = false, length = 32)
     @NotNull
-    @Size(min = 2, max = 32)
+    @Size(min = 1, max = 32)
     private String username;
     @Column(nullable = false, length = 32)
     @NotNull
-    @Size(min = 2, max = 32)
+    @Size(min = 1, max = 32)
     private String password;
     @Enumerated(EnumType.STRING)
     @NotNull
