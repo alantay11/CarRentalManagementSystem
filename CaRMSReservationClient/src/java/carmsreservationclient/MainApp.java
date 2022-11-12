@@ -106,7 +106,7 @@ public class MainApp {
                     } else if (response == 2) {
                         doLogin();
                     } else if (response == 3) {
-                        doSearchCar();
+                        doSearchCarForReservation();
                     } else if (response == 4) {
                         break;
                     } else {
@@ -210,7 +210,7 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    doSearchCar();
+                    doSearchCarForReservation();
                 } else if (response == 2) {
                     doReserveCar();
                 } else if (response == 3) {
@@ -231,8 +231,74 @@ public class MainApp {
         }
     }
 
-    private Reservation doSearchCar() {
-        //System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
+    private void doSearchCar() {
+        System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
+        Scanner scanner = new Scanner(System.in);
+        String startDate = "";
+        String startTime = "";
+        String endDate = "";
+        String endTime = "";
+        LocalDateTime pickUpDateTime;
+        LocalDateTime returnDateTime;
+        long pickupOutletId;
+        long returnOutletId;
+        boolean available = false;
+        Reservation reservation = new Reservation();
+        reservation.setCustomer(currentCustomer);
+
+        while (true) {
+            try {
+                System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
+                startDate = scanner.nextLine().trim();
+                System.out.print("Enter pickup time in the format HH:MM> ");
+                startTime = scanner.nextLine().trim();
+                pickUpDateTime = LocalDateTime.parse(startDate + "T" + startTime);
+                reservation.setPickupTime(pickUpDateTime);
+
+                System.out.print("Enter return date in the format YYYY-MM-DD> ");
+                endDate = scanner.nextLine().trim();
+                System.out.print("Enter return time in the format HH:MM> ");
+                endTime = scanner.nextLine().trim();
+                returnDateTime = LocalDateTime.parse(endDate + "T" + endTime);
+                reservation.setReturnTime(returnDateTime);
+
+                List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
+
+                System.out.println("\nOutlets");
+                System.out.println("-----------------------------------");
+                for (Outlet o : outlets) {
+                    System.out.println(o.toString());
+                }
+                System.out.println("-----------------------------------\n");
+
+                System.out.print("Enter pickup outlet ID> ");
+                pickupOutletId = scanner.nextLong();
+                scanner.nextLine();
+                reservation.setDepartureOutlet(outletSessionBeanRemote.retrieveOutlet(pickupOutletId));
+
+                System.out.print("Enter return outlet ID> ");
+                returnOutletId = scanner.nextLong();
+                scanner.nextLine();
+                reservation.setDestinationOutlet(outletSessionBeanRemote.retrieveOutlet(returnOutletId));
+
+                available = carSessionBeanRemote.searchCar(pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+            } catch (DateTimeParseException ex) {
+                System.out.println("Invalid date or time entered, please try again");
+            } catch (OutletIsClosedException ex) {
+                System.out.println("Outlet is closed during your pickup or return times!");
+            }
+
+            if (available) {
+                System.out.println("A car is available for reservation\n");
+            } else {
+                System.out.println("No cars are available for the specified times and outlets\n");
+                reservation = null;
+            }
+            break;
+        }
+    }
+
+    private Reservation doSearchCarForReservation() {
         Scanner scanner = new Scanner(System.in);
         String startDate = "";
         String startTime = "";
@@ -335,7 +401,6 @@ public class MainApp {
             }
         }
         return reservation;
-        // NOT DONE
     }
 
     private void doReserveCar() {
@@ -343,7 +408,7 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            Reservation reservation = doSearchCar();
+            Reservation reservation = doSearchCarForReservation();
 
             if (reservation != null) {
                 CreditCard creditCard = doSaveCreditCard();

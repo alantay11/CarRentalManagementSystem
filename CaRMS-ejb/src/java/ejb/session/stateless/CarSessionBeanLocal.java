@@ -43,4 +43,6 @@ public interface CarSessionBeanLocal {
 
     boolean deleteCarByLicensePlate(String plateNum) throws InvalidIdException;
 
+    boolean searchCar(LocalDateTime pickupDateTime, LocalDateTime returnDateTime, long pickupOutletId, long returnOutletId) throws OutletIsClosedException;
+
 }
