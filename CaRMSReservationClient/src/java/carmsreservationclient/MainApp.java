@@ -20,6 +20,7 @@ import entity.Customer;
 import entity.Outlet;
 import entity.RentalRate;
 import entity.Reservation;
+import exception.CreditCardExistException;
 import exception.CustomerExistException;
 import exception.CustomerNotFoundException;
 import exception.InputDataValidationException;
@@ -409,28 +410,35 @@ public class MainApp {
         LocalDate expiryDate;
 
         while (true) {
-            try {
-                System.out.print("Enter name on credit card> ");
-                nameOnCC = scanner.nextLine().trim();
-                creditCard.setNameonCC(nameOnCC);
-                System.out.print("Enter credit card number> ");
-                ccNumber = scanner.nextLine().trim();
-                creditCard.setCcNumber(ccNumber);
-                System.out.print("Enter credit card cvv> ");
-                cvv = scanner.nextLine().trim();
-                creditCard.setCvv(cvv);
+            System.out.print("Enter name on credit card> ");
+            nameOnCC = scanner.nextLine().trim();
+            creditCard.setNameonCC(nameOnCC);
+            System.out.print("Enter credit card number> ");
+            ccNumber = scanner.nextLine().trim();
+            creditCard.setCcNumber(ccNumber);
+            System.out.print("Enter credit card cvv> ");
+            cvv = scanner.nextLine().trim();
+            creditCard.setCvv(cvv);
 
-                System.out.print("Enter expiry date in the format YYYY-MM> ");
-                String expiry = scanner.nextLine().trim() + "-01";
-                expiryDate = LocalDate.parse(expiry);
-                expiryDate = YearMonth.from(expiryDate).atEndOfMonth();
-                System.out.println(expiryDate);
-                creditCard.setExpiryDate(expiryDate);
+            System.out.print("Enter expiry date in the format YYYY-MM> ");
+            String expiry = scanner.nextLine().trim() + "-01";
+            expiryDate = LocalDate.parse(expiry);
+            expiryDate = YearMonth.from(expiryDate).atEndOfMonth();
+            System.out.println(expiryDate);
+            creditCard.setExpiryDate(expiryDate);
 
-                return creditCardSessionBeanRemote.createCreditCard(creditCard, currentCustomer.getCustomerId());
+            Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate(creditCard);
+            if (constraintViolations.isEmpty()) {
+                try {
+                    return creditCardSessionBeanRemote.createCreditCard(creditCard, currentCustomer.getCustomerId());
 
-            } catch (DateTimeParseException ex) {
-                System.out.println("Invalid date or time entered, please try again");
+                } catch (DateTimeParseException ex) {
+                    System.out.println("Invalid date or time entered, please try again");
+                } catch (CreditCardExistException ex) {
+                    System.out.println("Credit card already exists!");
+                } catch (InputDataValidationException ex) {
+                    System.out.println(ex);
+                }
             }
         }
     }

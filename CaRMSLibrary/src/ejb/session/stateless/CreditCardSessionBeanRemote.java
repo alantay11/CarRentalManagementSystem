@@ -6,6 +6,8 @@
 package ejb.session.stateless;
 
 import entity.CreditCard;
+import exception.CreditCardExistException;
+import exception.InputDataValidationException;
 import javax.ejb.Remote;
 
 /**
@@ -15,6 +17,6 @@ import javax.ejb.Remote;
 @Remote
 public interface CreditCardSessionBeanRemote {
 
-    CreditCard createCreditCard(CreditCard creditCard, long customerId);
+    CreditCard createCreditCard(CreditCard creditCard, long customerId) throws CreditCardExistException, InputDataValidationException;
     
 }
