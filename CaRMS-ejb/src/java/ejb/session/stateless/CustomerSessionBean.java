@@ -10,6 +10,7 @@ import exception.CustomerExistException;
 import exception.CustomerNotFoundException;
 import exception.InputDataValidationException;
 import exception.InvalidLoginCredentialException;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -85,6 +86,19 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     public Customer retrieveCustomer(long customerId) {
         return em.find(Customer.class, customerId);
     }
+    
+    @Override
+    public List<Customer> retrieveAllCustomers() {
+        Query query = em.createQuery("SELECT c FROM Customer c");
+        List<Customer> customers = query.getResultList();
+
+        for (Customer c : customers) {
+            c.getReservationList().size();
+        }
+
+        return customers;
+    }
+    
 
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Customer>> constraintViolations) {
         String msg = "Input data validation error!:";
@@ -95,4 +109,6 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
 
         return msg;
     }
+
+    
 }

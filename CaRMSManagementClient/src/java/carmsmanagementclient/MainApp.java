@@ -8,6 +8,7 @@ package carmsmanagementclient;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarModelSessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
@@ -23,6 +24,7 @@ import java.util.Scanner;
  */
 public class MainApp {
 
+    private CustomerSessionBeanRemote customerSessionBeanRemote;
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
@@ -39,13 +41,15 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
+    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, 
+            OutletSessionBeanRemote outletSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.customerSessionBeanRemote = customerSessionBeanRemote;
     }
 
     public void runApp() {
@@ -76,7 +80,7 @@ public class MainApp {
                                 operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote);
                                 operationsManagerModule.operationsManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
-                                customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                                customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote);
                                 customerServiceExecutiveModule.customerServiceExecutiveMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SYSTEMADMINISTRATOR)) {
                                 sysAdminMenu();
@@ -156,7 +160,7 @@ public class MainApp {
                         operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote);
                         operationsManagerModule.operationsManagerMenu();
                     } else if (response == 7) {
-                        customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                        customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote);
                         customerServiceExecutiveModule.customerServiceExecutiveMenu();
                     } else if (response == 8) {
                         break;

@@ -10,6 +10,7 @@ import exception.CustomerExistException;
 import exception.CustomerNotFoundException;
 import exception.InputDataValidationException;
 import exception.InvalidLoginCredentialException;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -24,5 +25,7 @@ public interface CustomerSessionBeanRemote {
     Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException ;
 
     Customer createCustomer(Customer customer) throws CustomerExistException, InputDataValidationException;
+
+    List<Customer> retrieveAllCustomers();
     
 }

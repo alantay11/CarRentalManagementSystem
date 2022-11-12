@@ -32,6 +32,8 @@ public interface ReservationSessionBeanRemote {
 
     public List<Reservation> retrieveReservationByDate(LocalDate currDate);
 
-    public void updateReservationStatus(long reservationId) throws UpdateReservationStatusFailException;
+    public Reservation pickupCar(long reservationId) throws UpdateReservationStatusFailException;
+
+    Reservation returnCar(long reservationId) throws UpdateReservationStatusFailException;
     
 }
