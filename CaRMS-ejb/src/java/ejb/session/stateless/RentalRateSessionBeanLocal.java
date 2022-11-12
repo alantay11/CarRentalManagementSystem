@@ -6,9 +6,12 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
+import entity.Reservation;
 import exception.InputDataValidationException;
 import exception.InvalidIdException;
+import exception.NoRentalRateAvailableException;
 import exception.RentalRateExistException;
+import java.math.BigDecimal;
 import javax.ejb.Local;
 
 /**
@@ -21,5 +24,7 @@ public interface RentalRateSessionBeanLocal {
     RentalRate createRentalRate(RentalRate rentalRate, long carCategoryId) throws InvalidIdException, RentalRateExistException, InputDataValidationException;
 
     RentalRate retrieveRentalRate(long rentalRateId);
+
+    BigDecimal calculateTotalCost(Reservation reservation) throws NoRentalRateAvailableException;
 
 }

@@ -332,7 +332,7 @@ public class MainApp {
             } catch (DateTimeParseException ex) {
                 System.out.println("Invalid date or time entered, please try again");
             } catch (OutletIsClosedException ex) {
-                System.out.println(ex);
+                System.out.println("Outlet is closed during your pickup or return times!");
             }
         }
         return reservation;
@@ -420,7 +420,7 @@ public class MainApp {
             String expiry = scanner.nextLine().trim() + "-01";
             expiryDate = LocalDate.parse(expiry);
             expiryDate = YearMonth.from(expiryDate).atEndOfMonth();
-            System.out.println(expiryDate);
+            //System.out.println(expiryDate);
             creditCard.setExpiryDate(expiryDate);
 
             Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate(creditCard);
@@ -551,7 +551,7 @@ public class MainApp {
     }
 
     private void doViewAllMyActiveReservations() {
-        System.out.println("*** CaRMSRC System :: Customer :: View All My Reservations ***\n");
+        System.out.println("*** CaRMSRC System :: Customer :: View All My Active Reservations ***\n");
         Scanner scanner = new Scanner(System.in);
         List<Reservation> reservations = getAllMyReservations();
         System.out.println("\n-----------------------------------");

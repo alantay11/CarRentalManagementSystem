@@ -5,6 +5,9 @@
  */
 package ejb.session.stateless;
 
+import entity.CreditCard;
+import exception.CreditCardExistException;
+import exception.InputDataValidationException;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +16,7 @@ import javax.ejb.Local;
  */
 @Local
 public interface CreditCardSessionBeanLocal {
-    
+
+    CreditCard createCreditCard(CreditCard creditCard, long customerId) throws CreditCardExistException, InputDataValidationException;
+
 }
