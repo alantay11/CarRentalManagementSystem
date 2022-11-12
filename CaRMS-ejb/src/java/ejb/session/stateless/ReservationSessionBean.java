@@ -38,6 +38,9 @@ import javax.validation.ValidatorFactory;
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
 
     @EJB
+    private CustomerSessionBeanLocal customerSessionBean;
+
+    @EJB
     private CarSessionBeanLocal carSessionBean;
 
     @PersistenceContext(unitName = "CaRMS-ejbPU")
@@ -58,7 +61,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         if (constraintViolations.isEmpty()) {
             try {
                 em.persist(reservation);
-                reservation.getCustomer().getReservationList().add(reservation);
+                long customerId = reservation.getCustomer().getCustomerId();
+                customerSessionBean.retrieveCustomer(customerId).getReservationList().add(reservation);
 
                 em.flush();
                 return reservation;

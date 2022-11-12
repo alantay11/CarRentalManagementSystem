@@ -132,8 +132,10 @@ public class Outlet implements Serializable {
 
     @Override
     public String toString() {
-        return "Outlet ID: " + outletId + " " + address + this.carList + this.employeeList + this.inboundTransitDriverDispatchList
-                + this.openingTime + this.closingTime;
+        return "Outlet ID: " + outletId + " , " + this.address + 
+                ((this.openingTime == null || this.closingTime == null) ? ", Open 24h" :
+                ", Opening Time: " + this.openingTime.toLocalTime() + ", Closing Time: " + this.closingTime);
+                //+ this.carList + this.employeeList + this.inboundTransitDriverDispatchList;
     }
 
 }

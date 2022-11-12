@@ -120,17 +120,14 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
-    public RentalRate retrieveRentalRate(long rentalRateId
-    ) {
-        RentalRate rentalRate = em.find(RentalRate.class,
-                rentalRateId);
+    public RentalRate retrieveRentalRate(long rentalRateId) {
+        RentalRate rentalRate = em.find(RentalRate.class, rentalRateId);
         rentalRate.getReservationList().size();
         return rentalRate;
     }
 
     @Override
-    public boolean deleteRentalRate(long rentalRateId
-    ) {
+    public boolean deleteRentalRate(long rentalRateId) {
         RentalRate rentalRate = retrieveRentalRate(rentalRateId);
         CarCategory carCategory = rentalRate.getCarCategory();
         List<RentalRate> rentalRateList = carCategory.getRentalRateList();

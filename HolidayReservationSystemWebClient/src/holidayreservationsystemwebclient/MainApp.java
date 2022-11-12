@@ -6,21 +6,17 @@
 package holidayreservationsystemwebclient;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 import ws.client.partner.CarCategory;
 import ws.client.partner.CarModel;
 import ws.client.partner.CreditCard;
 import ws.client.partner.CreditCardExistException_Exception;
 import ws.client.partner.Customer;
 import ws.client.partner.CustomerExistException_Exception;
-import ws.client.partner.InputDataValidationException;
 import ws.client.partner.InputDataValidationException_Exception;
 import ws.client.partner.InvalidLoginCredentialException_Exception;
-import ws.client.partner.LocalDate;
 import ws.client.partner.NoRentalRateAvailableException_Exception;
 import ws.client.partner.Outlet;
 import ws.client.partner.OutletIsClosedException_Exception;
@@ -52,8 +48,8 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
 
-        System.out.println("*** Welcome to the Holiday Reservation System (HRS) ***\n");
         while (true) {
+            System.out.println("*** Welcome to the Holiday Reservation System (HRS) ***\n");
             System.out.println("1: Login");
             System.out.println("2: Search Car");
             System.out.println("3: Exit\n");
@@ -92,7 +88,7 @@ public class MainApp {
             System.out.println("3: Cancel Reservation");
             System.out.println("4: View Reservation Details");
             System.out.println("5: View All Partner Reservations");
-            System.out.println("6: Logout");
+            System.out.println("6: Logout\n");
             response = 0;
 
             while (response < 1 || response > 6) {
@@ -139,7 +135,7 @@ public class MainApp {
                 System.out.println("Login successful!\n");
                 partnerMenu();
             } catch (InvalidLoginCredentialException_Exception ex) {
-                System.out.println("\nInvalid login credential: " + ex.getMessage() + "\n");
+                System.out.println("\nInvalid login credential!");
             }
         } else {
             System.out.println("Invalid input, please try again!\n");
@@ -241,22 +237,33 @@ public class MainApp {
             Reservation reservation = doSearchCar();
 
             if (reservation != null) {
-                Customer customer = doRegisterCustomer();
-                reservation.setCustomer(customer);
-                
-                CreditCard creditCard = doSaveCreditCard();
-                currentCustomer.setCreditCard(creditCard);
-                BigDecimal paymentAmount = new BigDecimal("0.00");
-                paymentAmount = partnerWebServicePort.calculateTotalCost(reservation);
-                reservation.setPaymentAmount(paymentAmount);
+                doRegisterCustomer();
+                if (currentCustomer != null) {
+                    reservation.setCustomer(currentCustomer);
 
-                System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
-                String confirmation = scanner.nextLine().trim().toLowerCase();
+                    CreditCard creditCard = doReadCreditCard();
+                    currentCustomer.setCreditCard(creditCard);
+                    BigDecimal paymentAmount = new BigDecimal("0.00");
+                    paymentAmount = partnerWebServicePort.calculateTotalCost(reservation);
+                    reservation.setPaymentAmount(paymentAmount);
 
-                if (confirmation.equals("y")) {
-                    // calculate rentalrate costs and request payment then set reservation and create
-                    System.out.println("\nReservation of amount: $" + paymentAmount.toString() + " paid using " + creditCard.getCcNumber() + "\n");
-                    reservation.setPaid(true);
+                    System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
+                    String confirmation = scanner.nextLine().trim().toLowerCase();
+
+                    if (confirmation.equals("y")) {
+                        // calculate rentalrate costs and request payment then set reservation and create
+                        System.out.println("\nReservation of amount: $" + paymentAmount.toString() + " paid using " + creditCard.getCcNumber() + "\n");
+                        reservation.setPaid(true);
+                        try {
+                            reservation = partnerWebServicePort.createReservation(reservation);
+                        } catch (ReservationExistException_Exception ex) {
+                            System.out.println("Reservation already exists!\n");
+                        } catch (InputDataValidationException_Exception ex) {
+                            System.out.println(ex.getMessage() + "\n");
+                        }
+                    }
+                } else {
+                    System.out.println("\nPayment will be required upon pickup\n");
                     try {
                         reservation = partnerWebServicePort.createReservation(reservation);
                     } catch (ReservationExistException_Exception ex) {
@@ -265,29 +272,20 @@ public class MainApp {
                         System.out.println(ex.getMessage() + "\n");
                     }
                 }
-            } else {
-                System.out.println("\nPayment will be required upon pickup\n");
-                try {
-                    reservation = partnerWebServicePort.createReservation(reservation);
-                } catch (ReservationExistException_Exception ex) {
-                    System.out.println("Reservation already exists!\n");
-                } catch (InputDataValidationException_Exception ex) {
-                    System.out.println(ex.getMessage() + "\n");
-                }
-            }
 
-            System.out.println("\nNew " + reservation.toString() + " created\n");
+                System.out.println("\nNew " + reservation.toString() + " created\n");
+            }
 
         } catch (NoRentalRateAvailableException_Exception ex) {
             System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
         }
     }
-    
+
     private Customer doRegisterCustomer() {
         Scanner scanner = new Scanner(System.in);
         Customer customer = new Customer();
 
-        System.out.println("*** CaRMSRC System :: Register As Customer ***\n");
+        System.out.println("*** HRS :: Register As Customer ***\n");
         System.out.print("Enter username> ");
         customer.setUsername(scanner.nextLine().trim());
         System.out.print("Enter password> ");
@@ -308,19 +306,19 @@ public class MainApp {
         customer.setPostalCode(scanner.nextLine().trim());
         customer.setPartner(currentPartner);
 
-            try {
-                customer = partnerWebServicePort.createCustomer(customer);
-            } catch (CustomerExistException_Exception ex) {
-                System.out.println("Customer already exists!\n");
-            } catch (InputDataValidationException_Exception ex) {
-                System.out.println(ex.getMessage() + "\n");
-            }
+        try {
+            currentCustomer = partnerWebServicePort.createCustomer(customer);
+        } catch (CustomerExistException_Exception ex) {
+            System.out.println("Customer already exists!\n");
+        } catch (InputDataValidationException_Exception ex) {
+            System.out.println(ex.getMessage() + "\n");
+        }
 
-        System.out.println("\nNew " + customer.toString() + " created\n");
-        return customer;
+        System.out.println("\nNew " + currentCustomer.toString() + " created\n");
+        return currentCustomer;
     }
 
-    private CreditCard doSaveCreditCard() {
+    private CreditCard doReadCreditCard() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\nPlease enter credit card details");
         CreditCard creditCard = new CreditCard();
@@ -341,7 +339,7 @@ public class MainApp {
 
             System.out.print("Enter expiry date in the format YYYY-MM> ");
             String expiry = scanner.nextLine().trim() + "-01";
-            try {
+            /*try {
                 return partnerWebServicePort.createCreditCard(creditCard, currentCustomer.getCustomerId(), expiry);
 
             } catch (DateTimeParseException ex) {
@@ -350,7 +348,8 @@ public class MainApp {
                 System.out.println("Credit card already exists!");
             } catch (InputDataValidationException_Exception ex) {
                 System.out.println(ex);
-            }
+            }*/
+            return creditCard;
         }
     }
 

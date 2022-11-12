@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Employee;
+import entity.Outlet;
 import entity.Reservation;
 import entity.TransitDriverDispatch;
 import exception.UpdateDispatchRecordFailException;
@@ -38,6 +39,8 @@ public class TransitDriverDispatchSessionBean implements TransitDriverDispatchSe
         // set bi assoc
         newDispatchRecord.setReservation(reservation);
         reservation.setTransitDriverDispatch(newDispatchRecord);
+        Outlet destOutlet = newDispatchRecord.getDestinationOutlet();
+        destOutlet.getInboundTransitDriverDispatchList().add(newDispatchRecord);
 
         em.flush();
     }

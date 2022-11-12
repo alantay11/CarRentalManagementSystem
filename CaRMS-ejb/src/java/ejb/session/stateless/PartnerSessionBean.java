@@ -30,7 +30,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         return partner;
     }
 
-        @Override
+    @Override
     public Partner partnerLogin(String username, String password) throws InvalidLoginCredentialException {
 
         Partner partner = retrievePartnerByUsername(username);
@@ -53,7 +53,6 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         return partner;
     }
 
-    
     @Override
     public Partner retrievePartner(long partnerId) {
         Partner partner = em.find(Partner.class, partnerId);

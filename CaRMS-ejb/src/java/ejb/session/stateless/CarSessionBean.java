@@ -111,6 +111,18 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         return car;
     }
 
+    @Override
+    public Car retrieveCarByLicensePlate(String plateNum) throws InvalidIdException {
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.licensePlateNum = :plateNum");
+        query.setParameter("plateNum", plateNum);
+
+        if (query.getResultList().isEmpty()) {
+            throw new InvalidIdException();
+        }
+
+        return (Car) query.getResultList().get(0);
+    }
+
     // usecase #21
     @Override
     public Car updateCar(Car car) throws InputDataValidationException {
@@ -154,6 +166,31 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             em.merge(car);
 
             return false;
+        }
+    }
+
+    @Override
+    public boolean deleteCarByLicensePlate(String plateNum) throws InvalidIdException {
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.licensePlateNum = :plateNum");
+        query.setParameter("plateNum", plateNum);
+
+        if (query.getResultList().isEmpty()) {
+            throw new InvalidIdException();
+        } else {
+            Car car = (Car) query.getResultList().get(0);
+            // removing connection from carmodel to car
+            car.getModel().getCarList().remove(car);
+
+            // removing connextion from car category to car
+            car.getModel().getCarCategory().getCarList().remove(car);
+            if (!car.getCarStatus().equals(CarStatusEnum.RESERVED)) { // might need to fix this check
+                em.remove(car);
+                return true;
+            } else {
+                car.setEnabled(false);
+                em.merge(car);
+                return false;
+            }
         }
     }
 
@@ -268,10 +305,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         query.setParameter("categoryId", categoryId);
         int totalAvailableCars = query.getResultList().size();
 
-        Query reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE c.model.carCategory.carCategoryId = :categoryId AND r.cancelled = false"); // all reservations that are for the same category
+        Query reservationQuery = em.createQuery("SELECT r FROM Reservation r WHERE r.carCategory.carCategoryId = :categoryId AND r.cancelled = false"); // all reservations that are for the same category
         reservationQuery.setParameter("categoryId", categoryId);
 
-        List<Reservation> reservations = query.getResultList();
+        List<Reservation> reservations = reservationQuery.getResultList();
         int clashingReservations = 0;
 
         for (Reservation reservation : reservations) {

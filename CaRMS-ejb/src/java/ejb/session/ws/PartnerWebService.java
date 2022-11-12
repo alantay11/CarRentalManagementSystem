@@ -42,6 +42,7 @@ import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -90,17 +91,20 @@ public class PartnerWebService {
     @WebMethod(operationName = "partnerLogin")
     public Partner partnerLogin(@WebParam(name = "username") String username,
             @WebParam(name = "password") String password) throws InvalidLoginCredentialException {
-        Partner partner = partnerSessionBeanLocal.partnerLogin(username, password);
+        Partner partner;
+        try {
+            partner = partnerSessionBeanLocal.partnerLogin(username, password);
+            em.detach(partner);
+            for (Customer c : partner.getCustomerList()) {
+                em.detach(c);
+                c.setPartner(null);
+                System.out.println("********** PartnerWebService.partnerLogin");
 
-        em.detach(partner);
-        for (Customer c : partner.getCustomerList()) {
-            em.detach(c);
-            c.setPartner(null);
+                //partner.setCustomerList(null); don't need?
+            }
+        } catch (InvalidLoginCredentialException ex) {
+            throw ex;
         }
-
-        System.out.println("********** PartnerWebService.partnerLogin");
-
-        //partner.setCustomerList(null); don't need?
         return partner;
     }
 
@@ -189,11 +193,22 @@ public class PartnerWebService {
         Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
 
         if (constraintViolations.isEmpty()) {
-            em.persist(customer);
-            customer.getPartner().getCustomerList().add(customer);
+            try {
+                em.persist(customer);
+                customer.getPartner().getCustomerList().add(customer);
 
-            em.flush();
-            return customer;
+                em.flush();
+                em.detach(customer);
+                customer.setPartner(null);
+                List<Reservation> reservations = customer.getReservationList();
+                for (Reservation r : reservations) {
+                    r.setCustomer(null);
+                }
+                
+                return customer;
+            } catch (PersistenceException ex) {
+                throw new CustomerExistException();
+            }
         } else {
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessageForCustomer(constraintViolations));
         }

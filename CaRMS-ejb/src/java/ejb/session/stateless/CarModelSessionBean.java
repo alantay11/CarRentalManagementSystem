@@ -89,16 +89,14 @@ public class CarModelSessionBean implements CarModelSessionBeanRemote, CarModelS
 
     // usecase #17
     @Override
-    public CarModel retrieveCarModel(long carModelId
-    ) {
+    public CarModel retrieveCarModel(long carModelId) {
         CarModel carModel = em.find(CarModel.class, carModelId);
         carModel.getCarList().size();
         return carModel;
     }
 
     @Override
-    public boolean deleteCarModel(long carModelId
-    ) {
+    public boolean deleteCarModel(long carModelId) {
         CarModel carModel = retrieveCarModel(carModelId);
 
         if (carModel.getCarList().isEmpty()) {

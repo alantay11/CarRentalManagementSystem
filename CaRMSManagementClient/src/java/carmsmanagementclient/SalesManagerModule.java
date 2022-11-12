@@ -174,8 +174,8 @@ public class SalesManagerModule {
             System.out.println(r.toString());
         }
         System.out.println("-----------------------------------\n");
-        System.out.print("Press enter to continue>");
-        scanner.nextLine();
+        //System.out.print("Press enter to continue>");
+        //scanner.nextLine();
     }
 
     private List<RentalRate> getAllRentalRates() {

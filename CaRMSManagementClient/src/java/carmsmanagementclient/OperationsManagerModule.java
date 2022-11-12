@@ -148,11 +148,9 @@ public class OperationsManagerModule {
             // retrieve car category first
             List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
 
-            int counter = 1;
             System.out.println("\n-----------------------------------");
             for (CarCategory c : carCategoryList) {
-                System.out.println(counter + ": " + c.toString());
-                counter++;
+                System.out.println(c.toString());
             }
             System.out.println("-----------------------------------\n");
             System.out.print("Enter ID of car category> ");
@@ -246,11 +244,9 @@ public class OperationsManagerModule {
                         carModel.setModel(scanner.nextLine().trim());
                     } else if (response == 3) {
                         List<CarCategory> carCategoryList = carCategorySessionBeanRemote.retrieveAllCarCategories();
-                        int counter = 1;
                         System.out.println("\n-----------------------------------");
                         for (CarCategory c : carCategoryList) {
-                            System.out.println(counter + ": " + c.toString());
-                            counter++;
+                            System.out.println(c.toString());
                         }
                         System.out.println("-----------------------------------\n");
                         System.out.print("Enter ID of car category> ");
@@ -331,11 +327,9 @@ public class OperationsManagerModule {
         // create car for particular make and model 
         List<CarModel> carModelList = carModelSessionBeanRemote.retrieveAllCarModels();
 
-        int counter = 1;
         System.out.println("\n-----------------------------------");
         for (CarModel cm : carModelList) {
-            System.out.println(counter + ": " + cm.toString());
-            counter++;
+            System.out.println(cm.toString());
         }
         System.out.println("-----------------------------------\n");
         System.out.print("Enter ID of car model> ");
@@ -362,11 +356,9 @@ public class OperationsManagerModule {
         }
 
         List<Outlet> outletList = outletSessionBeanRemote.retrieveAllOutlets();
-        counter = 1;
         System.out.println("\n-----------------------------------");
         for (Outlet o : outletList) {
-            System.out.println(counter + ": " + o.toString());
-            counter++;
+            System.out.println(o.toString());
         }
         System.out.println("-----------------------------------\n");
         System.out.print("Enter ID of outlet> ");
@@ -403,7 +395,7 @@ public class OperationsManagerModule {
         System.out.println("\n-----------------------------------");
         for (Car c : carList) {
             if (c.isEnabled()) {
-                System.out.println(c.toString());
+                System.out.println("Car ID: " + c.getCarId() + ", License Plate No: " + c.getLicensePlateNum() + ", " + c.getModel().getMake() + ", " + c.getModel().getModel());
             }
         }
         System.out.println("-----------------------------------\n");
@@ -418,16 +410,14 @@ public class OperationsManagerModule {
 
         System.out.println("\n-----------------------------------");
         for (Car c : carList) {
-            System.out.println("ID: " + c.getCarId() + ", Car Model: " + c.getModel());
+            System.out.println("ID: " + c.getCarId() + ", License Plate No: " + c.getLicensePlateNum() + ", Car Model: " + c.getModel().getMake() + " , Model: " + c.getModel().getModel());
         }
         System.out.println("-----------------------------------\n");
 
-        System.out.print("Enter ID of car you want to view> ");
-        long carId = scanner.nextLong();
-        scanner.nextLine();
-        Car car;
+        System.out.print("Enter license plate number of the car you want to view> ");
+        String plateNum = scanner.nextLine().trim();
         try {
-            car = carSessionBeanRemote.retrieveCar(carId);
+            Car car = carSessionBeanRemote.retrieveCarByLicensePlate(plateNum);
             System.out.println("\n" + car.toString() + "\n");
             System.out.print("Press enter to continue>");
             scanner.nextLine();
@@ -443,12 +433,17 @@ public class OperationsManagerModule {
         Scanner scanner = new Scanner(System.in);
         Integer response;
 
-        doViewAllCars();
-        System.out.print("Enter ID of car you want to update> ");
-        long carId = scanner.nextLong();
-        Car car;
+        List<Car> carList = getAllCars();
+        System.out.println("\n-----------------------------------");
+        for (Car c : carList) {
+            System.out.println("ID: " + c.getCarId() + ", License Plate No: " + c.getLicensePlateNum() + ", Car Model: " + c.getModel().getMake() + " , Model: " + c.getModel().getModel());
+        }
+        System.out.println("-----------------------------------\n");
+
+        System.out.print("Enter license plate number of the car you want to view> ");
+        String plateNum = scanner.nextLine().trim();
         try {
-            car = carSessionBeanRemote.retrieveCar(carId);
+            Car car = carSessionBeanRemote.retrieveCarByLicensePlate(plateNum);
 
             // attributes: license plate number, colour, status 
             // (in outlet or on rental) and location (specific customer or outlet).
@@ -537,16 +532,21 @@ public class OperationsManagerModule {
         System.out.println("*** CaRMSMC System :: Operations Manager :: Delete Car ***\n");
         Scanner scanner = new Scanner(System.in);
 
-        doViewAllCars();
-        System.out.print("Enter ID of car you want to delete> ");
-        long carId = scanner.nextLong();
+        List<Car> carList = getAllCars();
+        System.out.println("\n-----------------------------------");
+        for (Car c : carList) {
+            System.out.println("ID: " + c.getCarId() + ", License Plate No: " + c.getLicensePlateNum() + ", Car Model: " + c.getModel().getMake() + ", " + c.getModel().getModel());
+        }
+        System.out.println("-----------------------------------\n");
+
+        System.out.print("Enter license plate number of the car you want to delete> ");
+        String plateNum = scanner.nextLine().trim();
         try {
-            Car car = carSessionBeanRemote.retrieveCar(carId);
-            scanner.nextLine();
+            Car car = carSessionBeanRemote.retrieveCarByLicensePlate(plateNum);
             System.out.print("\nConfirm deletion of " + car.toString() + "? (Y/N)> ");
             String confirmation = scanner.nextLine().trim().toLowerCase();
             if (confirmation.equals("y")) {
-                boolean deleted = carSessionBeanRemote.deleteCar(carId);
+                boolean deleted = carSessionBeanRemote.deleteCarByLicensePlate(plateNum);
                 if (deleted) {
                     System.out.println("\n" + car.toString() + " deleted\n");
                 } else {
@@ -592,23 +592,23 @@ public class OperationsManagerModule {
             System.out.println(e.toString());
         }
         System.out.println("-----------------------------------\n");
-        
+
         System.out.print("Enter employee ID of transit driver> ");
         long employeeId = scanner.nextLong();
         scanner.nextLine();
-        
+
         viewDispatchHelperForAssign(outletName);
-        
+
         System.out.print("Enter dispatch ID to assign to> ");
         long dispatchId = scanner.nextLong();
         scanner.nextLine();
-        
+
         TransitDriverDispatch transitDriverDispatch = transitDriverDispatchSessionBeanRemote.assignTransitDriver(employeeId, dispatchId);
-        
+
         System.out.println(transitDriverDispatch.toString() + " assigned to " + employeeSessionBeanRemote.retrieveEmployee(employeeId));
     }
-    
-    private void viewDispatchHelperForAssign(String outletName) {        
+
+    private void viewDispatchHelperForAssign(String outletName) {
         List<TransitDriverDispatch> dispatches = transitDriverDispatchSessionBeanRemote.retrieveCurrentDayDispatches(outletName);
 
         System.out.println("\n-----------------------------------");
@@ -626,7 +626,7 @@ public class OperationsManagerModule {
         }
         System.out.println("-----------------------------------\n");
     }
-    
+
     private void doUpdateTransitAsCompleted() {
         System.out.println("*** CaRMSMC System :: Operations Manager :: Update Transit as Completed ***\n");
         Scanner scanner = new Scanner(System.in);
@@ -634,15 +634,15 @@ public class OperationsManagerModule {
         viewAllOutlets();
         System.out.print("Enter name/address of outlet> ");
         String outletName = scanner.nextLine().trim();
-        
+
         viewDispatchHelperForAssign(outletName);
-        
+
         System.out.print("Enter dispatch ID update as completed> ");
         long dispatchId = scanner.nextLong();
         scanner.nextLine();
-        
+
         TransitDriverDispatch transitDriverDispatch = transitDriverDispatchSessionBeanRemote.updateAsCompleted(dispatchId);
-        
+
         System.out.println(transitDriverDispatch.toString() + " completed");
     }
 

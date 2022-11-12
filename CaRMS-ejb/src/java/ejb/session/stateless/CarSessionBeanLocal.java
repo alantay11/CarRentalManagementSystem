@@ -39,4 +39,8 @@ public interface CarSessionBeanLocal {
 
     public List<Car> retrieveAllCarsByCategory(Long carCategoryId);
 
+    Car retrieveCarByLicensePlate(String plateNum) throws InvalidIdException;
+
+    boolean deleteCarByLicensePlate(String plateNum) throws InvalidIdException;
+
 }
