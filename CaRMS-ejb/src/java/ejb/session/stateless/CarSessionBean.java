@@ -145,7 +145,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         carModel.setCarList(carList);
         em.merge(carCategory);
 
-        if (car.getCarStatus().equals(CarStatusEnum.AVAILABLE)) { // might need to fix this check
+        if (!car.getCarStatus().equals(CarStatusEnum.RESERVED)) { // might need to fix this check
             em.remove(car);
 
             return true;

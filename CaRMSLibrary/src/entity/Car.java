@@ -172,7 +172,8 @@ public class Car implements Serializable {
 
     @Override
     public String toString() {
-        return "Car with id " + this.carId + ", license plate number " + this.licensePlateNum + ", color " + this.color;
+        return "Car with id " + this.carId + ", license plate number " + this.licensePlateNum + ", color " + this.color
+                + "\n Make/Model " + this.model + " at " + this.currentOutlet;
     }
 
 }

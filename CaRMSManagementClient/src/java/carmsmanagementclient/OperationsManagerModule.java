@@ -11,10 +11,12 @@ import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.TransitDriverDispatchSessionBeanRemote;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.Outlet;
+import entity.TransitDriverDispatch;
 import enumeration.CarStatusEnum;
 import exception.CarExistException;
 import exception.CarModelExistException;
@@ -43,23 +45,24 @@ public class OperationsManagerModule {
     private CarModelSessionBeanRemote carModelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
+    private TransitDriverDispatchSessionBeanRemote transitDriverDispatchSessionBeanRemote;
 
     public OperationsManagerModule() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote,
-            RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
-            CarCategorySessionBeanRemote carCategorySessionBeanRemote,
-            CarModelSessionBeanRemote carModelSessionBeanRemote,
-            CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
+    public OperationsManagerModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
+            CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarModelSessionBeanRemote carModelSessionBeanRemote,
+            CarSessionBeanRemote carSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote,
+            TransitDriverDispatchSessionBeanRemote transitDriverDispatchSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.transitDriverDispatchSessionBeanRemote = transitDriverDispatchSessionBeanRemote;
 
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
@@ -75,11 +78,13 @@ public class OperationsManagerModule {
             System.out.println("2: View All Models");
             System.out.println("3: Update Model");
             System.out.println("4: Delete Model");
+            System.out.println("-----------------------------------");
             System.out.println("5: Create New Car");
             System.out.println("6: View All Cars");
             System.out.println("7: View Car Details");
             System.out.println("8: Update Car");
             System.out.println("9: Delete Car");
+            System.out.println("-----------------------------------");
             System.out.println("10: View Transit Driver Dispatch Records for Current Day Reservations");
             System.out.println("11: Assign Transit Driver");
             System.out.println("12: Update Transit As Completed");
@@ -111,7 +116,7 @@ public class OperationsManagerModule {
                 } else if (response == 9) {
                     doDeleteCar();
                 } else if (response == 10) {
-                    // doViewCurrentDayTransitDriverDispatchRecords();
+                    doViewCurrentDayTransitDriverDispatchRecords();
                 } else if (response == 11) {
                     // doAssignTransitDriver();
                 } else if (response == 12) {
@@ -365,7 +370,7 @@ public class OperationsManagerModule {
         System.out.println("-----------------------------------\n");
         System.out.print("Enter ID of outlet> ");
         long outletId = scanner.nextLong();
-        car.setModel(carModelSessionBeanRemote.retrieveCarModel(carModelId));
+        car.setCurrentOutlet(outletSessionBeanRemote.retrieveOutlet(outletId));
         scanner.nextLine();
 
         Set<ConstraintViolation<Car>> constraintViolations = validator.validate(car);
@@ -396,7 +401,9 @@ public class OperationsManagerModule {
         List<Car> carList = getAllCars();
         System.out.println("\n-----------------------------------");
         for (Car c : carList) {
-            System.out.println(c.toString());
+            if (c.isEnabled()) {
+                System.out.println(c.toString());
+            }
         }
         System.out.println("-----------------------------------\n");
         System.out.print("Press enter to continue>");
@@ -467,10 +474,10 @@ public class OperationsManagerModule {
 
                     try {
                         if (response == 1) {
-                            System.out.println("Enter Car License Plate Number> ");
+                            System.out.print("Enter Car License Plate Number> ");
                             car.setLicensePlateNum(scanner.nextLine().trim());
                         } else if (response == 2) {
-                            System.out.println("Enter Car Color> ");
+                            System.out.print("Enter Car Color> ");
                             car.setColor(scanner.nextLine().trim());
                         } else if (response == 3) {
                             System.out.print("Enter status (Available/Repair)> ");
@@ -481,7 +488,7 @@ public class OperationsManagerModule {
                                 car.setCarStatus(CarStatusEnum.REPAIR);
                             }
                         } else if (response == 4) {
-                            System.out.println("Enter Car Location> ");
+                            System.out.print("Enter Car Location> ");
                             // fill in here
 
                         } else if (response == 5) {
@@ -550,6 +557,17 @@ public class OperationsManagerModule {
         } catch (InvalidIdException ex) {
             System.out.println("You have entered an invalid ID!\n");
         }
+    }
+    
+    private void doViewCurrentDayTransitDriverDispatchRecords() {
+        List<TransitDriverDispatch> dispatches = transitDriverDispatchSessionBeanRemote.retrieveCurrentDayDispatches();
+        
+        System.out.println("\n-----------------------------------");
+        for (TransitDriverDispatch t : dispatches) {
+            System.out.println(t.toString());
+        }
+        System.out.println("-----------------------------------\n");
+        
     }
 
     // car

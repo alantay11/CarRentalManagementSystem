@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Reservation;
 import entity.TransitDriverDispatch;
 import exception.UpdateDispatchRecordFailException;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -24,5 +25,7 @@ public interface TransitDriverDispatchSessionBeanRemote {
     public void updateDispatchRecordCompleted(Long transitDriverDispatchId) throws UpdateDispatchRecordFailException;
 
     public void deleteDispatchRecord(Long transitDriverDispatchId);
+
+    List<TransitDriverDispatch> retrieveCurrentDayDispatches();
     
 }

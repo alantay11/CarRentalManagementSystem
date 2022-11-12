@@ -122,7 +122,7 @@ public class CarModel implements Serializable {
 
     @Override
     public String toString() {
-        return "CarModel with id " + carModelId + ", make " + this.make + ", model " + this.model + " for category " + this.carCategory + " with cars " + this.carList;
+        return "CarModel with id " + carModelId + ", make " + this.make + ", model " + this.model + " of " + this.carCategory;// + " with cars " + this.carList;
     }
 
     public CarCategory getCarCategory() {

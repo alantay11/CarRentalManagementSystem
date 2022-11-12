@@ -8,9 +8,12 @@ package ejb.session.stateless;
 import entity.Reservation;
 import entity.TransitDriverDispatch;
 import exception.UpdateDispatchRecordFailException;
+import java.time.LocalDateTime;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -58,11 +61,24 @@ public class TransitDriverDispatchSessionBean implements TransitDriverDispatchSe
         
         em.flush();
     }
+    
+    
 
     // d
     @Override
     public void deleteDispatchRecord(Long transitDriverDispatchId) {
         
+    }
+
+    @Override
+    public List<TransitDriverDispatch> retrieveCurrentDayDispatches() {
+        Query query = em.createQuery("SELECT t FROM TransitDriverDispatch t WHERE t.pickupTime >= today AND t.dropoffTime <= tomorrow");
+        LocalDateTime today = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+        LocalDateTime tomorrow = today.plusDays(1);
+        query.setParameter("today", today).setParameter("tomorrow", tomorrow);
+        List<TransitDriverDispatch> dispatches = query.getResultList();
+        
+        return (List<TransitDriverDispatch>) dispatches;
     }
 
 }

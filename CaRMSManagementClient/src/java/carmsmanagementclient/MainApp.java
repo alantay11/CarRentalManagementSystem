@@ -12,6 +12,7 @@ import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.TransitDriverDispatchSessionBeanRemote;
 import entity.Employee;
 import enumeration.EmployeeAccessRightEnum;
 import exception.InvalidLoginCredentialException;
@@ -31,6 +32,7 @@ public class MainApp {
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
+    private TransitDriverDispatchSessionBeanRemote transitDriverDispatchSessionBeanRemote;
 
     private SalesManagerModule salesManagerModule;
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
@@ -41,8 +43,8 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, 
-            OutletSessionBeanRemote outletSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote) {
+    public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote,
+            OutletSessionBeanRemote outletSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, TransitDriverDispatchSessionBeanRemote transitDriverDispatchSessionBeanRemote) {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
@@ -50,6 +52,7 @@ public class MainApp {
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
+        this.transitDriverDispatchSessionBeanRemote = transitDriverDispatchSessionBeanRemote;
     }
 
     public void runApp() {
@@ -77,7 +80,7 @@ public class MainApp {
                                 salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                                 salesManagerModule.salesManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.OPERATIONSMANAGER)) {
-                                operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote);
+                                operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote, transitDriverDispatchSessionBeanRemote);
                                 operationsManagerModule.operationsManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
                                 customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote);
@@ -157,7 +160,7 @@ public class MainApp {
                         salesManagerModule = new SalesManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
                         salesManagerModule.salesManagerMenu();
                     } else if (response == 6) {
-                        operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote);
+                        operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote, transitDriverDispatchSessionBeanRemote);
                         operationsManagerModule.operationsManagerMenu();
                     } else if (response == 7) {
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote);

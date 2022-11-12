@@ -50,11 +50,10 @@ public class TransitDriverDispatch implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet destinationOutlet;
-   
+
     @OneToOne
     @JoinColumn(nullable = false)
     private Reservation reservation;
-    
 
     public TransitDriverDispatch() {
     }
@@ -154,7 +153,9 @@ public class TransitDriverDispatch implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.TransitDriverDispatch[ id=" + transitDriverDispatchId + " ]";
+        return "TransitDriverDispatch id=" + transitDriverDispatchId + " for car " + this.car + " from " + this.departureOutlet.getAddress() + " at " + this.pickupTime
+                + " to " + this.destinationOutlet.getAddress() + " at " + this.dropoffTime + " by " + this.employee.getFirstName() + " " + this.employee.getLastName() + 
+                "\nfor " + this.reservation;
     }
 
 }
