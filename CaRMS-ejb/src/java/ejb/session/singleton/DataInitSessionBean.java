@@ -79,7 +79,7 @@ public class DataInitSessionBean {
 
         Outlet outletC = new Outlet();
         outletC.setAddress("Outlet C");
-        outletC.setOpeningTime(LocalTime.parse("08:00:01"));
+        outletC.setOpeningTime(LocalTime.parse("07:59:59"));
         outletC.setClosingTime(LocalTime.parse("22:00"));
 
         if (em.find(Outlet.class, 1l) == null) {
