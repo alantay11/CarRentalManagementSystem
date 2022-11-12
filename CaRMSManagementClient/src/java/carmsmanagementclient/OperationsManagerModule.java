@@ -121,7 +121,7 @@ public class OperationsManagerModule {
                 } else if (response == 11) {
                     doAssignTransitDriver();
                 } else if (response == 12) {
-                    // doUpdateTransitDriverDispatchRecord();
+                    doUpdateTransitAsCompleted();
                 } else if (response == 13) {
                     break;
                 } else {
@@ -605,7 +605,7 @@ public class OperationsManagerModule {
         
         TransitDriverDispatch transitDriverDispatch = transitDriverDispatchSessionBeanRemote.assignTransitDriver(employeeId, dispatchId);
         
-        System.out.print(transitDriverDispatch.toString() + " assigned to " + employeeSessionBeanRemote.retrieveEmployee(employeeId));
+        System.out.println(transitDriverDispatch.toString() + " assigned to " + employeeSessionBeanRemote.retrieveEmployee(employeeId));
     }
     
     private void viewDispatchHelperForAssign(String outletName) {        
@@ -625,6 +625,25 @@ public class OperationsManagerModule {
             System.out.println(o.toString());
         }
         System.out.println("-----------------------------------\n");
+    }
+    
+    private void doUpdateTransitAsCompleted() {
+        System.out.println("*** CaRMSMC System :: Operations Manager :: Update Transit as Completed ***\n");
+        Scanner scanner = new Scanner(System.in);
+
+        viewAllOutlets();
+        System.out.print("Enter name/address of outlet> ");
+        String outletName = scanner.nextLine().trim();
+        
+        viewDispatchHelperForAssign(outletName);
+        
+        System.out.print("Enter dispatch ID update as completed> ");
+        long dispatchId = scanner.nextLong();
+        scanner.nextLine();
+        
+        TransitDriverDispatch transitDriverDispatch = transitDriverDispatchSessionBeanRemote.updateAsCompleted(dispatchId);
+        
+        System.out.println(transitDriverDispatch.toString() + " completed");
     }
 
     // car

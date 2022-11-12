@@ -27,5 +27,7 @@ public interface TransitDriverDispatchSessionBeanLocal {
     public void deleteDispatchRecord(Long transitDriverDispatchId);   
 
     List<TransitDriverDispatch> retrieveCurrentDayDispatches(String ddressName);
+
+    TransitDriverDispatch updateAsCompleted(long dispatch);
     
 }

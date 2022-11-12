@@ -96,4 +96,15 @@ public class TransitDriverDispatchSessionBean implements TransitDriverDispatchSe
         return transitDriverDispatch;
     }
 
+    @Override
+    public TransitDriverDispatch updateAsCompleted(long dispatchId) {
+        TransitDriverDispatch transitDriverDispatch = retrieveDispatchRecordById(dispatchId);
+        Employee employee = transitDriverDispatch.getEmployee();
+
+        transitDriverDispatch.setEmployee(null);
+        employee.setTransitDriverDispatchRecord(null);
+
+        return transitDriverDispatch;
+    }
+
 }

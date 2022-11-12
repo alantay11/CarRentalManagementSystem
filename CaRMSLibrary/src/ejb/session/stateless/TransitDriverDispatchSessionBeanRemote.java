@@ -29,5 +29,7 @@ public interface TransitDriverDispatchSessionBeanRemote {
     List<TransitDriverDispatch> retrieveCurrentDayDispatches(String addressName);
 
     TransitDriverDispatch assignTransitDriver(long employeeId, long dispatchId);
+
+    TransitDriverDispatch updateAsCompleted(long dispatchId);
     
 }
