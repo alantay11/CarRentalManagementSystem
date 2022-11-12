@@ -15,6 +15,7 @@ import ejb.session.stateless.TransitDriverDispatchSessionBeanRemote;
 import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
+import entity.Employee;
 import entity.Outlet;
 import entity.TransitDriverDispatch;
 import enumeration.CarStatusEnum;
@@ -118,7 +119,7 @@ public class OperationsManagerModule {
                 } else if (response == 10) {
                     doViewCurrentDayTransitDriverDispatchRecords();
                 } else if (response == 11) {
-                    // doAssignTransitDriver();
+                    doAssignTransitDriver();
                 } else if (response == 12) {
                     // doUpdateTransitDriverDispatchRecord();
                 } else if (response == 13) {
@@ -558,16 +559,72 @@ public class OperationsManagerModule {
             System.out.println("You have entered an invalid ID!\n");
         }
     }
-    
+
     private void doViewCurrentDayTransitDriverDispatchRecords() {
-        List<TransitDriverDispatch> dispatches = transitDriverDispatchSessionBeanRemote.retrieveCurrentDayDispatches();
-        
+        System.out.println("*** CaRMSMC System :: Operations Manager :: View Current Day Transit Driver Dispatch Records ***\n");
+        Scanner scanner = new Scanner(System.in);
+
+        viewAllOutlets();
+        System.out.print("Enter name/address of outlet> ");
+        String outletName = scanner.nextLine().trim();
+
+        List<TransitDriverDispatch> dispatches = transitDriverDispatchSessionBeanRemote.retrieveCurrentDayDispatches(outletName);
+
         System.out.println("\n-----------------------------------");
         for (TransitDriverDispatch t : dispatches) {
             System.out.println(t.toString());
         }
         System.out.println("-----------------------------------\n");
+
+    }
+
+    private void doAssignTransitDriver() {
+        System.out.println("*** CaRMSMC System :: Operations Manager :: Do Assign Transit Driver ***\n");
+        Scanner scanner = new Scanner(System.in);
+
+        viewAllOutlets();
+        System.out.print("Enter name/address of outlet> ");
+        String outletName = scanner.nextLine().trim();
+
+        List<Employee> employees = employeeSessionBeanRemote.retrieveEmployeesOfOutlet(outletName);
+        System.out.println("\n-----------------------------------");
+        for (Employee e : employees) {
+            System.out.println(e.toString());
+        }
+        System.out.println("-----------------------------------\n");
         
+        System.out.print("Enter employee ID of transit driver> ");
+        long employeeId = scanner.nextLong();
+        scanner.nextLine();
+        
+        viewDispatchHelperForAssign(outletName);
+        
+        System.out.print("Enter dispatch ID to assign to> ");
+        long dispatchId = scanner.nextLong();
+        scanner.nextLine();
+        
+        TransitDriverDispatch transitDriverDispatch = transitDriverDispatchSessionBeanRemote.assignTransitDriver(employeeId, dispatchId);
+        
+        System.out.print(transitDriverDispatch.toString() + " assigned to " + employeeSessionBeanRemote.retrieveEmployee(employeeId));
+    }
+    
+    private void viewDispatchHelperForAssign(String outletName) {        
+        List<TransitDriverDispatch> dispatches = transitDriverDispatchSessionBeanRemote.retrieveCurrentDayDispatches(outletName);
+
+        System.out.println("\n-----------------------------------");
+        for (TransitDriverDispatch t : dispatches) {
+            System.out.println(t.toString());
+        }
+        System.out.println("-----------------------------------\n");
+    }
+
+    private void viewAllOutlets() {
+        List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
+        System.out.println("\n-----------------------------------");
+        for (Outlet o : outlets) {
+            System.out.println(o.toString());
+        }
+        System.out.println("-----------------------------------\n");
     }
 
     // car

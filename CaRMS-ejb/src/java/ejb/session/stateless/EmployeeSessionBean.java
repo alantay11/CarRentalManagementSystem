@@ -9,6 +9,7 @@ import entity.Employee;
 import entity.Outlet;
 import exception.InvalidLoginCredentialException;
 import exception.EmployeeNotFoundException;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -66,5 +67,20 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         em.flush();
         return employee;
     }
+
+    @Override
+    public List<Employee> retrieveEmployeesOfOutlet(String outletName) {
+        Outlet outlet = outletSessionBeanLocal.retrieveOutletByName(outletName);
+        return outlet.getEmployeeList();
+    }
+
+    @Override
+    public Employee retrieveEmployee(long employeeId) {
+        return em.find(Employee.class, employeeId);
+    }
+    
+    
+    
+    
 
 }

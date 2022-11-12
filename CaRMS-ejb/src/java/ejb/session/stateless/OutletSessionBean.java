@@ -50,6 +50,21 @@ public class OutletSessionBean implements OutletSessionBeanLocal, OutletSessionB
         }
         return outlets;
     }
+
+    @Override
+    public Outlet retrieveOutletByName(String outletName) {
+       Query query = em.createQuery("SELECT o FROM Outlet o WHERE o.address = :outletName");
+       query.setParameter("outletName", outletName);
+
+        List<Outlet> outlets = query.getResultList();
+
+        for (Outlet o : outlets) {
+            o.getCarList().size();
+            o.getEmployeeList().size();
+            o.getInboundTransitDriverDispatchList().size();
+        }
+        return outlets.get(0);
+    }
     
     
     

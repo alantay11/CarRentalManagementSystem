@@ -21,4 +21,6 @@ public interface OutletSessionBeanRemote {
     public Outlet retrieveOutlet(long outletId);
 
     List<Outlet> retrieveAllOutlets();
+
+    Outlet retrieveOutletByName(String outletName);
 }

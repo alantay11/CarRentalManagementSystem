@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import exception.EmployeeNotFoundException;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -19,5 +20,9 @@ public interface EmployeeSessionBeanLocal {
     Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException;
 
     Employee createEmployee(Employee employee, long outletId);
+
+    List<Employee> retrieveEmployeesOfOutlet(String outletName);
+
+    Employee retrieveEmployee(long employeeId);
     
 }

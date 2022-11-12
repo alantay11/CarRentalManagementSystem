@@ -26,6 +26,8 @@ public interface TransitDriverDispatchSessionBeanRemote {
 
     public void deleteDispatchRecord(Long transitDriverDispatchId);
 
-    List<TransitDriverDispatch> retrieveCurrentDayDispatches();
+    List<TransitDriverDispatch> retrieveCurrentDayDispatches(String addressName);
+
+    TransitDriverDispatch assignTransitDriver(long employeeId, long dispatchId);
     
 }
