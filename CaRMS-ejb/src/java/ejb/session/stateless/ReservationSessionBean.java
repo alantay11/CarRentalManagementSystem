@@ -57,8 +57,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
         if (constraintViolations.isEmpty()) {
             try {
-
                 em.persist(reservation);
+                reservation.getCustomer().getReservationList().add(reservation);
 
                 em.flush();
                 return reservation;

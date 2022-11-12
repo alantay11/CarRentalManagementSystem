@@ -6,7 +6,9 @@
 package ejb.session.stateless;
 
 import entity.Customer;
+import exception.CustomerExistException;
 import exception.CustomerNotFoundException;
+import exception.InputDataValidationException;
 import javax.ejb.Local;
 
 /**
@@ -16,8 +18,10 @@ import javax.ejb.Local;
 @Local
 public interface CustomerSessionBeanLocal {
 
-    Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException ;
+    Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException;
 
     Customer retrieveCustomer(long customerId);
-    
+
+    Customer createCustomer(Customer customer) throws CustomerExistException, InputDataValidationException;
+
 }

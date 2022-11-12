@@ -49,6 +49,15 @@
 <message name="CreditCardExistException">
 <part name="fault" element="tns:CreditCardExistException"/>
 </message>
+<message name="createCustomer">
+<part name="parameters" element="tns:createCustomer"/>
+</message>
+<message name="createCustomerResponse">
+<part name="parameters" element="tns:createCustomerResponse"/>
+</message>
+<message name="CustomerExistException">
+<part name="fault" element="tns:CustomerExistException"/>
+</message>
 <message name="retrieveAllCarCategories">
 <part name="parameters" element="tns:retrieveAllCarCategories"/>
 </message>
@@ -128,6 +137,12 @@
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/createCreditCardResponse" message="tns:createCreditCardResponse"/>
 <fault message="tns:InputDataValidationException" name="InputDataValidationException" wsam:Action="http://ws.session.ejb/PartnerWebService/createCreditCard/Fault/InputDataValidationException"/>
 <fault message="tns:CreditCardExistException" name="CreditCardExistException" wsam:Action="http://ws.session.ejb/PartnerWebService/createCreditCard/Fault/CreditCardExistException"/>
+</operation>
+<operation name="createCustomer">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/createCustomerRequest" message="tns:createCustomer"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/createCustomerResponse" message="tns:createCustomerResponse"/>
+<fault message="tns:InputDataValidationException" name="InputDataValidationException" wsam:Action="http://ws.session.ejb/PartnerWebService/createCustomer/Fault/InputDataValidationException"/>
+<fault message="tns:CustomerExistException" name="CustomerExistException" wsam:Action="http://ws.session.ejb/PartnerWebService/createCustomer/Fault/CustomerExistException"/>
 </operation>
 <operation name="retrieveAllCarCategories">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/retrieveAllCarCategoriesRequest" message="tns:retrieveAllCarCategories"/>
@@ -228,6 +243,21 @@
 </fault>
 <fault name="CreditCardExistException">
 <soap:fault name="CreditCardExistException" use="literal"/>
+</fault>
+</operation>
+<operation name="createCustomer">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="InputDataValidationException">
+<soap:fault name="InputDataValidationException" use="literal"/>
+</fault>
+<fault name="CustomerExistException">
+<soap:fault name="CustomerExistException" use="literal"/>
 </fault>
 </operation>
 <operation name="retrieveAllCarCategories">

@@ -20,6 +20,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Digits;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -36,9 +37,11 @@ public class Reservation implements Serializable {
 
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     @NotNull
+    @Future
     private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     @NotNull
+    @Future
     private LocalDateTime returnTime;
     @Column(nullable = false, columnDefinition = "boolean default false")
     @NotNull

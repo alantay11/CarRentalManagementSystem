@@ -2,6 +2,8 @@
 
 <xs:element name="CreditCardExistException" type="tns:CreditCardExistException"/>
 
+<xs:element name="CustomerExistException" type="tns:CustomerExistException"/>
+
 <xs:element name="InputDataValidationException" type="tns:InputDataValidationException"/>
 
 <xs:element name="InvalidLoginCredentialException" type="tns:InvalidLoginCredentialException"/>
@@ -29,6 +31,10 @@
 <xs:element name="createCreditCard" type="tns:createCreditCard"/>
 
 <xs:element name="createCreditCardResponse" type="tns:createCreditCardResponse"/>
+
+<xs:element name="createCustomer" type="tns:createCustomer"/>
+
+<xs:element name="createCustomerResponse" type="tns:createCustomerResponse"/>
 
 <xs:element name="createReservation" type="tns:createReservation"/>
 
@@ -351,6 +357,30 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="createCustomer">
+<xs:sequence>
+<xs:element name="customer" type="tns:customer" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="createCustomerResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:customer" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="InputDataValidationException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="CustomerExistException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="retrieveReservation">
 <xs:sequence>
 <xs:element name="reservationId" type="xs:long"/>
@@ -376,12 +406,6 @@
 </xs:complexType>
 
 <xs:complexType name="ReservationExistException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="InputDataValidationException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>

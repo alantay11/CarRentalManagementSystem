@@ -16,6 +16,7 @@ import ws.client.partner.CarModel;
 import ws.client.partner.CreditCard;
 import ws.client.partner.CreditCardExistException_Exception;
 import ws.client.partner.Customer;
+import ws.client.partner.CustomerExistException_Exception;
 import ws.client.partner.InputDataValidationException;
 import ws.client.partner.InputDataValidationException_Exception;
 import ws.client.partner.InvalidLoginCredentialException_Exception;
@@ -233,13 +234,16 @@ public class MainApp {
     }
 
     private void doReserveCar() {
-        System.out.println("*** CaRMSRC System :: Customer :: Reserve Car ***\n");
+        System.out.println("*** HRS :: Partner :: Reserve Car ***\n");
         Scanner scanner = new Scanner(System.in);
 
         try {
             Reservation reservation = doSearchCar();
 
             if (reservation != null) {
+                Customer customer = doRegisterCustomer();
+                reservation.setCustomer(customer);
+                
                 CreditCard creditCard = doSaveCreditCard();
                 currentCustomer.setCreditCard(creditCard);
                 BigDecimal paymentAmount = new BigDecimal("0.00");
@@ -278,6 +282,43 @@ public class MainApp {
             System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
         }
     }
+    
+    private Customer doRegisterCustomer() {
+        Scanner scanner = new Scanner(System.in);
+        Customer customer = new Customer();
+
+        System.out.println("*** CaRMSRC System :: Register As Customer ***\n");
+        System.out.print("Enter username> ");
+        customer.setUsername(scanner.nextLine().trim());
+        System.out.print("Enter password> ");
+        customer.setPassword(scanner.nextLine().trim());
+        System.out.print("Enter first name> ");
+        customer.setFirstName(scanner.nextLine().trim());
+        System.out.print("Enter last name> ");
+        customer.setLastName(scanner.nextLine().trim());
+        System.out.print("Enter email> ");
+        customer.setEmail(scanner.nextLine().trim());
+        System.out.print("Enter contact number> ");
+        customer.setContactNumber(scanner.nextLine().trim());
+        System.out.print("Enter address line 1> ");
+        customer.setAddressLine1(scanner.nextLine().trim());
+        System.out.print("Enter address line 2> ");
+        customer.setAddressLine2(scanner.nextLine().trim());
+        System.out.print("Enter postal code> ");
+        customer.setPostalCode(scanner.nextLine().trim());
+        customer.setPartner(currentPartner);
+
+            try {
+                customer = partnerWebServicePort.createCustomer(customer);
+            } catch (CustomerExistException_Exception ex) {
+                System.out.println("Customer already exists!\n");
+            } catch (InputDataValidationException_Exception ex) {
+                System.out.println(ex.getMessage() + "\n");
+            }
+
+        System.out.println("\nNew " + customer.toString() + " created\n");
+        return customer;
+    }
 
     private CreditCard doSaveCreditCard() {
         Scanner scanner = new Scanner(System.in);
@@ -315,7 +356,7 @@ public class MainApp {
 
     private void doCancelReservation() {
         try {
-            System.out.println("*** CaRMSRC System :: Customer :: Cancel Reservation ***\n");
+            System.out.println("*** HRS :: Customer :: Cancel Reservation ***\n");
             Scanner scanner = new Scanner(System.in);
 
             doViewAllMyActiveReservations();
@@ -365,7 +406,7 @@ public class MainApp {
 
     private void doViewReservationDetails() {
         try {
-            System.out.println("*** CaRMSRC System :: Customer :: View Reservation Details ***\n");
+            System.out.println("*** HRS :: Customer :: View Reservation Details ***\n");
             Scanner scanner = new Scanner(System.in);
             List<Reservation> reservations = getAllMyReservations();
             System.out.println("\n-----------------------------------");

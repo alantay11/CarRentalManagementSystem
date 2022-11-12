@@ -9,6 +9,7 @@ import ejb.session.stateless.CarCategorySessionBeanLocal;
 import ejb.session.stateless.CarModelSessionBeanLocal;
 import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.CreditCardSessionBeanLocal;
+import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.RentalRateSessionBeanLocal;
@@ -21,6 +22,7 @@ import entity.Outlet;
 import entity.Partner;
 import entity.Reservation;
 import exception.CreditCardExistException;
+import exception.CustomerExistException;
 import exception.InputDataValidationException;
 import exception.InvalidLoginCredentialException;
 import exception.NoRentalRateAvailableException;
@@ -55,8 +57,9 @@ import javax.validation.ValidatorFactory;
 public class PartnerWebService {
 
     @EJB
+    private CustomerSessionBeanLocal customerSessionBeanLocal;
+    @EJB
     private CreditCardSessionBeanLocal creditCardSessionBeanLocal;
-
     @EJB
     private ReservationSessionBeanLocal reservationSessionBeanLocal;
     @EJB
@@ -181,6 +184,21 @@ public class PartnerWebService {
         }
     }
 
+    @WebMethod(operationName = "createCustomer")
+    public Customer createCustomer(@WebParam(name = "customer") Customer customer) throws InputDataValidationException, CustomerExistException {
+        Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
+
+        if (constraintViolations.isEmpty()) {
+            em.persist(customer);
+            customer.getPartner().getCustomerList().add(customer);
+
+            em.flush();
+            return customer;
+        } else {
+            throw new InputDataValidationException(prepareInputDataValidationErrorsMessageForCustomer(constraintViolations));
+        }
+    }
+
     @WebMethod(operationName = "createCreditCard")
     public CreditCard createCreditCard(@WebParam(name = "creditCard") CreditCard creditCard, @WebParam(name = "customerId") long customerId,
             @WebParam(name = "expiry") String expiry) throws InputDataValidationException, CreditCardExistException {
@@ -206,7 +224,7 @@ public class PartnerWebService {
 
         return reservation;
     }
-    
+
     @WebMethod(operationName = "cancelReservation")
     public void cancelReservation(@WebParam(name = "reservationId") long reservationId, @WebParam(name = "refund") BigDecimal refund) throws ReservationRecordNotFoundException {
         reservationSessionBeanLocal.cancelReservation(reservationId, refund);
@@ -244,6 +262,16 @@ public class PartnerWebService {
     }
 
     private String prepareInputDataValidationErrorsMessageForCreditCard(Set<ConstraintViolation<CreditCard>> constraintViolations) {
+        String msg = "Input data validation error!:";
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+
+        return msg;
+    }
+
+    private String prepareInputDataValidationErrorsMessageForCustomer(Set<ConstraintViolation<Customer>> constraintViolations) {
         String msg = "Input data validation error!:";
 
         for (ConstraintViolation constraintViolation : constraintViolations) {
