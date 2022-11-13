@@ -6,13 +6,11 @@
 package holidayreservationsystemwebclient;
 
 import java.math.BigDecimal;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import ws.client.partner.CarCategory;
 import ws.client.partner.CarModel;
 import ws.client.partner.CreditCard;
-import ws.client.partner.CreditCardExistException_Exception;
 import ws.client.partner.Customer;
 import ws.client.partner.CustomerExistException_Exception;
 import ws.client.partner.InputDataValidationException_Exception;
@@ -188,6 +186,68 @@ public class MainApp {
         returnOutletId = scanner.nextLong();
         scanner.nextLine();
 
+        try {
+            available = partnerWebServicePort.searchCar(pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+        } catch (OutletIsClosedException_Exception ex) {
+            System.out.println("Outlet is closed during your pickup or return times!");
+        }
+
+        if (available) {
+            System.out.println("A car is available for reservation\n");
+        } else {
+            System.out.println("No cars are available for the specified times and outlets\n");
+            reservation = null;
+        }
+
+        return reservation;
+    }
+
+    private Reservation doSearchCarForReservation() {
+        //System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
+        Scanner scanner = new Scanner(System.in);
+        String startDate = "";
+        String startTime = "";
+        String endDate = "";
+        String endTime = "";
+        String pickUpDateTime;
+        String returnDateTime;
+        long pickupOutletId;
+        long returnOutletId;
+        long makeModelId;
+        long categoryId;
+        boolean available = false;
+        Reservation reservation = new Reservation();
+
+        // cannot copy paste, need manual coding
+        System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
+        startDate = scanner.nextLine().trim();
+        System.out.print("Enter pickup time in the format HH:MM> ");
+        startTime = scanner.nextLine().trim();
+        pickUpDateTime = startDate + "T" + startTime;
+        System.out.print("Enter return date in the format YYYY-MM-DD> ");
+        endDate = scanner.nextLine().trim();
+        System.out.print("Enter return time in the format HH:MM> ");
+        endTime = scanner.nextLine().trim();
+        returnDateTime = endDate + "T" + endTime;
+
+        List<Outlet> outlets = partnerWebServicePort.retrieveAllOutlets();
+
+        System.out.println("\nOutlets");
+        System.out.println("-----------------------------------");
+        for (Outlet o : outlets) {
+            System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress());
+            //+ " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
+        }
+        System.out.println("-----------------------------------\n");
+
+        System.out.print("Enter pickup outlet ID> ");
+        pickupOutletId = scanner.nextLong();
+        scanner.nextLine();
+
+        System.out.print("Enter return outlet ID> ");
+        returnOutletId = scanner.nextLong();
+        scanner.nextLine();
+
         System.out.print("Do you want to search by Make and Model? (Y/N)> ");
         String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
         if (searchByMakeModel.equals("y")) {
@@ -196,7 +256,9 @@ public class MainApp {
 
                 System.out.println("-----------------------------------\n");
                 for (CarModel carModel : carModels) {
-                    System.out.println(carModel.toString());
+                    System.out.println("CarModel ID: " + carModel.getCarModelId()
+                            + ", Make/Model: " + carModel.getMake() + ", " + carModel.getModel()
+                            + ", Category: " + carModel.getCarCategory().getCarCategoryName());
                 }
                 System.out.println("-----------------------------------\n");
                 System.out.print("Enter Make and Model ID> ");
@@ -214,7 +276,8 @@ public class MainApp {
 
                 System.out.println("-----------------------------------\n");
                 for (CarCategory carCategory : carCategories) {
-                    System.out.println(carCategory.toString());
+                    System.out.println("CarCategory ID: " + carCategory.getCarCategoryId()
+                            + ", Name: " + carCategory.getCarCategoryName());
                 }
                 System.out.println("-----------------------------------\n");
                 System.out.print("Enter Category ID> ");
@@ -226,6 +289,14 @@ public class MainApp {
                 System.out.println("Outlet is closed during your pickup or return times!");
             }
         }
+
+        if (available) {
+            System.out.println("A car is available for reservation\n");
+        } else {
+            System.out.println("No cars are available for the specified times and outlets\n");
+            reservation = null;
+        }
+
         return reservation;
     }
 
@@ -234,7 +305,7 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            Reservation reservation = doSearchCar();
+            Reservation reservation = doSearchCarForReservation();
 
             if (reservation != null) {
                 doRegisterCustomer();
@@ -245,14 +316,14 @@ public class MainApp {
                     currentCustomer.setCreditCard(creditCard);
                     BigDecimal paymentAmount = new BigDecimal("0.00");
                     paymentAmount = partnerWebServicePort.calculateTotalCost(reservation);
-                    reservation.setPaymentAmount(paymentAmount);
+                    reservation.setPrice(paymentAmount);
 
                     System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
                     String confirmation = scanner.nextLine().trim().toLowerCase();
 
                     if (confirmation.equals("y")) {
                         // calculate rentalrate costs and request payment then set reservation and create
-                        System.out.println("\nReservation of amount: $" + paymentAmount.toString() + " paid using " + creditCard.getCcNumber() + "\n");
+                        System.out.println("\nReservation paid using " + creditCard.getCcNumber() + "\n");
                         reservation.setPaid(true);
                         try {
                             reservation = partnerWebServicePort.createReservation(reservation);
@@ -273,7 +344,7 @@ public class MainApp {
                     }
                 }
 
-                System.out.println("\nNew " + reservation.toString() + " created\n");
+                System.out.println("\nNew reservation created with ID: " + reservation.getReservationId() + "\n");
             }
 
         } catch (NoRentalRateAvailableException_Exception ex) {
@@ -314,7 +385,7 @@ public class MainApp {
             System.out.println(ex.getMessage() + "\n");
         }
 
-        System.out.println("\nNew " + currentCustomer.toString() + " created\n");
+        System.out.println("\nNew customer created with ID: " + currentCustomer.getCustomerId() + "\n");
         return currentCustomer;
     }
 
@@ -364,7 +435,7 @@ public class MainApp {
             Reservation reservation = partnerWebServicePort.retrieveReservation(reservationId);
             scanner.nextLine();
 
-            BigDecimal totalCost = reservation.getPaymentAmount();
+            BigDecimal totalCost = reservation.getPrice();
 
             BigDecimal penalty = partnerWebServicePort.calculatePenalty(totalCost, reservation);
             BigDecimal refund = totalCost.subtract(penalty);
@@ -378,7 +449,7 @@ public class MainApp {
                 String confirmation = scanner.nextLine().trim().toLowerCase();
                 if (confirmation.equals("y")) {
                     partnerWebServicePort.cancelReservation(reservationId, refund);
-                    System.out.println("\n" + reservation.toString() + " cancelled\n");
+                    System.out.println("\nReservation has been cancelled\n");
                     System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
 
                 } else {
@@ -391,7 +462,7 @@ public class MainApp {
                 String confirmation = scanner.nextLine().trim().toLowerCase();
                 if (confirmation.equals("y")) {
                     partnerWebServicePort.cancelReservation(reservationId, refund);
-                    System.out.println("\n" + reservation.toString() + " cancelled\n");
+                    System.out.println("\nReservation has been cancelled\n");
                     System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
 
                 } else {
@@ -417,7 +488,9 @@ public class MainApp {
             long reservationId = scanner.nextLong();
             scanner.nextLine();
             Reservation reservation = partnerWebServicePort.retrieveReservation(reservationId);
-            System.out.println("\n" + reservation.toString() + "\n");
+            System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
+                    + " from " + reservation.getDepartureOutlet().getAddress()
+                    + " to " + reservation.getDestinationOutlet().getAddress());
             System.out.print("Press enter to continue>");
             scanner.nextLine();
             System.out.println();
@@ -435,8 +508,10 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         List<Reservation> reservations = getAllMyReservations();
         System.out.println("\n-----------------------------------");
-        for (Reservation r : reservations) {
-            System.out.println(r.toString());//"ID: " + r.getReservationId()+ ", Rate Name: " + r.get());
+        for (Reservation reservation : reservations) {
+            System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
+                    + " from " + reservation.getDepartureOutlet().getAddress()
+                    + " to " + reservation.getDestinationOutlet().getAddress());
         }
         System.out.println("-----------------------------------\n");
         System.out.print("Press enter to continue>");
@@ -448,9 +523,11 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         List<Reservation> reservations = getAllMyReservations();
         System.out.println("\n-----------------------------------");
-        for (Reservation r : reservations) {
-            if (!r.isCancelled()) {
-                System.out.println(r.toString());//"ID: " + r.getReservationId()+ ", Rate Name: " + r.get());
+        for (Reservation reservation : reservations) {
+            if (!reservation.isCancelled()) {
+                System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
+                    + " from " + reservation.getDepartureOutlet().getAddress()
+                    + " to " + reservation.getDestinationOutlet().getAddress());
             }
         }
         System.out.println("-----------------------------------\n");

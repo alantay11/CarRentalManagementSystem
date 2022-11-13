@@ -64,6 +64,8 @@
 
 <xs:element name="retrieveReservationResponse" type="tns:retrieveReservationResponse"/>
 
+<xs:element name="searchCar" type="tns:searchCar"/>
+
 <xs:element name="searchCarByCategory" type="tns:searchCarByCategory"/>
 
 <xs:element name="searchCarByCategoryResponse" type="tns:searchCarByCategoryResponse"/>
@@ -71,6 +73,8 @@
 <xs:element name="searchCarByMakeModel" type="tns:searchCarByMakeModel"/>
 
 <xs:element name="searchCarByMakeModelResponse" type="tns:searchCarByMakeModelResponse"/>
+
+<xs:element name="searchCarResponse" type="tns:searchCarResponse"/>
 
 <xs:complexType name="cancelReservation">
 <xs:sequence>
@@ -134,11 +138,10 @@
 <xs:element name="destinationOutlet" type="tns:outlet" minOccurs="0"/>
 <xs:element name="paid" type="xs:boolean"/>
 <xs:element name="partner" type="tns:partner" minOccurs="0"/>
-<xs:element name="paymentAmount" type="xs:decimal" minOccurs="0"/>
 <xs:element name="pickupTime" type="tns:localDateTime" minOccurs="0"/>
+<xs:element name="price" type="xs:decimal" minOccurs="0"/>
 <xs:element name="refundAmount" type="xs:decimal" minOccurs="0"/>
 <xs:element name="rentalRateList" type="tns:rentalRate" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-<xs:element name="requiresTransfer" type="xs:boolean"/>
 <xs:element name="reservationId" type="xs:long" minOccurs="0"/>
 <xs:element name="returnTime" type="tns:localDateTime" minOccurs="0"/>
 <xs:element name="transitDriverDispatch" type="tns:transitDriverDispatch" minOccurs="0"/>
@@ -192,11 +195,8 @@
 <xs:complexType name="transitDriverDispatch">
 <xs:sequence>
 <xs:element name="car" type="tns:car" minOccurs="0"/>
-<xs:element name="departureOutlet" type="tns:outlet" minOccurs="0"/>
 <xs:element name="destinationOutlet" type="tns:outlet" minOccurs="0"/>
-<xs:element name="dropoffTime" type="tns:localDateTime" minOccurs="0"/>
 <xs:element name="employee" type="tns:employee" minOccurs="0"/>
-<xs:element name="pickupTime" type="tns:localDateTime" minOccurs="0"/>
 <xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
 <xs:element name="transitDriverDispatchId" type="xs:long" minOccurs="0"/>
 </xs:sequence>
@@ -281,6 +281,21 @@
 <xs:element name="password" type="xs:string" minOccurs="0"/>
 <xs:element name="reservationList" type="tns:reservation" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
 <xs:element name="username" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="searchCar">
+<xs:sequence>
+<xs:element name="pickUpDateTime" type="xs:string" minOccurs="0"/>
+<xs:element name="returnDateTime" type="xs:string" minOccurs="0"/>
+<xs:element name="pickupOutletId" type="xs:long"/>
+<xs:element name="returnOutletId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="searchCarResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
 </xs:sequence>
 </xs:complexType>
 

@@ -171,6 +171,13 @@ public class PartnerWebService {
             @WebParam(name = "returnOutletId") long returnOutletId) throws OutletIsClosedException {
         return carSessionBeanLocal.searchCarByCategory(categoryId, LocalDateTime.parse(pickUpDateTime), LocalDateTime.parse(returnDateTime), pickupOutletId, returnOutletId);
     }
+    
+    @WebMethod(operationName = "searchCar")
+    public boolean searchCar(@WebParam(name = "pickUpDateTime") String pickUpDateTime,
+            @WebParam(name = "returnDateTime") String returnDateTime, @WebParam(name = "pickupOutletId") long pickupOutletId,
+            @WebParam(name = "returnOutletId") long returnOutletId) throws OutletIsClosedException {
+        return carSessionBeanLocal.searchCar(LocalDateTime.parse(pickUpDateTime), LocalDateTime.parse(returnDateTime), pickupOutletId, returnOutletId);
+    }
 
     @WebMethod(operationName = "calculateTotalCost")
     public BigDecimal calculateTotalCost(@WebParam(name = "reservation") Reservation reservation) throws NoRentalRateAvailableException {
