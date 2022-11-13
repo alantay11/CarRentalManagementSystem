@@ -60,6 +60,10 @@
 
 <xs:element name="retrieveAllPartnerReservationsResponse" type="tns:retrieveAllPartnerReservationsResponse"/>
 
+<xs:element name="retrieveCategoryIdOfModel" type="tns:retrieveCategoryIdOfModel"/>
+
+<xs:element name="retrieveCategoryIdOfModelResponse" type="tns:retrieveCategoryIdOfModelResponse"/>
+
 <xs:element name="retrieveReservation" type="tns:retrieveReservation"/>
 
 <xs:element name="retrieveReservationResponse" type="tns:retrieveReservationResponse"/>
@@ -93,11 +97,23 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="retrieveCategoryIdOfModel">
+<xs:sequence>
+<xs:element name="makemodelId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveCategoryIdOfModelResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="searchCarByCategory">
 <xs:sequence>
 <xs:element name="categoryId" type="xs:long"/>
-<xs:element name="pickUpDateTime" type="xs:string" minOccurs="0"/>
-<xs:element name="returnDateTime" type="xs:string" minOccurs="0"/>
+<xs:element name="pickupGreg" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnGreg" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="pickupOutletId" type="xs:long"/>
 <xs:element name="returnOutletId" type="xs:long"/>
 </xs:sequence>
@@ -301,7 +317,9 @@
 
 <xs:complexType name="calculateTotalCost">
 <xs:sequence>
-<xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
+<xs:element name="pickupGreg" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnGreg" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="categoryId" type="xs:long"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -320,8 +338,8 @@
 <xs:complexType name="searchCarByMakeModel">
 <xs:sequence>
 <xs:element name="makeModelId" type="xs:long"/>
-<xs:element name="pickUpDateTime" type="xs:string" minOccurs="0"/>
-<xs:element name="returnDateTime" type="xs:string" minOccurs="0"/>
+<xs:element name="pickupGreg" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnGreg" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="pickupOutletId" type="xs:long"/>
 <xs:element name="returnOutletId" type="xs:long"/>
 </xs:sequence>
@@ -396,21 +414,11 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="retrieveReservation">
-<xs:sequence>
-<xs:element name="reservationId" type="xs:long"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="retrieveReservationResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:reservation" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="createReservation">
 <xs:sequence>
 <xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
+<xs:element name="pickupGreg" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="returnGreg" type="xs:dateTime" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -423,6 +431,18 @@
 <xs:complexType name="ReservationExistException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveReservation">
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveReservationResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:reservation" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 

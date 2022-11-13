@@ -12,6 +12,7 @@ import exception.InvalidIdException;
 import exception.NoRentalRateAvailableException;
 import exception.RentalRateExistException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import javax.ejb.Local;
 
 /**
@@ -26,5 +27,7 @@ public interface RentalRateSessionBeanLocal {
     RentalRate retrieveRentalRate(long rentalRateId);
 
     BigDecimal calculateTotalCost(Reservation reservation) throws NoRentalRateAvailableException;
+
+    BigDecimal calculateTotalCostWeb(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException ;
 
 }

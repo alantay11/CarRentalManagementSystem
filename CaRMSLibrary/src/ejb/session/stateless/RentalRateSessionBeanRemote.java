@@ -40,5 +40,7 @@ public interface RentalRateSessionBeanRemote {
     BigDecimal calculateTotalCost(Reservation reservation) throws NoRentalRateAvailableException;
 
     List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException;
+
+    BigDecimal calculateTotalCostWeb(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException ;
     
 }

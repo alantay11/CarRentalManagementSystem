@@ -33,6 +33,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import javax.ejb.EJB;
@@ -133,10 +135,25 @@ public class PartnerWebService {
     }
 
     @WebMethod(operationName = "searchCarByMakeModel")
-    public boolean searchCarByMakeModel(@WebParam(name = "makeModelId") long makeModelId, @WebParam(name = "pickUpDateTime") String pickUpDateTime,
-            @WebParam(name = "returnDateTime") String returnDateTime, @WebParam(name = "pickupOutletId") long pickupOutletId,
+    public boolean searchCarByMakeModel(@WebParam(name = "makeModelId") long makeModelId, @WebParam(name = "pickupGreg") Date pickupGreg,
+            @WebParam(name = "returnGreg") Date returnGreg, @WebParam(name = "pickupOutletId") long pickupOutletId,
             @WebParam(name = "returnOutletId") long returnOutletId) throws OutletIsClosedException {
-        return carSessionBeanLocal.searchCarByMakeModel(makeModelId, LocalDateTime.parse(pickUpDateTime), LocalDateTime.parse(returnDateTime), pickupOutletId, returnOutletId);
+
+        LocalDateTime pickUpDateTime = pickupGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime returnDateTime = returnGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        return carSessionBeanLocal.searchCarByMakeModel(makeModelId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
+    }
+
+    @WebMethod(operationName = "searchCarByCategory")
+    public boolean searchCarByCategory(@WebParam(name = "categoryId") long categoryId, @WebParam(name = "pickupGreg") Date pickupGreg,
+            @WebParam(name = "returnGreg") Date returnGreg, @WebParam(name = "pickupOutletId") long pickupOutletId,
+            @WebParam(name = "returnOutletId") long returnOutletId) throws OutletIsClosedException {
+
+        LocalDateTime pickUpDateTime = pickupGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime returnDateTime = returnGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        return carSessionBeanLocal.searchCarByCategory(categoryId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
     }
 
     @WebMethod(operationName = "retrieveAllCarCategories")
@@ -153,7 +170,7 @@ public class PartnerWebService {
 
     @WebMethod(operationName = "retrieveAllPartnerReservations")
     public List<Reservation> retrieveAllPartnerReservations(@WebParam(name = "partnerId") long partnerId) {
-        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.partnerId = : partnerId");
+        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.partnerId = :partnerId");
         query.setParameter("partnerId", partnerId);
 
         List<Reservation> reservations = query.getResultList();
@@ -161,17 +178,18 @@ public class PartnerWebService {
         for (Reservation r : reservations) {
             em.detach(r);
             r.setRentalRateList(null);
+            r.setPartner(null);
         }
         return reservations;
     }
 
-    @WebMethod(operationName = "searchCarByCategory")
-    public boolean searchCarByCategory(@WebParam(name = "categoryId") long categoryId, @WebParam(name = "pickUpDateTime") String pickUpDateTime,
-            @WebParam(name = "returnDateTime") String returnDateTime, @WebParam(name = "pickupOutletId") long pickupOutletId,
-            @WebParam(name = "returnOutletId") long returnOutletId) throws OutletIsClosedException {
-        return carSessionBeanLocal.searchCarByCategory(categoryId, LocalDateTime.parse(pickUpDateTime), LocalDateTime.parse(returnDateTime), pickupOutletId, returnOutletId);
+    @WebMethod(operationName = "retrieveCategoryIdOfModel")
+    public long retrieveCategoryIdOfModel(@WebParam(name = "makemodelId") long makemodelId) {
+        CarModel carModel = em.find(CarModel.class, makemodelId);
+
+        return carModel.getCarCategory().getCarCategoryId();
     }
-    
+
     @WebMethod(operationName = "searchCar")
     public boolean searchCar(@WebParam(name = "pickUpDateTime") String pickUpDateTime,
             @WebParam(name = "returnDateTime") String returnDateTime, @WebParam(name = "pickupOutletId") long pickupOutletId,
@@ -180,12 +198,24 @@ public class PartnerWebService {
     }
 
     @WebMethod(operationName = "calculateTotalCost")
-    public BigDecimal calculateTotalCost(@WebParam(name = "reservation") Reservation reservation) throws NoRentalRateAvailableException {
-        return rentalRateSessionBeanLocal.calculateTotalCost(reservation);
+    public BigDecimal calculateTotalCost(@WebParam(name = "pickupGreg") Date pickupGreg,
+            @WebParam(name = "returnGreg") Date returnGreg, @WebParam(name = "categoryId") long categoryId) throws NoRentalRateAvailableException {
+        LocalDateTime pickUpDateTime = pickupGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime returnDateTime = returnGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        return rentalRateSessionBeanLocal.calculateTotalCostWeb(pickUpDateTime, returnDateTime, categoryId);
     }
 
     @WebMethod(operationName = "createReservation")
-    public Reservation createReservation(@WebParam(name = "reservation") Reservation reservation) throws ReservationExistException, InputDataValidationException {
+    public Reservation createReservation(@WebParam(name = "reservation") Reservation reservation,
+            @WebParam(name = "pickupGreg") Date pickupGreg,
+            @WebParam(name = "returnGreg") Date returnGreg) throws ReservationExistException, InputDataValidationException {
+        LocalDateTime pickUpDateTime = pickupGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        LocalDateTime returnDateTime = returnGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        
+        reservation.setPickupTime(pickUpDateTime);
+        reservation.setReturnTime(returnDateTime);
+        
         Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
 
         if (constraintViolations.isEmpty()) {
@@ -211,7 +241,7 @@ public class PartnerWebService {
                 for (Reservation r : reservations) {
                     r.setCustomer(null);
                 }
-                
+
                 return customer;
             } catch (PersistenceException ex) {
                 throw new CustomerExistException();

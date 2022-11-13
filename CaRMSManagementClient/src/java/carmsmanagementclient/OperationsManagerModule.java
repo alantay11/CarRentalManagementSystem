@@ -586,6 +586,12 @@ public class OperationsManagerModule {
         System.out.print("Enter name/address of outlet> ");
         String outletName = scanner.nextLine().trim();
 
+        viewDispatchHelperForAssign(outletName);
+
+        System.out.print("Enter dispatch ID to assign to> ");
+        long dispatchId = scanner.nextLong();
+        scanner.nextLine();
+
         List<Employee> employees = employeeSessionBeanRemote.retrieveEmployeesOfOutlet(outletName);
         System.out.println("\n-----------------------------------");
         for (Employee e : employees) {
@@ -595,12 +601,6 @@ public class OperationsManagerModule {
 
         System.out.print("Enter employee ID of transit driver> ");
         long employeeId = scanner.nextLong();
-        scanner.nextLine();
-
-        viewDispatchHelperForAssign(outletName);
-
-        System.out.print("Enter dispatch ID to assign to> ");
-        long dispatchId = scanner.nextLong();
         scanner.nextLine();
 
         TransitDriverDispatch transitDriverDispatch = transitDriverDispatchSessionBeanRemote.assignTransitDriver(employeeId, dispatchId);

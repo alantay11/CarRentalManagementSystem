@@ -6,13 +6,18 @@
 package holidayreservationsystemwebclient;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import ws.client.partner.CarCategory;
 import ws.client.partner.CarModel;
 import ws.client.partner.CreditCard;
@@ -36,20 +41,21 @@ import ws.client.partner.ReservationRecordNotFoundException_Exception;
  */
 public class MainApp {
 
-    private final ValidatorFactory validatorFactory;
-    private final Validator validator;
-
     private PartnerWebService_Service partnerWebService_Service;
     private PartnerWebService partnerWebServicePort;
 
-    Partner currentPartner;
-    Customer currentCustomer;
+    private Partner currentPartner;
+    private Customer currentCustomer;
+
+    private GregorianCalendar cal = new GregorianCalendar();
+    private LocalDateTime globalPickup;
+    private LocalDateTime globalReturn;
+    private XMLGregorianCalendar globalGregPickup;
+    private XMLGregorianCalendar globalGregReturn;
 
     public MainApp() {
         this.partnerWebService_Service = new PartnerWebService_Service();
         this.partnerWebServicePort = partnerWebService_Service.getPartnerWebServicePort();
-        validatorFactory = Validation.buildDefaultValidatorFactory();
-        validator = validatorFactory.getValidator();
     }
 
     public void runApp() {
@@ -165,6 +171,7 @@ public class MainApp {
         long categoryId;
         boolean available = false;
         Reservation reservation = new Reservation();
+        reservation.setPartner(currentPartner);
 
         // cannot copy paste, need manual coding
         System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
@@ -212,102 +219,120 @@ public class MainApp {
         return reservation;
     }
 
-    private Reservation doSearchCarForReservation() {
-        //System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
-        Scanner scanner = new Scanner(System.in);
-        String startDate = "";
-        String startTime = "";
-        String endDate = "";
-        String endTime = "";
-        String pickUpDateTime;
-        String returnDateTime;
-        long pickupOutletId;
-        long returnOutletId;
-        long makeModelId;
-        long categoryId;
-        boolean available = false;
+    private Pair<Reservation, Long> doSearchCarForReservation() {
         Reservation reservation = new Reservation();
+        long makeModelId = -1;
+        long categoryId = -1;
 
-        // cannot copy paste, need manual coding
-        System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
-        startDate = scanner.nextLine().trim();
-        System.out.print("Enter pickup time in the format HH:MM> ");
-        startTime = scanner.nextLine().trim();
-        pickUpDateTime = startDate + "T" + startTime;
-        System.out.print("Enter return date in the format YYYY-MM-DD> ");
-        endDate = scanner.nextLine().trim();
-        System.out.print("Enter return time in the format HH:MM> ");
-        endTime = scanner.nextLine().trim();
-        returnDateTime = endDate + "T" + endTime;
+        try {
+            //System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
+            Scanner scanner = new Scanner(System.in);
+            String startDate = "";
+            String startTime = "";
+            String endDate = "";
+            String endTime = "";
+            String pickUpDateTime;
+            String returnDateTime;
+            long pickupOutletId;
+            long returnOutletId;
+            boolean available = false;
 
-        List<Outlet> outlets = partnerWebServicePort.retrieveAllOutlets();
+            // cannot copy paste, need manual coding
+            System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
+            startDate = scanner.nextLine().trim();
+            System.out.print("Enter pickup time in the format HH:MM> ");
+            startTime = scanner.nextLine().trim();
+            pickUpDateTime = startDate + "T" + startTime;
+            System.out.print("Enter return date in the format YYYY-MM-DD> ");
+            endDate = scanner.nextLine().trim();
+            System.out.print("Enter return time in the format HH:MM> ");
+            endTime = scanner.nextLine().trim();
+            returnDateTime = endDate + "T" + endTime;
 
-        System.out.println("\nOutlets");
-        System.out.println("-----------------------------------");
-        for (Outlet o : outlets) {
-            System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress());
-            //+ " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
-        }
-        System.out.println("-----------------------------------\n");
+            Date pickupDate = Date.from(LocalDateTime.parse(pickUpDateTime).atZone(ZoneId.systemDefault()).toInstant());
+            Date returnDate = Date.from(LocalDateTime.parse(returnDateTime).atZone(ZoneId.systemDefault()).toInstant());
 
-        System.out.print("Enter pickup outlet ID> ");
-        pickupOutletId = scanner.nextLong();
-        scanner.nextLine();
+            cal.setTime(pickupDate);
+            XMLGregorianCalendar pickupGreg = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+            globalGregPickup = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+            cal.setTime(returnDate);
+            XMLGregorianCalendar returnGreg = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+            globalGregReturn = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
 
-        System.out.print("Enter return outlet ID> ");
-        returnOutletId = scanner.nextLong();
-        scanner.nextLine();
+            List<Outlet> outlets = partnerWebServicePort.retrieveAllOutlets();
 
-        System.out.print("Do you want to search by Make and Model? (Y/N)> ");
-        String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
-        if (searchByMakeModel.equals("y")) {
-            try {
-                List<CarModel> carModels = partnerWebServicePort.retrieveAllCarModels();
+            System.out.println("\nOutlets");
+            System.out.println("-----------------------------------");
+            for (Outlet o : outlets) {
+                System.out.println("ID: " + o.getOutletId() + ", address: " + o.getAddress());
+                //+ " , opening time: " + o.getOpeningTime() + " , closing time: " + o.getClosingTime());
+            }
+            System.out.println("-----------------------------------\n");
 
-                System.out.println("-----------------------------------\n");
-                for (CarModel carModel : carModels) {
-                    System.out.println("CarModel ID: " + carModel.getCarModelId()
-                            + ", Make/Model: " + carModel.getMake() + ", " + carModel.getModel()
-                            + ", Category: " + carModel.getCarCategory().getCarCategoryName());
+            System.out.print("Enter pickup outlet ID> ");
+            pickupOutletId = scanner.nextLong();
+            scanner.nextLine();
+
+            System.out.print("Enter return outlet ID> ");
+            returnOutletId = scanner.nextLong();
+            scanner.nextLine();
+
+            System.out.print("Do you want to search by Make and Model? (Y/N)> ");
+            String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
+            if (searchByMakeModel.equals("y")) {
+                try {
+                    List<CarModel> carModels = partnerWebServicePort.retrieveAllCarModels();
+
+                    System.out.println("-----------------------------------\n");
+                    for (CarModel carModel : carModels) {
+                        System.out.println("CarModel ID: " + carModel.getCarModelId()
+                                + ", Make/Model: " + carModel.getMake() + ", " + carModel.getModel()
+                                + ", Category: " + carModel.getCarCategory().getCarCategoryName());
+                    }
+                    System.out.println("-----------------------------------\n");
+                    System.out.print("Enter Make and Model ID> ");
+                    makeModelId = scanner.nextLong();
+                    scanner.nextLine();
+
+                    available = partnerWebServicePort.searchCarByMakeModel(makeModelId, pickupGreg, returnGreg, pickupOutletId, returnOutletId);
+                } catch (OutletIsClosedException_Exception ex) {
+                    System.out.println("Outlet is closed during your pickup or return times!");
                 }
-                System.out.println("-----------------------------------\n");
-                System.out.print("Enter Make and Model ID> ");
-                makeModelId = scanner.nextLong();
-                scanner.nextLine();
 
-                available = partnerWebServicePort.searchCarByMakeModel(makeModelId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
-            } catch (OutletIsClosedException_Exception ex) {
-                System.out.println("Outlet is closed during your pickup or return times!");
+            } else {
+                try {
+                    List<CarCategory> carCategories = partnerWebServicePort.retrieveAllCarCategories();
+
+                    System.out.println("-----------------------------------\n");
+                    for (CarCategory carCategory : carCategories) {
+                        System.out.println("CarCategory ID: " + carCategory.getCarCategoryId()
+                                + ", Name: " + carCategory.getCarCategoryName());
+                    }
+                    System.out.println("-----------------------------------\n");
+                    System.out.print("Enter Category ID> ");
+                    categoryId = scanner.nextLong();
+                    scanner.nextLine();
+
+                    available = partnerWebServicePort.searchCarByCategory(categoryId, pickupGreg, returnGreg, pickupOutletId, returnOutletId);
+                } catch (OutletIsClosedException_Exception ex) {
+                    System.out.println("Outlet is closed during your pickup or return times!");
+                }
             }
 
-        } else {
-            try {
-                List<CarCategory> carCategories = partnerWebServicePort.retrieveAllCarCategories();
-
-                System.out.println("-----------------------------------\n");
-                for (CarCategory carCategory : carCategories) {
-                    System.out.println("CarCategory ID: " + carCategory.getCarCategoryId()
-                            + ", Name: " + carCategory.getCarCategoryName());
-                }
-                System.out.println("-----------------------------------\n");
-                System.out.print("Enter Category ID> ");
-                categoryId = scanner.nextLong();
-                scanner.nextLine();
-
-                available = partnerWebServicePort.searchCarByCategory(categoryId, pickUpDateTime, returnDateTime, pickupOutletId, returnOutletId);
-            } catch (OutletIsClosedException_Exception ex) {
-                System.out.println("Outlet is closed during your pickup or return times!");
+            if (available) {
+                System.out.println("A car is available for reservation\n");
+            } else {
+                System.out.println("No cars are available for the specified times and outlets\n");
+                reservation = null;
             }
-        }
 
-        if (available) {
-            System.out.println("A car is available for reservation\n");
-        } else {
-            System.out.println("No cars are available for the specified times and outlets\n");
-            reservation = null;
+        } catch (DatatypeConfigurationException ex) {
+            System.out.println("You have input invalid dates or times!");
         }
-
-        return reservation;
+        if (makeModelId != -1 && categoryId == -1) {
+            categoryId = partnerWebServicePort.retrieveCategoryIdOfModel(makeModelId);
+        }
+        return new Pair<Reservation, Long>(reservation, categoryId);
     }
 
     private void doReserveCar() {
@@ -315,7 +340,9 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            Reservation reservation = doSearchCarForReservation();
+            Pair<Reservation, Long> pair = doSearchCarForReservation();
+            Reservation reservation = pair.first();
+            long carCategoryId = pair.second();
 
             if (reservation != null) {
                 doRegisterCustomer();
@@ -325,7 +352,8 @@ public class MainApp {
                     CreditCard creditCard = doReadCreditCard();
                     currentCustomer.setCreditCard(creditCard);
                     BigDecimal paymentAmount = new BigDecimal("0.00");
-                    paymentAmount = partnerWebServicePort.calculateTotalCost(reservation);
+
+                    paymentAmount = partnerWebServicePort.calculateTotalCost(globalGregPickup, globalGregReturn, carCategoryId);
                     reservation.setPrice(paymentAmount);
 
                     System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
@@ -335,34 +363,25 @@ public class MainApp {
                         // calculate rentalrate costs and request payment then set reservation and create
                         System.out.println("\nReservation paid using " + creditCard.getCcNumber() + "\n");
                         reservation.setPaid(true);
-                        Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
-                        if (constraintViolations.isEmpty()) {
-                            try {
-                                reservation = partnerWebServicePort.createReservation(reservation);
-                            } catch (ReservationExistException_Exception ex) {
-                                System.out.println("Reservation already exists!\n");
-                            } catch (InputDataValidationException_Exception ex) {
-                                System.out.println(ex.getMessage() + "\n");
-                            }
-                        } else {
-                            showInputDataValidationErrorsForReservation(constraintViolations);
-                        }
-                    }
-                } else {
-                    System.out.println("\nPayment will be required upon pickup\n");
-                    Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
-                    if (constraintViolations.isEmpty()) {
+
                         try {
-                            reservation = partnerWebServicePort.createReservation(reservation);
+                            reservation = partnerWebServicePort.createReservation(reservation, globalGregPickup, globalGregReturn);
                         } catch (ReservationExistException_Exception ex) {
                             System.out.println("Reservation already exists!\n");
                         } catch (InputDataValidationException_Exception ex) {
                             System.out.println(ex.getMessage() + "\n");
                         }
-                    } else {
-                        showInputDataValidationErrorsForReservation(constraintViolations);
                     }
+                } else {
+                    System.out.println("\nPayment will be required upon pickup\n");
 
+                    try {
+                        reservation = partnerWebServicePort.createReservation(reservation, globalGregPickup, globalGregReturn);
+                    } catch (ReservationExistException_Exception ex) {
+                        System.out.println("Reservation already exists!\n");
+                    } catch (InputDataValidationException_Exception ex) {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                     System.out.println("\nNew reservation created with ID: " + reservation.getReservationId() + "\n");
                 }
             }
@@ -375,7 +394,7 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         Customer customer = new Customer();
 
-        System.out.println("*** HRS :: Register As Customer ***\n");
+        System.out.println("*** HRS :: Register Customer ***\n");
         System.out.print("Enter username> ");
         customer.setUsername(scanner.nextLine().trim());
         System.out.print("Enter password> ");
@@ -396,18 +415,14 @@ public class MainApp {
         customer.setPostalCode(scanner.nextLine().trim());
         customer.setPartner(currentPartner);
 
-        Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
-        if (constraintViolations.isEmpty()) {
-            try {
-                currentCustomer = partnerWebServicePort.createCustomer(customer);
-            } catch (CustomerExistException_Exception ex) {
-                System.out.println("Customer already exists!\n");
-            } catch (InputDataValidationException_Exception ex) {
-                System.out.println(ex.getMessage() + "\n");
-            }
-        } else {
-            showInputDataValidationErrorsForCustomer(constraintViolations);
+        try {
+            currentCustomer = partnerWebServicePort.createCustomer(customer);
+        } catch (CustomerExistException_Exception ex) {
+            System.out.println("Customer already exists!\n");
+        } catch (InputDataValidationException_Exception ex) {
+            System.out.println(ex.getMessage() + "\n");
         }
+
         System.out.println("\nNew customer created with ID: " + currentCustomer.getCustomerId() + "\n");
         return currentCustomer;
     }
@@ -433,8 +448,7 @@ public class MainApp {
 
             System.out.print("Enter expiry date in the format YYYY-MM> ");
             String expiry = scanner.nextLine().trim() + "-01";
-            /*Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate(creditCard);
-                if (constraintViolations.isEmpty()) {
+            /*
             try {
                 return partnerWebServicePort.createCreditCard(creditCard, currentCustomer.getCustomerId(), expiry);
 
@@ -443,17 +457,15 @@ public class MainApp {
             } catch (CreditCardExistException_Exception ex) {
                 System.out.println("Credit card already exists!");
             } catch (InputDataValidationException_Exception ex) {
-                System.out.println(ex);
-            } else {
-                    showInputDataValidationErrorsForCreditCard(constraintViolations);
-            }*/
+                System.out.println(ex);*/
+
             return creditCard;
         }
     }
 
     private void doCancelReservation() {
         try {
-            System.out.println("*** HRS :: Customer :: Cancel Reservation ***\n");
+            System.out.println("*** HRS :: Partner :: Cancel Reservation ***\n");
             Scanner scanner = new Scanner(System.in);
 
             doViewAllMyActiveReservations();
@@ -527,7 +539,28 @@ public class MainApp {
     }
 
     private List<Reservation> getAllMyReservations() {
-        return partnerWebServicePort.retrieveAllPartnerReservations(currentCustomer.getId());
+        return partnerWebServicePort.retrieveAllPartnerReservations(currentPartner.getPartnerId());
+    }
+
+    private void doViewAllMyActiveReservations() {
+        try {
+            System.out.println("***HRS :: Partner :: View All Active Partner Reservations ***\n");
+            Scanner scanner = new Scanner(System.in);
+            List<Reservation> reservations = getAllMyReservations();
+            System.out.println("\n-----------------------------------");
+            for (Reservation reservation : reservations) {
+                if (!reservation.isCancelled()) {
+                    System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
+                            + " from " + reservation.getDepartureOutlet().getAddress()
+                            + " to " + reservation.getDestinationOutlet().getAddress());
+                }
+            }
+            System.out.println("-----------------------------------\n");
+            System.out.print("Press enter to continue>");
+            scanner.nextLine();
+        } catch (InputMismatchException ex) {
+            System.out.println("Invalid input!");
+        }
     }
 
     private void doViewAllMyReservations() {
@@ -545,50 +578,45 @@ public class MainApp {
         scanner.nextLine();
     }
 
-    private void doViewAllMyActiveReservations() {
-        System.out.println("***HRS :: Partner :: View All Active Partner Reservations ***\n");
-        Scanner scanner = new Scanner(System.in);
-        List<Reservation> reservations = getAllMyReservations();
-        System.out.println("\n-----------------------------------");
-        for (Reservation reservation : reservations) {
-            if (!reservation.isCancelled()) {
-                System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
-                        + " from " + reservation.getDepartureOutlet().getAddress()
-                        + " to " + reservation.getDestinationOutlet().getAddress());
+    class Pair<T, U> {
+
+        private final T t;
+        private final U u;
+
+        public Pair(T t, U u) {
+            this.t = t;
+            this.u = u;
+        }
+
+        T first() {
+            return this.t;
+        }
+
+        U second() {
+            return this.u;
+        }
+
+        @Override
+        public String toString() {
+            return "(" + this.t + ", " + this.u + ")";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            } else if (obj instanceof Pair) {
+                Pair<?, ?> other = (Pair<?, ?>) obj;
+                return this.first().equals(other.first())
+                        && this.second().equals(other.second());
+            } else {
+                return false;
             }
         }
-        System.out.println("-----------------------------------\n");
-        System.out.print("Press enter to continue>");
-        scanner.nextLine();
-    }
 
-    private void showInputDataValidationErrorsForCustomer(Set<ConstraintViolation<Customer>> constraintViolations) {
-        System.out.println("\nInput data validation error!:");
-
-        for (ConstraintViolation constraintViolation : constraintViolations) {
-            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        @Override
+        public int hashCode() {
+            return java.util.Objects.hash(t, u);
         }
-
-        System.out.println("\nPlease try again......\n");
-    }
-
-    private void showInputDataValidationErrorsForReservation(Set<ConstraintViolation<Reservation>> constraintViolations) {
-        System.out.println("\nInput data validation error!:");
-
-        for (ConstraintViolation constraintViolation : constraintViolations) {
-            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-        }
-
-        System.out.println("\nPlease try again......\n");
-    }
-
-    private void showInputDataValidationErrorsForCreditCard(Set<ConstraintViolation<CreditCard>> constraintViolations) {
-        System.out.println("\nInput data validation error!:");
-
-        for (ConstraintViolation constraintViolation : constraintViolations) {
-            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-        }
-
-        System.out.println("\nPlease try again......\n");
     }
 }

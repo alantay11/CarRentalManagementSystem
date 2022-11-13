@@ -170,6 +170,20 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
 
     @Override
+    public BigDecimal calculateTotalCostWeb(LocalDateTime pickupTime, LocalDateTime returnTime, long carCategoryId) throws NoRentalRateAvailableException {
+        List<RentalRate> bestRates = retrieveApplicableRentalRates(pickupTime, returnTime, carCategoryId);
+        System.out.println("bestRates = " + bestRates);
+
+        BigDecimal total = new BigDecimal("0.00");
+        for (RentalRate rate : bestRates) {
+            total = total.add(rate.getRatePerDay());
+            System.out.println("total =" + total + " rate perday = " + rate.getRatePerDay());
+        }
+
+        return total;
+    }
+
+    @Override
     public List<RentalRate> retrieveApplicableRentalRates(LocalDateTime pickupTime, LocalDateTime returnTime,
             long carCategoryId) throws NoRentalRateAvailableException {
         Duration duration = Duration.between(pickupTime, returnTime);

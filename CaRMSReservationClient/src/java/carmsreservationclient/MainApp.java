@@ -428,8 +428,15 @@ public class MainApp {
         Reservation reservation = doSearchCarForReservation();
 
         if (reservation != null) {
-            CreditCard creditCard = doSaveCreditCard();
-            currentCustomer.setCreditCard(creditCard);
+            CreditCard creditCard;
+
+            if (currentCustomer.getCreditCard() == null) {
+                creditCard = doSaveCreditCard();
+                currentCustomer.setCreditCard(creditCard);
+            } else {
+                creditCard = currentCustomer.getCreditCard();
+            }
+
             BigDecimal paymentAmount = reservation.getPrice();
 
             System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
