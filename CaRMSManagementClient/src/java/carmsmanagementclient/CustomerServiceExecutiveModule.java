@@ -126,7 +126,7 @@ public class CustomerServiceExecutiveModule {
             if (reservation.isPaid()) {
                 reservation = reservationSessionBeanRemote.pickupCar(reservationId);
             } else {
-                BigDecimal paymentAmount = reservation.getPaymentAmount();
+                BigDecimal paymentAmount = reservation.getPrice();
                 System.out.print("\nYou are required to pay $" + paymentAmount + " for the reservation");
                 CreditCard cc = customer.getCreditCard();
 

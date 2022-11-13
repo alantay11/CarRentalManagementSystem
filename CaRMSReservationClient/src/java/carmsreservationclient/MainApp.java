@@ -412,7 +412,7 @@ public class MainApp {
             try {
                 BigDecimal paymentAmount = new BigDecimal("0.00");
                 paymentAmount = rentalRateSessionBeanRemote.calculateTotalCost(reservation);
-                reservation.setPaymentAmount(paymentAmount);
+                reservation.setPrice(paymentAmount);
                 System.out.println("\nThe total cost of the reservation will be $" + paymentAmount);
             } catch (NoRentalRateAvailableException ex) {
                 System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
@@ -430,7 +430,7 @@ public class MainApp {
         if (reservation != null) {
             CreditCard creditCard = doSaveCreditCard();
             currentCustomer.setCreditCard(creditCard);
-            BigDecimal paymentAmount = reservation.getPaymentAmount();
+            BigDecimal paymentAmount = reservation.getPrice();
 
             System.out.print("\nDo you want to pay $" + paymentAmount + " for the reservation now? (Y/N)> ");
             String confirmation = scanner.nextLine().trim().toLowerCase();
@@ -529,7 +529,7 @@ public class MainApp {
             Reservation reservation = reservationSessionBeanRemote.retrieveReservation(reservationId);
             scanner.nextLine();
 
-            BigDecimal totalCost = reservation.getPaymentAmount();
+            BigDecimal totalCost = reservation.getPrice();
             LocalDateTime pickup = reservation.getPickupTime();
 
             BigDecimal penalty = calculatePenalty(totalCost, pickup);

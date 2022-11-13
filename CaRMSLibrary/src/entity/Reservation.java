@@ -51,7 +51,7 @@ public class Reservation implements Serializable {
     private boolean paid;
     @Column(nullable = false, precision = 11, scale = 2)
     @Digits(integer = 6, fraction = 2)
-    private BigDecimal paymentAmount;
+    private BigDecimal price;
     @Column(nullable = false, precision = 11, scale = 2)
     @Digits(integer = 6, fraction = 2)
     private BigDecimal refundAmount;
@@ -88,7 +88,7 @@ public class Reservation implements Serializable {
         this.rentalRateList = new ArrayList<>();
         this.cancelled = false;
         this.paid = false;
-        this.paymentAmount = new BigDecimal("0.00");
+        this.price = new BigDecimal("0.00");
         this.refundAmount = new BigDecimal("0.00");
     }
 
@@ -100,12 +100,12 @@ public class Reservation implements Serializable {
         this.paid = paid;
     }
 
-    public BigDecimal getPaymentAmount() {
-        return paymentAmount;
+    public BigDecimal getPrice() {
+        return price;
     }
 
-    public void setPaymentAmount(BigDecimal paymentAmount) {
-        this.paymentAmount = paymentAmount;
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public BigDecimal getRefundAmount() {
