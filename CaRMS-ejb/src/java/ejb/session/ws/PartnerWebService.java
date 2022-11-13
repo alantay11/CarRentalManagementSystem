@@ -14,6 +14,7 @@ import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.RentalRateSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
+import entity.Car;
 import entity.CarCategory;
 import entity.CarModel;
 import entity.CreditCard;
@@ -97,13 +98,10 @@ public class PartnerWebService {
         try {
             partner = partnerSessionBeanLocal.partnerLogin(username, password);
             em.detach(partner);
-            for (Customer c : partner.getCustomerList()) {
-                em.detach(c);
-                c.setPartner(null);
-                System.out.println("********** PartnerWebService.partnerLogin");
+            System.out.println("********** PartnerWebService.partnerLogin");
 
-                //partner.setCustomerList(null); don't need?
-            }
+            em.flush();
+
         } catch (InvalidLoginCredentialException ex) {
             throw ex;
         }
@@ -170,16 +168,26 @@ public class PartnerWebService {
 
     @WebMethod(operationName = "retrieveAllPartnerReservations")
     public List<Reservation> retrieveAllPartnerReservations(@WebParam(name = "partnerId") long partnerId) {
-        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.partnerId = :partnerId");
+        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.partner.partnerId = :partnerId AND r.cancelled = false");
         query.setParameter("partnerId", partnerId);
-
+        System.out.println("Query created");
         List<Reservation> reservations = query.getResultList();
 
         for (Reservation r : reservations) {
             em.detach(r);
             r.setRentalRateList(null);
             r.setPartner(null);
+            System.out.println("detaching");
+            r.setCustomer(null);
+            r.setCar(null);
+            r.setCarModel(null);
+            r.setCarCategory(null);
+            r.setDepartureOutlet(null);
+            r.setDestinationOutlet(null);
         }
+        System.out.println("Detached");
+        em.flush();
+        System.out.println("reservations: " + reservations.size());
         return reservations;
     }
 
@@ -188,6 +196,16 @@ public class PartnerWebService {
         CarModel carModel = em.find(CarModel.class, makemodelId);
 
         return carModel.getCarCategory().getCarCategoryId();
+    }
+
+    @WebMethod(operationName = "retrieveCategory")
+    public CarCategory retrieveCategory(@WebParam(name = "categoryId") long categoryId) {
+        CarCategory carCategory = em.find(CarCategory.class, categoryId);
+
+        em.detach(carCategory);
+        carCategory.setCarList(null);
+        carCategory.setRentalRateList(null);
+        return carCategory;
     }
 
     @WebMethod(operationName = "searchCar")
@@ -212,10 +230,10 @@ public class PartnerWebService {
             @WebParam(name = "returnGreg") Date returnGreg) throws ReservationExistException, InputDataValidationException {
         LocalDateTime pickUpDateTime = pickupGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime returnDateTime = returnGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        
+
         reservation.setPickupTime(pickUpDateTime);
         reservation.setReturnTime(returnDateTime);
-        
+
         Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
 
         if (constraintViolations.isEmpty()) {
@@ -232,7 +250,6 @@ public class PartnerWebService {
         if (constraintViolations.isEmpty()) {
             try {
                 em.persist(customer);
-                customer.getPartner().getCustomerList().add(customer);
 
                 em.flush();
                 em.detach(customer);
@@ -241,7 +258,7 @@ public class PartnerWebService {
                 for (Reservation r : reservations) {
                     r.setCustomer(null);
                 }
-
+                em.flush();
                 return customer;
             } catch (PersistenceException ex) {
                 throw new CustomerExistException();
@@ -272,9 +289,59 @@ public class PartnerWebService {
     public Reservation retrieveReservation(@WebParam(name = "reservationId") long reservationId) throws ReservationRecordNotFoundException {
         Reservation reservation = reservationSessionBeanLocal.retrieveReservation(reservationId);
 
+        em.detach(reservation);
         reservation.setRentalRateList(null);
+        reservation.setCustomer(null);
+        reservation.setCar(null);
+        reservation.setCarCategory(null);
+        reservation.setCarModel(null);
+        reservation.setDepartureOutlet(null);
+        reservation.setDestinationOutlet(null);
 
         return reservation;
+    }
+
+    @WebMethod(operationName = "retrieveOutlet")
+    public Outlet retrieveOutlet(@WebParam(name = "outletId") long outletId) throws ReservationRecordNotFoundException {
+        Outlet outlet = outletSessionBeanLocal.retrieveOutlet(outletId);
+
+        em.detach(outlet);
+        List<Car> cars = outlet.getCarList();
+        
+        for (Car c : cars) {
+            c.setCurrentOutlet(null);
+        }
+        
+        outlet.setCarList(null);
+        outlet.setEmployeeList(null);
+        outlet.setInboundTransitDriverDispatchList(null);
+        em.flush();
+
+        return outlet;
+    }
+
+    @WebMethod(operationName = "reservationStringMaker")
+    public String reservationStringMaker(@WebParam(name = "reservationId") long reservationId) {
+        System.out.println("started");
+        String result = "";
+        try {
+            Reservation reservation = reservationSessionBeanLocal.retrieveReservation(reservationId);
+            /*em.detach(reservation);
+            System.out.println("string detach");*/
+
+            System.out.println("string ID: " + reservationId);
+
+            result = ", Category: " + reservation.getCarCategory().getCarCategoryName()
+                    + "\nPickup Time: " + reservation.getPickupTime().toString().replace("T", ", ")
+                    + " from " + reservation.getDepartureOutlet().getAddress()
+                    + "\nReturn Time: " + reservation.getReturnTime().toString().replace("T", ", ")
+                    + " to " + reservation.getDestinationOutlet().getAddress();
+            System.out.println("string generated");
+
+        } catch (ReservationRecordNotFoundException ex) {
+            System.out.println("empty");
+        }
+        return result;
     }
 
     @WebMethod(operationName = "cancelReservation")
@@ -283,9 +350,10 @@ public class PartnerWebService {
     }
 
     @WebMethod(operationName = "calculatePenalty")
-    public BigDecimal calculatePenalty(@WebParam(name = "totalCost") BigDecimal totalCost, @WebParam(name = "reservation") Reservation reservation) throws ReservationRecordNotFoundException {
+    public BigDecimal calculatePenalty(@WebParam(name = "totalCost") BigDecimal totalCost, @WebParam(name = "pickupGreg") Date pickupGreg) throws ReservationRecordNotFoundException {
         BigDecimal penalty = new BigDecimal("0.00");
-        LocalDateTime pickup = reservation.getPickupTime();
+
+        LocalDateTime pickup = pickupGreg.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
         if (LocalDateTime.now().isBefore(pickup.minusDays(14))) {
             //System.out.println("more than 14 before");

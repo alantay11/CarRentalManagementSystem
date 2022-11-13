@@ -8,6 +8,7 @@ package holidayreservationsystemwebclient;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.InputMismatchException;
@@ -119,7 +120,7 @@ public class MainApp {
                 } else if (response == 4) {
                     doViewReservationDetails();
                 } else if (response == 5) {
-                    doViewAllMyReservations();
+                    doViewAllMyActiveReservations();
                 } else if (response == 6) {
                     break;
                 } else {
@@ -171,7 +172,6 @@ public class MainApp {
         long categoryId;
         boolean available = false;
         Reservation reservation = new Reservation();
-        reservation.setPartner(currentPartner);
 
         // cannot copy paste, need manual coding
         System.out.print("Enter pickup date in the format YYYY-MM-DD> ");
@@ -184,6 +184,8 @@ public class MainApp {
         System.out.print("Enter return time in the format HH:MM> ");
         endTime = scanner.nextLine().trim();
         returnDateTime = endDate + "T" + endTime;
+        reservation.setPickupString(pickUpDateTime);
+        reservation.setReturnString(returnDateTime);
 
         List<Outlet> outlets = partnerWebServicePort.retrieveAllOutlets();
 
@@ -223,6 +225,7 @@ public class MainApp {
         Reservation reservation = new Reservation();
         long makeModelId = -1;
         long categoryId = -1;
+        reservation.setPartner(currentPartner);
 
         try {
             //System.out.println("*** CaRMSRC System :: Customer :: Search Car ***\n");
@@ -248,6 +251,8 @@ public class MainApp {
             System.out.print("Enter return time in the format HH:MM> ");
             endTime = scanner.nextLine().trim();
             returnDateTime = endDate + "T" + endTime;
+            reservation.setPickupString(pickUpDateTime);
+            reservation.setReturnString(returnDateTime);
 
             Date pickupDate = Date.from(LocalDateTime.parse(pickUpDateTime).atZone(ZoneId.systemDefault()).toInstant());
             Date returnDate = Date.from(LocalDateTime.parse(returnDateTime).atZone(ZoneId.systemDefault()).toInstant());
@@ -272,10 +277,14 @@ public class MainApp {
             System.out.print("Enter pickup outlet ID> ");
             pickupOutletId = scanner.nextLong();
             scanner.nextLine();
+            Outlet departureOutlet = partnerWebServicePort.retrieveOutlet(pickupOutletId);
+            reservation.setDepartureOutlet(departureOutlet);
 
             System.out.print("Enter return outlet ID> ");
             returnOutletId = scanner.nextLong();
             scanner.nextLine();
+            Outlet returnOutlet = partnerWebServicePort.retrieveOutlet(returnOutletId);
+            reservation.setDestinationOutlet(returnOutlet);
 
             System.out.print("Do you want to search by Make and Model? (Y/N)> ");
             String searchByMakeModel = scanner.nextLine().trim().toLowerCase();
@@ -328,10 +337,15 @@ public class MainApp {
 
         } catch (DatatypeConfigurationException ex) {
             System.out.println("You have input invalid dates or times!");
+        } catch (ReservationRecordNotFoundException_Exception ex) {
+            System.out.println("No reservation found!");
         }
         if (makeModelId != -1 && categoryId == -1) {
             categoryId = partnerWebServicePort.retrieveCategoryIdOfModel(makeModelId);
         }
+
+        CarCategory carCategory = partnerWebServicePort.retrieveCategory(categoryId);
+        reservation.setCarCategory(carCategory);
         return new Pair<Reservation, Long>(reservation, categoryId);
     }
 
@@ -468,7 +482,11 @@ public class MainApp {
             System.out.println("*** HRS :: Partner :: Cancel Reservation ***\n");
             Scanner scanner = new Scanner(System.in);
 
-            doViewAllMyActiveReservations();
+            boolean empty = doViewAllMyActiveReservations();
+            if (empty) {
+                return;
+            }
+
             System.out.print("Enter ID of reservation you want to delete> ");
             long reservationId = scanner.nextLong();
             Reservation reservation = partnerWebServicePort.retrieveReservation(reservationId);
@@ -476,7 +494,14 @@ public class MainApp {
 
             BigDecimal totalCost = reservation.getPrice();
 
-            BigDecimal penalty = partnerWebServicePort.calculatePenalty(totalCost, reservation);
+            Date pickupDate = Date.from(LocalDateTime.parse(reservation.getPickupString()).atZone(ZoneId.systemDefault()).toInstant());
+            Date returnDate = Date.from(LocalDateTime.parse(reservation.getReturnString()).atZone(ZoneId.systemDefault()).toInstant());
+
+            cal.setTime(pickupDate);
+            XMLGregorianCalendar pickupGreg = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+            XMLGregorianCalendar gregPickup = DatatypeFactory.newInstance().newXMLGregorianCalendar(cal);
+
+            BigDecimal penalty = partnerWebServicePort.calculatePenalty(totalCost, gregPickup);
             BigDecimal refund = totalCost.subtract(penalty);
             //System.out.println("total " + totalCost + " pickup " + pickup + " penalty " + penalty);
 
@@ -510,6 +535,8 @@ public class MainApp {
             }
         } catch (ReservationRecordNotFoundException_Exception ex) {
             System.out.println("You have input an invalid reservation");
+        } catch (DatatypeConfigurationException ex) {
+            Logger.getLogger(MainApp.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -518,18 +545,25 @@ public class MainApp {
             System.out.println("*** HRS :: Customer :: View Reservation Details ***\n");
             Scanner scanner = new Scanner(System.in);
             List<Reservation> reservations = getAllMyReservations();
+
+            if (reservations.isEmpty()) {
+                System.out.println("No reservations have been made!");
+                return;
+            }
             System.out.println("\n-----------------------------------");
-            for (Reservation r : reservations) {
-                System.out.println("ID: " + r.getReservationId() + ", Pickup at: " + r.getPickupTime() + " from " + r.getDepartureOutlet());
+            for (Reservation reservation : reservations) {
+                if (!reservation.isCancelled()) {
+                    String reserv = partnerWebServicePort.reservationStringMaker(reservation.getReservationId());
+                    System.out.println("ID: " + reservation.getReservationId() + reserv);
+                }
             }
             System.out.println("-----------------------------------\n");
             System.out.print("Enter ID of reservation you want to view> ");
             long reservationId = scanner.nextLong();
             scanner.nextLine();
             Reservation reservation = partnerWebServicePort.retrieveReservation(reservationId);
-            System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
-                    + " from " + reservation.getDepartureOutlet().getAddress()
-                    + " to " + reservation.getDestinationOutlet().getAddress());
+            String specific = partnerWebServicePort.reservationStringMaker(reservation.getReservationId());
+            System.out.println("ID: " + reservation.getReservationId() + specific);
             System.out.print("Press enter to continue>");
             scanner.nextLine();
             System.out.println();
@@ -542,17 +576,21 @@ public class MainApp {
         return partnerWebServicePort.retrieveAllPartnerReservations(currentPartner.getPartnerId());
     }
 
-    private void doViewAllMyActiveReservations() {
+    private boolean doViewAllMyActiveReservations() {
         try {
             System.out.println("***HRS :: Partner :: View All Active Partner Reservations ***\n");
             Scanner scanner = new Scanner(System.in);
             List<Reservation> reservations = getAllMyReservations();
+
+            if (reservations.isEmpty()) {
+                System.out.println("No reservations have been made!");
+                return true;
+            }
             System.out.println("\n-----------------------------------");
             for (Reservation reservation : reservations) {
                 if (!reservation.isCancelled()) {
-                    System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
-                            + " from " + reservation.getDepartureOutlet().getAddress()
-                            + " to " + reservation.getDestinationOutlet().getAddress());
+                    String reserv = partnerWebServicePort.reservationStringMaker(reservation.getReservationId());
+                    System.out.println("ID: " + reservation.getReservationId() + reserv);
                 }
             }
             System.out.println("-----------------------------------\n");
@@ -561,21 +599,7 @@ public class MainApp {
         } catch (InputMismatchException ex) {
             System.out.println("Invalid input!");
         }
-    }
-
-    private void doViewAllMyReservations() {
-        System.out.println("*** HRS :: Partner :: View All Partner Reservations ***\n");
-        Scanner scanner = new Scanner(System.in);
-        List<Reservation> reservations = getAllMyReservations();
-        System.out.println("\n-----------------------------------");
-        for (Reservation reservation : reservations) {
-            System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
-                    + " from " + reservation.getDepartureOutlet().getAddress()
-                    + " to " + reservation.getDestinationOutlet().getAddress());
-        }
-        System.out.println("-----------------------------------\n");
-        System.out.print("Press enter to continue>");
-        scanner.nextLine();
+        return false;
     }
 
     class Pair<T, U> {

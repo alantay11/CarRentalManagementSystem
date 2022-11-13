@@ -55,6 +55,11 @@ public class Reservation implements Serializable {
     @Column(nullable = false, precision = 11, scale = 2)
     @Digits(integer = 6, fraction = 2)
     private BigDecimal refundAmount;
+    
+    @Column(length = 32)
+    private String pickupString;
+    @Column(length = 32)
+    private String returnString;
 
     @ManyToMany
     private List<RentalRate> rentalRateList;
@@ -90,6 +95,22 @@ public class Reservation implements Serializable {
         this.paid = false;
         this.price = new BigDecimal("0.00");
         this.refundAmount = new BigDecimal("0.00");
+    }
+
+    public String getPickupString() {
+        return pickupString;
+    }
+
+    public void setPickupString(String pickupString) {
+        this.pickupString = pickupString;
+    }
+
+    public String getReturnString() {
+        return returnString;
+    }
+
+    public void setReturnString(String returnString) {
+        this.returnString = returnString;
     }
 
     public boolean isPaid() {
@@ -250,7 +271,7 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "Reservation ID: " + this.reservationId + ", Category: " + this.carCategory.getCarCategoryName()
+        return "Reservation ID: " + this.reservationId +  ((this.carCategory == null) ? ", Category: " + this.carModel.getCarCategory().getCarCategoryName() : ", Category: " + this.carCategory.getCarCategoryName())
                 + "\nPickup Time: " + this.pickupTime.toString().replace("T", ", ")
                 + " from " + this.departureOutlet.getAddress()
                 + "\nReturn Time: " + this.returnTime.toString().replace("T", ", ")

@@ -56,7 +56,6 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     @Override
     public Partner retrievePartner(long partnerId) {
         Partner partner = em.find(Partner.class, partnerId);
-        partner.getCustomerList().size();
         return partner;
     }
 
@@ -65,10 +64,6 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         Query query = em.createQuery("SELECT p FROM Partner p");
 
         List<Partner> partners = query.getResultList();
-
-        for (Partner p : partners) {
-            p.getCustomerList().size();
-        }
         return partners;
     }
 
