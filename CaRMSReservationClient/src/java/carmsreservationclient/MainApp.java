@@ -511,6 +511,8 @@ public class MainApp {
                     } catch (InputDataValidationException ex) {
                         System.out.println(ex);
                     }
+                } else {
+                    showInputDataValidationErrorsForCreditCard(constraintViolations);
                 }
             } catch (DateTimeParseException ex) {
                 System.out.println("Invalid date or time entered, please try again");
@@ -603,7 +605,7 @@ public class MainApp {
             List<Reservation> reservations = getAllMyReservations();
             System.out.println("\n-----------------------------------");
             for (Reservation r : reservations) {
-                System.out.println("Reservation ID: " + r.getReservationId() + ", Category: " + r.getCarCategory().getCarCategoryName() + ", Pickup at: " 
+                System.out.println("Reservation ID: " + r.getReservationId() + ", Category: " + r.getCarCategory().getCarCategoryName() + ", Pickup at: "
                         + r.getPickupTime().toString().replace("T", ", ") + " from " + r.getDepartureOutlet().getAddress());
             }
             System.out.println("-----------------------------------\n");

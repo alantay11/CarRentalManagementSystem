@@ -8,6 +8,11 @@ package holidayreservationsystemwebclient;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import ws.client.partner.CarCategory;
 import ws.client.partner.CarModel;
 import ws.client.partner.CreditCard;
@@ -31,6 +36,9 @@ import ws.client.partner.ReservationRecordNotFoundException_Exception;
  */
 public class MainApp {
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+
     private PartnerWebService_Service partnerWebService_Service;
     private PartnerWebService partnerWebServicePort;
 
@@ -40,6 +48,8 @@ public class MainApp {
     public MainApp() {
         this.partnerWebService_Service = new PartnerWebService_Service();
         this.partnerWebServicePort = partnerWebService_Service.getPartnerWebServicePort();
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
     public void runApp() {
@@ -325,6 +335,23 @@ public class MainApp {
                         // calculate rentalrate costs and request payment then set reservation and create
                         System.out.println("\nReservation paid using " + creditCard.getCcNumber() + "\n");
                         reservation.setPaid(true);
+                        Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
+                        if (constraintViolations.isEmpty()) {
+                            try {
+                                reservation = partnerWebServicePort.createReservation(reservation);
+                            } catch (ReservationExistException_Exception ex) {
+                                System.out.println("Reservation already exists!\n");
+                            } catch (InputDataValidationException_Exception ex) {
+                                System.out.println(ex.getMessage() + "\n");
+                            }
+                        } else {
+                            showInputDataValidationErrorsForReservation(constraintViolations);
+                        }
+                    }
+                } else {
+                    System.out.println("\nPayment will be required upon pickup\n");
+                    Set<ConstraintViolation<Reservation>> constraintViolations = validator.validate(reservation);
+                    if (constraintViolations.isEmpty()) {
                         try {
                             reservation = partnerWebServicePort.createReservation(reservation);
                         } catch (ReservationExistException_Exception ex) {
@@ -332,21 +359,13 @@ public class MainApp {
                         } catch (InputDataValidationException_Exception ex) {
                             System.out.println(ex.getMessage() + "\n");
                         }
+                    } else {
+                        showInputDataValidationErrorsForReservation(constraintViolations);
                     }
-                } else {
-                    System.out.println("\nPayment will be required upon pickup\n");
-                    try {
-                        reservation = partnerWebServicePort.createReservation(reservation);
-                    } catch (ReservationExistException_Exception ex) {
-                        System.out.println("Reservation already exists!\n");
-                    } catch (InputDataValidationException_Exception ex) {
-                        System.out.println(ex.getMessage() + "\n");
-                    }
+
+                    System.out.println("\nNew reservation created with ID: " + reservation.getReservationId() + "\n");
                 }
-
-                System.out.println("\nNew reservation created with ID: " + reservation.getReservationId() + "\n");
             }
-
         } catch (NoRentalRateAvailableException_Exception ex) {
             System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
         }
@@ -377,14 +396,18 @@ public class MainApp {
         customer.setPostalCode(scanner.nextLine().trim());
         customer.setPartner(currentPartner);
 
-        try {
-            currentCustomer = partnerWebServicePort.createCustomer(customer);
-        } catch (CustomerExistException_Exception ex) {
-            System.out.println("Customer already exists!\n");
-        } catch (InputDataValidationException_Exception ex) {
-            System.out.println(ex.getMessage() + "\n");
+        Set<ConstraintViolation<Customer>> constraintViolations = validator.validate(customer);
+        if (constraintViolations.isEmpty()) {
+            try {
+                currentCustomer = partnerWebServicePort.createCustomer(customer);
+            } catch (CustomerExistException_Exception ex) {
+                System.out.println("Customer already exists!\n");
+            } catch (InputDataValidationException_Exception ex) {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        } else {
+            showInputDataValidationErrorsForCustomer(constraintViolations);
         }
-
         System.out.println("\nNew customer created with ID: " + currentCustomer.getCustomerId() + "\n");
         return currentCustomer;
     }
@@ -410,7 +433,9 @@ public class MainApp {
 
             System.out.print("Enter expiry date in the format YYYY-MM> ");
             String expiry = scanner.nextLine().trim() + "-01";
-            /*try {
+            /*Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate(creditCard);
+                if (constraintViolations.isEmpty()) {
+            try {
                 return partnerWebServicePort.createCreditCard(creditCard, currentCustomer.getCustomerId(), expiry);
 
             } catch (DateTimeParseException ex) {
@@ -419,6 +444,8 @@ public class MainApp {
                 System.out.println("Credit card already exists!");
             } catch (InputDataValidationException_Exception ex) {
                 System.out.println(ex);
+            } else {
+                    showInputDataValidationErrorsForCreditCard(constraintViolations);
             }*/
             return creditCard;
         }
@@ -526,8 +553,8 @@ public class MainApp {
         for (Reservation reservation : reservations) {
             if (!reservation.isCancelled()) {
                 System.out.println("Reservation ID: " + reservation.getReservationId() + ", Category: " + reservation.getCarCategory().getCarCategoryName()
-                    + " from " + reservation.getDepartureOutlet().getAddress()
-                    + " to " + reservation.getDestinationOutlet().getAddress());
+                        + " from " + reservation.getDepartureOutlet().getAddress()
+                        + " to " + reservation.getDestinationOutlet().getAddress());
             }
         }
         System.out.println("-----------------------------------\n");
@@ -535,4 +562,33 @@ public class MainApp {
         scanner.nextLine();
     }
 
+    private void showInputDataValidationErrorsForCustomer(Set<ConstraintViolation<Customer>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+
+    private void showInputDataValidationErrorsForReservation(Set<ConstraintViolation<Reservation>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+
+    private void showInputDataValidationErrorsForCreditCard(Set<ConstraintViolation<CreditCard>> constraintViolations) {
+        System.out.println("\nInput data validation error!:");
+
+        for (ConstraintViolation constraintViolation : constraintViolations) {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
 }
