@@ -34,6 +34,8 @@ public class TransitDriverDispatchSessionBean implements TransitDriverDispatchSe
     // c
     @Override
     public void createNewDispatchRecord(Reservation reservation, TransitDriverDispatch newDispatchRecord) {
+        newDispatchRecord.setCar(reservation.getCar());
+        newDispatchRecord.setDestinationOutlet(reservation.getDepartureOutlet());
         em.persist(newDispatchRecord);
 
         // set bi assoc

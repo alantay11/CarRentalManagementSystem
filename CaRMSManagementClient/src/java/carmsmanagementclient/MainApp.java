@@ -12,6 +12,7 @@ import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchSessionBeanRemote;
 import entity.Employee;
 import enumeration.EmployeeAccessRightEnum;
@@ -33,6 +34,7 @@ public class MainApp {
     private CarSessionBeanRemote carSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private TransitDriverDispatchSessionBeanRemote transitDriverDispatchSessionBeanRemote;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
     private SalesManagerModule salesManagerModule;
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
@@ -44,7 +46,8 @@ public class MainApp {
     }
 
     public MainApp(CarModelSessionBeanRemote carModelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote,
-            OutletSessionBeanRemote outletSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, TransitDriverDispatchSessionBeanRemote transitDriverDispatchSessionBeanRemote) {
+            OutletSessionBeanRemote outletSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, TransitDriverDispatchSessionBeanRemote transitDriverDispatchSessionBeanRemote,
+            ReservationSessionBeanRemote reservationSessionBeanRemote) {
         this.carModelSessionBeanRemote = carModelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
@@ -53,6 +56,7 @@ public class MainApp {
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.transitDriverDispatchSessionBeanRemote = transitDriverDispatchSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
     }
 
     public void runApp() {
@@ -83,7 +87,7 @@ public class MainApp {
                                 operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote, transitDriverDispatchSessionBeanRemote);
                                 operationsManagerModule.operationsManagerMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE)) {
-                                customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote);
+                                customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote, reservationSessionBeanRemote);
                                 customerServiceExecutiveModule.customerServiceExecutiveMenu();
                             } else if (currentEmployee.getAccessRight().equals(EmployeeAccessRightEnum.SYSTEMADMINISTRATOR)) {
                                 sysAdminMenu();
@@ -163,7 +167,7 @@ public class MainApp {
                         operationsManagerModule = new OperationsManagerModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, carModelSessionBeanRemote, carSessionBeanRemote, outletSessionBeanRemote, transitDriverDispatchSessionBeanRemote);
                         operationsManagerModule.operationsManagerMenu();
                     } else if (response == 7) {
-                        customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote);
+                        customerServiceExecutiveModule = new CustomerServiceExecutiveModule(employeeSessionBeanRemote, rentalRateSessionBeanRemote, carCategorySessionBeanRemote, customerSessionBeanRemote, reservationSessionBeanRemote);
                         customerServiceExecutiveModule.customerServiceExecutiveMenu();
                     } else if (response == 8) {
                         break;

@@ -7,7 +7,6 @@ package entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,8 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
 
 /**
  *
@@ -30,23 +27,23 @@ public class TransitDriverDispatch implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transitDriverDispatchId;
 
-    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    /*@Column(columnDefinition = "TIMESTAMP", nullable = false)
     @NotNull
     @Future
     private LocalDateTime pickupTime;
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     @NotNull
     @Future
-    private LocalDateTime dropoffTime;
+    private LocalDateTime dropoffTime;*/
 
     @OneToOne(mappedBy = "transitDriverDispatchRecord")
     private Car car;
     @OneToOne(mappedBy = "transitDriverDispatchRecord")
     private Employee employee;
 
-    @ManyToOne(optional = false)
+    /*@ManyToOne(optional = false)
     @JoinColumn(nullable = false)
-    private Outlet departureOutlet;
+    private Outlet departureOutlet;*/
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet destinationOutlet;
@@ -59,15 +56,15 @@ public class TransitDriverDispatch implements Serializable {
     }
 
     public TransitDriverDispatch(LocalDateTime pickupTime, LocalDateTime dropoffTime, Car car, Employee employee, Outlet departureOutlet, Outlet destinationOutlet) {
-        this.pickupTime = pickupTime;
-        this.dropoffTime = dropoffTime;
+        //this.pickupTime = pickupTime;
+        //this.dropoffTime = dropoffTime;
         this.car = car;
         this.employee = employee;
-        this.departureOutlet = departureOutlet;
+        //this.departureOutlet = departureOutlet;
         this.destinationOutlet = destinationOutlet;
     }
 
-    public LocalDateTime getPickupTime() {
+    /*public LocalDateTime getPickupTime() {
         return pickupTime;
     }
 
@@ -81,7 +78,7 @@ public class TransitDriverDispatch implements Serializable {
 
     public void setDropoffTime(LocalDateTime dropoffTime) {
         this.dropoffTime = dropoffTime;
-    }
+    }*/
 
     public Car getCar() {
         return car;
@@ -99,13 +96,13 @@ public class TransitDriverDispatch implements Serializable {
         this.employee = employee;
     }
 
-    public Outlet getDepartureOutlet() {
+    /*public Outlet getDepartureOutlet() {
         return departureOutlet;
     }
 
     public void setDepartureOutlet(Outlet departureOutlet) {
         this.departureOutlet = departureOutlet;
-    }
+    }*/
 
     public Outlet getDestinationOutlet() {
         return destinationOutlet;
@@ -153,9 +150,9 @@ public class TransitDriverDispatch implements Serializable {
 
     @Override
     public String toString() {
-        return "TransitDriverDispatch id=" + transitDriverDispatchId + " for car " + this.car + " from " + this.departureOutlet.getAddress() + " at " + this.pickupTime
-                + " to " + this.destinationOutlet.getAddress() + " at " + this.dropoffTime + " by " + this.employee.getFirstName() + " " + this.employee.getLastName() + 
-                "\nfor " + this.reservation;
+        return "TransitDriverDispatch ID: " + transitDriverDispatchId + " , Car: " + this.car //+  ", Pickup: " + this.pickupTime
+                + " To: " + this.destinationOutlet.getAddress();// + ", Dropoff: " + this.dropoffTime;// + " by " + this.employee.getFirstName() + " " + this.employee.getLastName() + 
+                //"\nfor " + this.reservation;
     }
 
 }

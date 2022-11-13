@@ -12,6 +12,7 @@ import exception.ReservationRecordNotFoundException;
 import exception.UpdateReservationStatusFailException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -34,6 +35,8 @@ public interface ReservationSessionBeanLocal {
 
     Reservation createReservation(Reservation reservation) throws ReservationExistException, InputDataValidationException;
 
-    void cancelReservation(long reservationId, BigDecimal refundAmount);
+    void cancelReservation(long reservationId, BigDecimal refundAmount) throws ReservationRecordNotFoundException;
+
+    void allocateCars(LocalDateTime dateTime);
 
 }

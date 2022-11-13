@@ -14,17 +14,12 @@ import entity.CreditCard;
 import entity.Customer;
 import entity.Reservation;
 import exception.CustomerNotFoundException;
-import exception.InputDataValidationException;
-import exception.ReservationExistException;
 import exception.ReservationRecordNotFoundException;
 import exception.UpdateReservationStatusFailException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -50,7 +45,7 @@ public class CustomerServiceExecutiveModule {
     }
 
     public CustomerServiceExecutiveModule(EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote,
-            CarCategorySessionBeanRemote carCategorySessionBean, CustomerSessionBeanRemote customerSessionBeanRemote) {
+            CarCategorySessionBeanRemote carCategorySessionBean, CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBean;
@@ -69,10 +64,11 @@ public class CustomerServiceExecutiveModule {
             System.out.println("*** CaRMSMC System :: Customer Service Executive ***\n");
             System.out.println("1: Pickup Car");
             System.out.println("2: Return car");
-            System.out.println("3: Logout\n");
+            System.out.println("3: Allocate Cars to Current Day Reservations");
+            System.out.println("4: Logout\n");
             response = 0;
 
-            while (response < 1 || response > 3) {
+            while (response < 1 || response > 4) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -82,13 +78,15 @@ public class CustomerServiceExecutiveModule {
                 } else if (response == 2) {
                     doReturnCar();
                 } else if (response == 3) {
+                    allocateCars();
+                } else if (response == 4) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 3) {
+            if (response == 4) {
                 break;
             }
         }
@@ -184,5 +182,19 @@ public class CustomerServiceExecutiveModule {
         } catch (CustomerNotFoundException ex) {
             System.out.println("You have input an invalid username");
         }
+    }
+
+    private void allocateCars() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter date in the format YYYY-MM-DD> ");
+        String date = scanner.nextLine().trim();
+        System.out.print("Enter time in the format HH:MM> ");
+        String time = scanner.nextLine().trim();
+        LocalDateTime dateTime = LocalDateTime.parse(date + "T" + time);
+
+        reservationSessionBeanRemote.allocateCars(dateTime);
+
+        System.out.println("Allocation complete");
+
     }
 }

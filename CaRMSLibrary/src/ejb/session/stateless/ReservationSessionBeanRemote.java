@@ -12,6 +12,7 @@ import exception.ReservationRecordNotFoundException;
 import exception.UpdateReservationStatusFailException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import javax.ejb.Remote;
 
@@ -26,7 +27,7 @@ public interface ReservationSessionBeanRemote {
 
     Reservation retrieveReservation(long reservationId) throws ReservationRecordNotFoundException;
 
-    void cancelReservation(long reservationId, BigDecimal refundAmount);
+    void cancelReservation(long reservationId, BigDecimal refundAmount) throws ReservationRecordNotFoundException;
 
     Reservation createReservation(Reservation reservation) throws ReservationExistException, InputDataValidationException;
 
@@ -37,5 +38,7 @@ public interface ReservationSessionBeanRemote {
     public Reservation pickupCar(long reservationId) throws UpdateReservationStatusFailException;
 
     Reservation returnCar(long reservationId) throws UpdateReservationStatusFailException;
+
+    void allocateCars(LocalDateTime dateTime);
     
 }

@@ -177,6 +177,7 @@ public class MainApp {
         if (constraintViolations.isEmpty()) {
             try {
                 customer = customerSessionBeanRemote.createCustomer(customer);
+                System.out.println("\n" + customer.toString() + ", registered!\n");
             } catch (CustomerExistException ex) {
                 System.out.println("Customer already exists!\n");
             } catch (InputDataValidationException ex) {
@@ -185,9 +186,6 @@ public class MainApp {
         } else {
             showInputDataValidationErrorsForCustomer(constraintViolations);
         }
-
-        System.out.println("\n" + customer.toString() + ", registered!\n");
-
     }
 
     private void customerMenu() {
@@ -299,7 +297,7 @@ public class MainApp {
                     } catch (NoRentalRateAvailableException ex) {
                         System.out.println("\nNo rental rates are available for your reservation, please try again with a different reservation\n");
                     }
-                }      */          
+                }      */
             } else {
                 System.out.println("No cars are available for the specified times and outlets\n");
                 reservation = null;
@@ -485,35 +483,37 @@ public class MainApp {
         LocalDate expiryDate;
 
         while (true) {
-            System.out.print("Enter name on credit card> ");
-            nameOnCC = scanner.nextLine().trim();
-            creditCard.setNameonCC(nameOnCC);
-            System.out.print("Enter credit card number> ");
-            ccNumber = scanner.nextLine().trim();
-            creditCard.setCcNumber(ccNumber);
-            System.out.print("Enter credit card cvv> ");
-            cvv = scanner.nextLine().trim();
-            creditCard.setCvv(cvv);
+            try {
+                System.out.print("Enter name on credit card> ");
+                nameOnCC = scanner.nextLine().trim();
+                creditCard.setNameonCC(nameOnCC);
+                System.out.print("Enter credit card number> ");
+                ccNumber = scanner.nextLine().trim();
+                creditCard.setCcNumber(ccNumber);
+                System.out.print("Enter credit card cvv> ");
+                cvv = scanner.nextLine().trim();
+                creditCard.setCvv(cvv);
 
-            System.out.print("Enter expiry date in the format YYYY-MM> ");
-            String expiry = scanner.nextLine().trim() + "-01";
-            expiryDate = LocalDate.parse(expiry);
-            expiryDate = YearMonth.from(expiryDate).atEndOfMonth();
-            //System.out.println(expiryDate);
-            creditCard.setExpiryDate(expiryDate);
+                System.out.print("Enter expiry date in the format YYYY-MM> ");
+                String expiry = scanner.nextLine().trim() + "-01";
+                expiryDate = LocalDate.parse(expiry);
+                expiryDate = YearMonth.from(expiryDate).atEndOfMonth();
+                //System.out.println(expiryDate);
+                creditCard.setExpiryDate(expiryDate);
 
-            Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate(creditCard);
-            if (constraintViolations.isEmpty()) {
-                try {
-                    return creditCardSessionBeanRemote.createCreditCard(creditCard, currentCustomer.getCustomerId());
+                Set<ConstraintViolation<CreditCard>> constraintViolations = validator.validate(creditCard);
+                if (constraintViolations.isEmpty()) {
+                    try {
+                        return creditCardSessionBeanRemote.createCreditCard(creditCard, currentCustomer.getCustomerId());
 
-                } catch (DateTimeParseException ex) {
-                    System.out.println("Invalid date or time entered, please try again");
-                } catch (CreditCardExistException ex) {
-                    System.out.println("Credit card already exists!");
-                } catch (InputDataValidationException ex) {
-                    System.out.println(ex);
+                    } catch (CreditCardExistException ex) {
+                        System.out.println("Credit card already exists!");
+                    } catch (InputDataValidationException ex) {
+                        System.out.println(ex);
+                    }
                 }
+            } catch (DateTimeParseException ex) {
+                System.out.println("Invalid date or time entered, please try again");
             }
         }
     }
@@ -545,7 +545,9 @@ public class MainApp {
                 if (confirmation.equals("y")) {
                     reservationSessionBeanRemote.cancelReservation(reservationId, refund);
                     System.out.println("\n" + reservation.toString() + " cancelled\n");
-                    System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+                    if (!penalty.equals(new BigDecimal("0.00"))) {
+                        System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+                    }
 
                 } else {
                     System.out.println("\nCancellation cancelled\n");
@@ -558,8 +560,9 @@ public class MainApp {
                 if (confirmation.equals("y")) {
                     reservationSessionBeanRemote.cancelReservation(reservationId, refund);
                     System.out.println("\n" + reservation.toString() + " cancelled\n");
-                    System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
-
+                    if (!penalty.equals(new BigDecimal("0.00"))) {
+                        System.out.println("Penalty has been charged to your saved credit card\n");// + reservation.getCustomer().getCreditCard().getCcNumber() + "\n");
+                    }
                 } else {
                     System.out.println("\nCancellation cancelled\n");
                 }
@@ -600,7 +603,8 @@ public class MainApp {
             List<Reservation> reservations = getAllMyReservations();
             System.out.println("\n-----------------------------------");
             for (Reservation r : reservations) {
-                System.out.println("ID: " + r.getReservationId() + ", Pickup at: " + r.getPickupTime().toString().replace("T", ", ") + " from " + r.getDepartureOutlet());
+                System.out.println("Reservation ID: " + r.getReservationId() + ", Category: " + r.getCarCategory().getCarCategoryName() + ", Pickup at: " 
+                        + r.getPickupTime().toString().replace("T", ", ") + " from " + r.getDepartureOutlet().getAddress());
             }
             System.out.println("-----------------------------------\n");
             System.out.print("Enter ID of reservation you want to view> ");

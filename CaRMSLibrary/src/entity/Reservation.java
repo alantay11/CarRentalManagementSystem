@@ -48,9 +48,6 @@ public class Reservation implements Serializable {
     private boolean cancelled;
     @Column(nullable = false, columnDefinition = "boolean default false")
     @NotNull
-    private boolean requiresTransfer;
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    @NotNull
     private boolean paid;
     @Column(nullable = false, precision = 11, scale = 2)
     @Digits(integer = 6, fraction = 2)
@@ -80,19 +77,16 @@ public class Reservation implements Serializable {
     @ManyToOne
     private Outlet destinationOutlet;
 
-
-    @OneToOne(mappedBy = "reservation",optional = true)
+    @OneToOne(mappedBy = "reservation", optional = true)
     private TransitDriverDispatch transitDriverDispatch;
-    
+
     @ManyToOne
     @JoinColumn(nullable = true)
     private Partner partner;
-    
-    
+
     public Reservation() {
         this.rentalRateList = new ArrayList<>();
         this.cancelled = false;
-        this.requiresTransfer = false;
         this.paid = false;
         this.paymentAmount = new BigDecimal("0.00");
         this.refundAmount = new BigDecimal("0.00");
@@ -104,14 +98,6 @@ public class Reservation implements Serializable {
 
     public void setPaid(boolean paid) {
         this.paid = paid;
-    }
-
-    public boolean isRequiresTransfer() {
-        return requiresTransfer;
-    }
-
-    public void setRequiresTransfer(boolean requiresTransfer) {
-        this.requiresTransfer = requiresTransfer;
     }
 
     public BigDecimal getPaymentAmount() {
@@ -264,11 +250,11 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "Reservation ID: " + this.reservationId + ", Pickup Time: " + this.pickupTime.toString().replace("T", ", ")
+        return "Reservation ID: " + this.reservationId + ", Category: " + this.carCategory.getCarCategoryName()
+                + "\nPickup Time: " + this.pickupTime.toString().replace("T", ", ")
                 + " from " + this.departureOutlet.getAddress()
                 + "\nReturn Time: " + this.returnTime.toString().replace("T", ", ")
                 + " to " + this.destinationOutlet.getAddress();
-                //+ " with rental rates " + this.rentalRateList;
     }
 
 }
