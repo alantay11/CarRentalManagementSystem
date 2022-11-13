@@ -88,7 +88,7 @@ public class DataInitSessionBean {
         //////////
 
         ////////// Employee
-        Employee systemAdmin = new Employee("system", "manager", "sys", "password", EmployeeAccessRightEnum.SYSTEMADMINISTRATOR, outletA);
+        //Employee systemAdmin = new Employee("system", "manager", "sys", "password", EmployeeAccessRightEnum.SYSTEMADMINISTRATOR, outletA);
         Employee a1 = new Employee("sales", "A", "a1", "password", EmployeeAccessRightEnum.SALESMANAGER, outletA);
         Employee a2 = new Employee("ops", "A", "a2", "password", EmployeeAccessRightEnum.OPERATIONSMANAGER, outletA);
         Employee a3 = new Employee("cse", "A", "a3", "password", EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE, outletA);
@@ -104,7 +104,7 @@ public class DataInitSessionBean {
         Employee c3 = new Employee("cse", "C", "c3", "password", EmployeeAccessRightEnum.CUSTOMERSERVICEEXECUTIVE, outletC);
 
         if (em.find(Employee.class, 1l) == null) {
-            employeeSessionBeanLocal.createEmployee(systemAdmin, outletA.getOutletId());
+            //employeeSessionBeanLocal.createEmployee(systemAdmin, outletA.getOutletId());
 
             employeeSessionBeanLocal.createEmployee(a1, outletA.getOutletId());
             employeeSessionBeanLocal.createEmployee(a2, outletA.getOutletId());

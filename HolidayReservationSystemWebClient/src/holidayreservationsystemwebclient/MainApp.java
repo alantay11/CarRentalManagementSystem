@@ -49,8 +49,6 @@ public class MainApp {
     private Customer currentCustomer;
 
     private GregorianCalendar cal = new GregorianCalendar();
-    private LocalDateTime globalPickup;
-    private LocalDateTime globalReturn;
     private XMLGregorianCalendar globalGregPickup;
     private XMLGregorianCalendar globalGregReturn;
 

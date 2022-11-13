@@ -78,7 +78,15 @@
 
 <xs:element name="retrieveReservation" type="tns:retrieveReservation"/>
 
+<xs:element name="retrieveReservationPickupTime" type="tns:retrieveReservationPickupTime"/>
+
+<xs:element name="retrieveReservationPickupTimeResponse" type="tns:retrieveReservationPickupTimeResponse"/>
+
 <xs:element name="retrieveReservationResponse" type="tns:retrieveReservationResponse"/>
+
+<xs:element name="retrieveReservationReturnTime" type="tns:retrieveReservationReturnTime"/>
+
+<xs:element name="retrieveReservationReturnTimeResponse" type="tns:retrieveReservationReturnTimeResponse"/>
 
 <xs:element name="searchCar" type="tns:searchCar"/>
 
@@ -91,6 +99,35 @@
 <xs:element name="searchCarByMakeModelResponse" type="tns:searchCarByMakeModelResponse"/>
 
 <xs:element name="searchCarResponse" type="tns:searchCarResponse"/>
+
+<xs:complexType name="cancelReservation">
+<xs:sequence>
+<xs:element name="reservationId" type="xs:long"/>
+<xs:element name="refund" type="xs:decimal" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="cancelReservationResponse">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="ReservationRecordNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveCategoryIdOfModel">
+<xs:sequence>
+<xs:element name="makemodelId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveCategoryIdOfModelResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
 
 <xs:complexType name="retrieveCategory">
 <xs:sequence>
@@ -261,35 +298,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="cancelReservation">
-<xs:sequence>
-<xs:element name="reservationId" type="xs:long"/>
-<xs:element name="refund" type="xs:decimal" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="cancelReservationResponse">
-<xs:sequence/>
-</xs:complexType>
-
-<xs:complexType name="ReservationRecordNotFoundException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="retrieveCategoryIdOfModel">
-<xs:sequence>
-<xs:element name="makemodelId" type="xs:long"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="retrieveCategoryIdOfModelResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:long"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="searchCarByCategory">
 <xs:sequence>
 <xs:element name="categoryId" type="xs:long"/>
@@ -324,21 +332,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="searchCar">
-<xs:sequence>
-<xs:element name="pickUpDateTime" type="xs:string" minOccurs="0"/>
-<xs:element name="returnDateTime" type="xs:string" minOccurs="0"/>
-<xs:element name="pickupOutletId" type="xs:long"/>
-<xs:element name="returnOutletId" type="xs:long"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="searchCarResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:boolean"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="calculateTotalCost">
 <xs:sequence>
 <xs:element name="pickupGreg" type="xs:dateTime" minOccurs="0"/>
@@ -359,6 +352,33 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="retrieveReservationReturnTime">
+<xs:sequence>
+<xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveReservationReturnTimeResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="searchCar">
+<xs:sequence>
+<xs:element name="pickUpDateTime" type="xs:string" minOccurs="0"/>
+<xs:element name="returnDateTime" type="xs:string" minOccurs="0"/>
+<xs:element name="pickupOutletId" type="xs:long"/>
+<xs:element name="returnOutletId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="searchCarResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="searchCarByMakeModel">
 <xs:sequence>
 <xs:element name="makeModelId" type="xs:long"/>
@@ -372,6 +392,18 @@
 <xs:complexType name="searchCarByMakeModelResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveReservationPickupTime">
+<xs:sequence>
+<xs:element name="reservation" type="tns:reservation" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="retrieveReservationPickupTimeResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -426,30 +458,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="createCustomer">
-<xs:sequence>
-<xs:element name="customer" type="tns:customer" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="createCustomerResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:customer" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="InputDataValidationException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="CustomerExistException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="retrieveReservation">
 <xs:sequence>
 <xs:element name="reservationId" type="xs:long"/>
@@ -477,6 +485,30 @@
 </xs:complexType>
 
 <xs:complexType name="ReservationExistException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="InputDataValidationException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="createCustomer">
+<xs:sequence>
+<xs:element name="customer" type="tns:customer" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="createCustomerResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:customer" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="CustomerExistException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
